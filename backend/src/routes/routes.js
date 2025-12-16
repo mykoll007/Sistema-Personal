@@ -63,13 +63,15 @@ router.get('/cron/limpar-videos', async (req, res) => {
     const secret = req.headers['x-cron-secret'];
 
     if (secret !== process.env.CRON_SECRET) {
-        return res.status(401).json({ message: 'Não autorizado' });
+        return res.status(403).json({ message: 'Não autorizado' });
     }
 
     try {
-        await limparVideosOrfaos();
+        await limparVideosOrfaos(); // sua função de limpeza
+        console.log('Cron executado com sucesso');
         res.json({ ok: true });
-    } catch {
+    } catch (err) {
+        console.error('Erro ao executar cron:', err);
         res.status(500).json({ error: 'Erro ao executar limpeza' });
     }
 });
