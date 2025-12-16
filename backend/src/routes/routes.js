@@ -62,16 +62,20 @@ router.get('/aluno/treinos', authAluno, AlunoController.listarTreinos);
 router.get('/cron/limpar-videos', async (req, res) => {
     const secret = req.headers['x-cron-secret'];
 
+    console.log('Recebendo requisição de cron com segredo:', secret);
+
     if (secret !== process.env.CRON_SECRET) {
+        console.log('Erro: segredo não confere');
         return res.status(403).json({ message: 'Não autorizado' });
     }
 
     try {
-        await limparVideosOrfaos(); // sua função de limpeza
-        console.log('Cron executado com sucesso');
+        console.log('Iniciando a limpeza dos vídeos...');
+        await limparVideosOrfaos(); // Sua função
+        console.log('Limpeza concluída com sucesso');
         res.json({ ok: true });
     } catch (err) {
-        console.error('Erro ao executar cron:', err);
+        console.error('Erro ao executar cron:', err); // Log do erro completo
         res.status(500).json({ error: 'Erro ao executar limpeza' });
     }
 });
