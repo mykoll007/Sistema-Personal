@@ -1,0 +1,55 @@
+#fotoTopbar {
+    cursor: pointer;
+}
+
+#listaCategoriasTreinos {
+    max-width: 1000px;
+    /* largura máxima */
+    margin: 0 auto;
+    /* centraliza */
+}
+/* Menu do perfil */
+#menuPerfil {
+    position: fixed;
+    top: 60px; /* abaixo da topbar */
+    right: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    display: none;
+    z-index: 1050; /* acima do topbar */
+    min-width: 150px;
+}
+#toastMessage {
+    z-index: 3000; /* abaixo do menu */
+}
+#modalTreinos, #modalConfigTreinos{
+    z-index: 3000;
+}
+#menuPerfil a {
+    display: block;
+    padding: 10px 15px;
+    color: #5a5c69;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+#menuPerfil a:hover {
+    background-color: #f8f9fc;
+}
+
+.menu-divider {
+    height: 1px;
+    background-color: #ddd;
+    margin: 5px 0;
+}
+
+#btnPerfil {
+    cursor: pointer;
+    z-index: 1100; /* acima de outros elementos */
+}
+
+#dev{
+    font-size: 16px;
+}

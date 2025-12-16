@@ -1,0 +1,11 @@
+{
+  "crons": [
+    {
+      "path": "/cron/limpar-videos",
+      "schedule": "0 3 * * *",
+      "headers": {
+        "x-cron-secret": "limpezadevideoautomatico"
+      }
+    }
+  ]
+}

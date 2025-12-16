@@ -1,0 +1,123 @@
+#fotoTopbar {
+    z-index: 9999;
+    cursor: pointer;
+}
+
+#listaCategoriasTreinos {
+    max-width: 1000px;
+    /* largura máxima */
+    margin: 0 auto;
+    /* centraliza */
+}
+/* Menu do perfil */
+#menuPerfil {
+    position: fixed;
+    top: 60px; /* abaixo da topbar */
+    right: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    display: none;
+    z-index: 1050; /* acima do topbar */
+    min-width: 150px;
+}
+#toastMessage {
+    z-index: 1000; /* abaixo do menu */
+}
+
+#menuPerfil a {
+    display: block;
+    padding: 10px 15px;
+    color: #5a5c69;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+#menuPerfil a:hover {
+    background-color: #f8f9fc;
+}
+
+.menu-divider {
+    height: 1px;
+    background-color: #ddd;
+    margin: 5px 0;
+}
+
+#btnPerfil {
+    cursor: pointer;
+    z-index: 1100; /* acima de outros elementos */
+}
+
+.profile-container {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .profile-pic-wrapper {
+            text-align: center;
+        }
+
+        .profile-pic {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #4e73df;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .profile-pic:hover {
+            opacity: 0.8;
+        }
+
+        #inputFoto {
+            display: none;
+        }
+
+        .btn-save {
+            width: 200px;
+        }
+        
+        /* ========================
+/* ========================
+   Sidebar Custom
+======================== */
+.sidebar-custom {
+    transition: transform 0.3s ease;
+    z-index: 1040; /* acima do conteúdo principal */ 
+}
+
+/* Sidebar fechada */
+.sidebar-custom.closed {
+    transform: translateX(-260px);
+}
+
+/* Sidebar aberta */
+.sidebar-custom.open {
+    transform: translateX(0);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .sidebar-custom {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: #4e73df; /* mesmo fundo do SB Admin */
+    }
+
+    /* Escurece o fundo quando aberto */
+    body.sidebar-open::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1030; /* abaixo da sidebar, acima do conteúdo */
+    }
+}
+

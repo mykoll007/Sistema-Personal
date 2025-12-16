@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfil do Aluno</title>
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/perfil-aluno.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="bg-light">
+
+    <header id="header">
+        <div class="header-left">
+            <div class="logo"><a href="aluno.html" style="text-decoration: none; color: #1a237e;">Thon</a></div>
+            <div class="social-icons">
+                <a href="https://wa.me/5511985377270" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://www.instagram.com/Thon_Cerqueiira/" target="_blank"><i
+                        class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <nav id="nav-menu">
+            <a href="aluno.html#sobre">Sobre</a>
+            <a href="treinos-aluno.html" data-protegido="treinos" id="linkTreinos">Treinos</a>
+            <a href="#" data-protegido="perfil" id="linkPerfil">Perfil</a>
+            <button class="logout-btn">Logout</button>
+        </nav>
+    </header>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow">
+                    <div class="card-body">
+
+                        <div class="text-center mb-4">
+                            <img src="img/undraw_profile.svg" width="110" class="rounded-circle mb-3">
+                            <h3 class="text-primary">Meu Perfil</h3>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="nomeAluno" class="form-control" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label>E-mail</label>
+                            <input type="email" id="emailAluno" class="form-control" disabled>
+                        </div>
+
+                        <a class="btn btn-danger" id="logoutBtn" href="#">Sair</a>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="js/perfil-aluno.js"></script>
+
+</body>
+
+</html>

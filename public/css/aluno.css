@@ -1,0 +1,782 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #212121;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'DM Sans', sans-serif;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    transition: top 0.4s ease;
+    z-index: 1000;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1a237e;
+}
+
+.social-icons a {
+    color: #1a237e;
+    font-size: 1.4rem;
+    margin-left: 10px;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: #f4c542;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+nav a {
+    color: #1a237e;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+    font-family: DM Sans, sans-serif;
+}
+
+nav a:hover {
+    color: #f4c542;
+}
+
+.login-btn {
+    padding: 6px 15px;
+    background-color: #1a237e;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-btn:hover {
+    background-color: #ff7043;
+}
+
+/* Hamburger */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+}
+
+.hamburger div {
+    width: 25px;
+    height: 3px;
+    background-color: #1a237e;
+    transition: all 0.3s ease;
+}
+
+.hamburger.active div:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.active div:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active div:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Hero */
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    padding: 120px 50px 37px;
+    flex-wrap: wrap;
+}
+
+.hero-text {
+    max-width: 600px;
+}
+
+.hero-text h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: #1a237e;
+}
+
+.hero-text p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.hero-text a {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #1a237e;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.hero-text a:hover {
+    background-color: #f4c542;
+}
+
+/* Hero carousel */
+.carousel-hero {
+    position: relative;
+    width: 350px;
+    max-width: 90vw;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 4px solid #1a237e;
+}
+
+.carousel-track-hero {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-item-hero {
+    min-width: 100%;
+}
+
+.carousel-item-hero img {
+    width: 100%;
+    display: block;
+    border-radius: 15px;
+}
+
+/* Sobre */
+#sobre {
+    padding: 48px 50px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+#sobre h2 {
+    margin-top: 13px;
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #1a237e;
+}
+
+#sobre p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #555;
+}
+
+/* Cards */
+/* Cards com Glassmorphism */
+.cards {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.15); /* Transparência glass */
+    backdrop-filter: blur(12px); /* Desfoque do fundo */
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px 20px;
+    flex: 1;
+    min-width: 260px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(26, 35, 126, 0.15);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.3s ease;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(244,197,66,0.2) 0%, transparent 70%);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+    pointer-events: none; /* Não bloqueia cliques */
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(26, 35, 126, 0.25);
+}
+
+.card i {
+    font-size: 3rem;
+    color: #f4c542;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.card:hover i {
+    transform: scale(1.2) rotate(-5deg);
+    color: #ffb900;
+}
+
+.card h3 {
+    margin-bottom: 15px;
+    color: #1a237e;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.card p {
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.card a {
+    display: inline-block;
+    padding: 12px 25px;
+    background: linear-gradient(90deg, #1a237e, #5348c4);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.card a:hover {
+    background: linear-gradient(90deg, #5348c4, #f4c542);
+    transform: translateY(-2px);
+}
+
+
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 30px;
+    color: #777;
+    background-color: #f4f4f4;
+}
+/* Modal Login */
+/* Modal Login - Moderno */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 3000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+}
+
+.modal-content {
+     z-index: 3001;
+    background-color: #ffffff;
+    margin: 8% auto;
+    padding: 40px 30px;
+    border-radius: 20px;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(26, 35, 126, 0.4);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal-content h2 {
+    margin-bottom: 10px;
+    color: #1a237e;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.modal-content p {
+    margin-bottom: 25px;
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.modal-content input {
+    width: 90%;
+    padding: 12px 15px;
+    margin: 12px 0;
+    border: 2px solid #1a237e;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.modal-content input:focus {
+    border-color: #f4c542;
+    box-shadow: 0 0 8px rgba(244, 197, 66, 0.5);
+}
+
+.modal-content button {
+    width: 95%;
+    padding: 12px 0;
+    background: linear-gradient(90deg, #1a237e, #5348c4);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.modal-content button:hover {
+    background: linear-gradient(90deg, #5348c4, #f4c542);
+    transform: translateY(-2px);
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #1a237e;
+    font-size: 1.6rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.2s;
+}
+
+.close:hover {
+    color: #ff7043;
+    transform: scale(1.2);
+}
+#align-ancora{
+    display: flex;
+    justify-content: center;
+}
+
+#ancora-wpp{
+        max-width: 186px;
+        display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#icone-wppMain{
+    font-size: 30px;
+    margin-right: 16px;
+    margin-bottom: 0;
+    color: white;
+}
+
+/* Responsividade */
+@media screen and (max-width: 1099px) {
+    .hero-text {
+        text-align: center;
+    }
+}
+
+@media (max-width: 600px) {
+    header {
+        flex-wrap: wrap;
+    }
+
+    nav {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #ffffff;
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    nav.open {
+        max-height: 300px;
+    }
+
+    nav a,
+    .login-btn {
+        padding: 12px 20px;
+        width: 100%;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .header-left {
+        gap: 10px;
+    }
+
+    .social-icons a {
+        font-size: 1.2rem;
+    }
+    #align-ancora{
+    display: flex;
+    justify-content: center;
+}
+}
+
+@media screen and (max-width: 450px){
+    .modal-content{
+        margin: 8% 5%;
+    }
+    .card{
+        padding: 10px;
+    }
+}
+
+
+/*Treinos-aluno.html*/
+
+/* Container que agrupa os cards de categoria */
+.categorias-container {
+    display: flex;
+    flex-wrap: wrap;       /* permite quebrar linha em telas pequenas */
+    gap: 30px;             /* espaço entre os cards */
+    justify-content: center; /* centraliza os cards horizontalmente */
+    margin-top: 40px;
+}
+
+/* Cada card de categoria */
+.treino-card {
+    flex: 0 1 300px;   /* largura base mínima de 300px, cresce se houver espaço */
+    max-width: 350px;  /* largura máxima do card */
+}
+
+/* Container de todos os cards de treino */
+#treinos-container {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap; /* Permite quebrar linha em telas menores */
+    justify-content: center; /* Centraliza os cards */
+}
+.treinos-aluno-title {
+        margin-top: 100px;
+    font-size: 2.2rem;
+    color: #1a237e;
+    text-align: center;
+    margin-bottom: 50px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Cada card de treino */
+.treino-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.15); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px 20px;
+    flex: 0 1 300px; /* largura mínima de 300px, pode crescer */
+    max-width: 350px; /* largura máxima para não ocupar a tela inteira */
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(26, 35, 126, 0.15);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.3s ease;
+    overflow: hidden;
+}
+
+/* Efeito de brilho ao passar o mouse */
+.treino-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(244,197,66,0.2) 0%, transparent 70%);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.treino-card:hover::before {
+    opacity: 1;
+}
+
+.treino-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(26, 35, 126, 0.25);
+}
+
+/* Ícone da categoria */
+.treino-card i {
+    display: block;
+    margin: 0 auto 15px auto;
+    font-size: 3.2rem;
+    color: #f4c542;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.treino-card i:hover {
+    transform: scale(1.3) rotate(-5deg);
+    color: #ffb900;
+}
+
+/* Título da categoria */
+.treino-card h3 {
+    margin-bottom: 20px;
+    color: #1a237e;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Lista de exercícios dentro do card */
+.exercicios-list {
+    text-align: left;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Cada exercício */
+
+
+
+
+/* Nome do exercício */
+.exercicio-item strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #f4c542; /* destaque amarelo */
+    letter-spacing: 0.5px;
+}
+
+/* Séries, repetições, peso, intervalo */
+.exercicio-item p {
+    margin: 4px 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #555;
+}
+
+/* Botão de vídeo */
+.exercicio-item .video-btn {
+    margin-top: 10px;
+    display: inline-block;
+    font-size: 0.95rem;
+    padding: 8px 16px;
+    background: linear-gradient(90deg, #1a237e, #5348c4);
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+     border: 1px solid ;
+     cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.exercicio-item .video-btn:hover {
+    background: linear-gradient(90deg, #5348c4, #f4c542);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 35, 126, 0.4);
+}
+
+#ft-treinos-aluno{
+       margin-top: 331px;
+}
+
+/* Container do toast */
+#toastMessage {
+    min-width: 250px;
+    max-width: 350px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    pointer-events: none; /* evita bloquear cliques */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 4000; /* abaixo do modal */
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    background-color:#1a237e;
+}
+
+/* Toast quando visível */
+#toastMessage.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Header do toast */
+#toastMessage .toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px 12px 0 0;
+    color: #fff;
+}
+
+
+/* Toast quando visível */
+#toastMessage.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+
+#toastMessage .toast-body {
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #f5f7ff;
+    background-color:#1a237e;
+}
+
+
+
+.video-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 700px;
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+}
+
+.video-modal-content h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    text-align: center;
+    color: #1a237e;
+}
+
+.video-modal-content video {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.video-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 26px;
+    cursor: pointer;
+} */
+
+
+
+
+
+/* Toast */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 4000; /* menor que o modal */
+    background-color:#1a237e;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none; /* evita bloquear cliques */
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.toast-header {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.toast-body {
+    font-size: 0.95rem;
+}
+
+
+/* Responsividade: em telas pequenas, empilha os cards */
+@media screen and (max-width: 600px) {
+    .treinos-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+}

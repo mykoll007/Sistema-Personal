@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Login do Aluno</title>
+
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-gradient-primary">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-xl-6 col-lg-7 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-5">
+
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4">Acesso do Aluno</h1>
+                            <p class="text-muted">Entre com a conta que seu personal cadastrou</p>
+                        </div>
+
+                        <form id="formLoginAluno">
+
+                            <div class="form-group">
+                                <input type="email" class="form-control form-control-user"
+                                    id="emailAluno" placeholder="Seu e-mail" required>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="password" class="form-control form-control-user"
+                                    id="senhaAluno" placeholder="Senha" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-user btn-block">
+                                Entrar
+                            </button>
+
+                            <hr>
+
+                            <div id="erroLogin" class="text-danger text-center mt-2" style="display:none;">
+                                E-mail ou senha incorretos.
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById("formLoginAluno").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById("emailAluno").value;
+            const senha = document.getElementById("senhaAluno").value;
+
+
+            window.location.href = "aluno.html";
+        });
+    </script>
+
+</body>
+
+</html>

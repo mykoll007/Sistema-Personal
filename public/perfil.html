@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfil - Thon</title>
+
+    <!-- Fontes e estilos SB Admin -->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,700,900" rel="stylesheet">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="css/perfil.css" rel="stylesheet">
+</head>
+
+<body id="page-top">
+
+    <div id="menuPerfil">
+        <a href="perfil.html">
+            <i class="fas fa-user mr-2"></i> Perfil
+        </a>
+
+        <div class="menu-divider"></div>
+
+        <a href="#" id="btnLogoutMenu">
+            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        </a>
+    </div>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion sidebar-custom" id="accordionSidebar">
+
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Thon</div>
+            </a>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Interface</div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-users"></i>
+                    <span>Alunos</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="treinos.html">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Treinos</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+        </ul>
+        <!-- Fim Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 shadow">
+
+                    <!-- Botão Hamburguer (mobile) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <ul class="navbar-nav ml-auto">
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <li class="nav-item no-arrow">
+                            <a class="nav-link" href="#" id="btnPerfil">
+                                <span id="nomePersonal" class="mr-2 d-none d-lg-inline text-gray-600 small"></span>
+
+                                <img id="fotoTopbar" class="img-profile rounded-circle" src="img/undraw_profile.svg">
+                            </a>
+                        </li>
+                    </ul>
+
+                </nav>
+                <!-- Fim Topbar -->
+
+                <div class="container-fluid">
+
+                    <h1 class="h3 mb-4 text-gray-800 text-center">Meu Perfil</h1>
+
+                    <div class="card shadow profile-container">
+                        <div class="card-body">
+
+                            <!-- Foto -->
+                            <div class="profile-pic-wrapper">
+                                <img id="fotoPreview" class="profile-pic" src="img/undraw_profile.svg"
+                                    alt="Foto de perfil">
+
+                                <br>
+                                <button class="btn btn-primary btn-sm mt-3"
+                                    onclick="document.getElementById('inputFoto').click()">
+                                    <i class="fas fa-camera"></i> Alterar Foto
+                                </button>
+
+                                <input type="file" id="inputFoto" accept="image/*">
+                            </div>
+
+                            <hr>
+
+                            <form>
+                                <div class="form-group">
+                                    <label>Nome</label>
+                                    <input type="text" id="nomeUsuario" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>E-mail</label>
+                                    <input type="email" class="form-control" disabled>
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-success btn-save">
+                                        <i class="fas fa-save"></i> Salvar Alterações
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto text-center">
+                    <span>Desenvolvedor Mykoll © 2025</span>
+                </div>
+            </footer>
+
+        </div>
+
+    </div>
+
+    <!-- ================= MODAL DE LOGOUT ================= -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutLabel">Deseja sair?</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    Selecione <strong>"Sair"</strong> abaixo para encerrar sua sessão.
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" id="btnLogout">Sair</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- ================= FIM MODAL DE LOGOUT ================= -->
+
+
+    <!-- Toast Notificação -->
+    <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 900;">
+        <div id="toastMessage" class="toast" data-delay="2000">
+            <div class="toast-header">
+                <strong class="mr-auto" id="toastTitle">Sistema</strong>
+                <small>Agora</small>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
+            </div>
+            <div class="toast-body" id="toastBody"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const sidebar = document.querySelector(".sidebar-custom");
+            const btn = document.getElementById("sidebarToggleTop");
+            const icon = btn.querySelector("i");
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add("closed");
+                icon.classList.add("fa-bars");
+            }
+
+            btn.addEventListener("click", function () {
+                if (sidebar.classList.contains("closed")) {
+                    sidebar.classList.remove("closed");
+                    sidebar.classList.add("open");
+                    icon.classList.replace("fa-bars", "fa-times");
+                    document.body.classList.add("sidebar-open");
+                } else {
+                    sidebar.classList.remove("open");
+                    sidebar.classList.add("closed");
+                    icon.classList.replace("fa-times", "fa-bars");
+                    document.body.classList.remove("sidebar-open");
+                }
+            });
+
+            // Fecha sidebar ao clicar fora no mobile
+            document.body.addEventListener("click", function (e) {
+                if (document.body.classList.contains("sidebar-open") &&
+                    !sidebar.contains(e.target) &&
+                    e.target !== btn &&
+                    !btn.contains(e.target)) {
+                    sidebar.classList.remove("open");
+                    sidebar.classList.add("closed");
+                    icon.classList.replace("fa-times", "fa-bars");
+                    document.body.classList.remove("sidebar-open");
+                }
+            });
+
+            // Preview da foto
+            document.getElementById("inputFoto").addEventListener("change", function () {
+                const file = this.files[0];
+                if (file) {
+                    document.getElementById("fotoPreview").src = URL.createObjectURL(file);
+                }
+            });
+
+        });
+    </script>
+
+    <script src="js/perfil.js"></script>
+</body>
+
+</html>

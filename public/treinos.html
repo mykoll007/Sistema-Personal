@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Treinos</title>
+
+    <!-- Custom fonts -->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet">
+
+    <!-- Custom styles -->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/treinos.css">
+
+
+</head>
+
+
+
+<body id="page-top">
+
+    <div id="menuPerfil">
+        <a href="perfil.html">
+            <i class="fas fa-user mr-2"></i> Perfil
+        </a>
+
+        <div class="menu-divider"></div>
+
+        <a href="#" id="btnLogoutMenu">
+            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        </a>
+    </div>
+
+
+    <!-- ================== PAGE WRAPPER ================== -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar">
+
+            <!-- Sidebar Logo -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Thon</div>
+            </a>
+
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Interface
+            </div>
+
+
+            <!-- Alunos -->
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-users"></i>
+                    <span>Alunos</span></a>
+            </li>
+
+            <!-- Treinos -->
+            <li class="nav-item active">
+                <a class="nav-link" href="treinos.html">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Treinos</span></a>
+            </li>
+
+
+
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggle -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        <!-- FIM DO SIDEBAR -->
+
+        <!-- ================== CONTENT WRAPPER ================== -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 shadow">
+
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+
+
+                    <ul class="navbar-nav ml-auto">
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- User Dropdown -->
+                        <li class="nav-item no-arrow">
+                            <a class="nav-link" href="#" id="btnPerfil">
+                                <span id="nomePersonal" class="mr-2 d-none d-lg-inline text-gray-600 small"></span>
+
+                                <img id="fotoTopbar" class="img-profile rounded-circle" src="img/undraw_profile.svg">
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- FIM TOPBAR -->
+
+                <!-- ================== CONTEÚDO ================== -->
+                <div class="container-fluid">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 text-gray-800">Treinos</h1>
+
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#modalCadastroTreino">
+                            + Cadastrar treino
+                        </button>
+                    </div>
+
+                    <!-- TREINOS RENDERIZADOS -->
+                    <div id="listaCategoriasTreinos"></div>
+
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto text-center">
+                    <span>Desenvolvedor Mykoll © 2025</span>
+                </div>
+            </footer>
+
+        </div>
+
+    </div>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutLabel">Deseja sair?</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    Selecione <strong>"Sair"</strong> abaixo caso deseje encerrar sua sessão atual.
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-primary" id="btnLogout">Sair</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================== MODAL CADASTRO TREINO ================== -->
+    <div class="modal fade" id="modalCadastroTreino" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Cadastrar Novo Treino</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form id="formTreino">
+
+                        <div class="form-group">
+                            <label>Categoria do Treino</label>
+                            <select class="form-control" id="categoria" required>
+                                <option value="">Selecione...</option>
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nome do Exercício</label>
+                            <input type="text" id="nome" class="form-control" placeholder="Ex: Rosca direta" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <textarea id="descricao" class="form-control" placeholder="Descreva o exercício..."
+                                required></textarea>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" onclick="salvarTreino()">Salvar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== MODAL VÍDEO ================== -->
+    <div class="modal fade" id="modalVideo" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalVideoTitulo"></h5>
+                </div>
+
+                <div class="modal-body">
+
+                    <p><strong>Selecione o vídeo do exercício:</strong></p>
+
+                    <input type="file" name="video" accept="video/*" id="videoPlayerFile" class="form-control mb-3">
+
+                    <video id="modalVideoPlayer" width="100%" controls></video>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" onclick="salvarVideo()">Salvar Vídeo</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== MODAL EXCLUIR TREINO ================== -->
+    <div class="modal fade" id="modalExcluirTreino" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Excluir Treino</h5>
+                </div>
+
+                <div class="modal-body">
+                    Tem certeza que deseja excluir o treino <strong id="nomeTreinoExcluir"></strong>?
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnConfirmarExcluirTreino" class="btn btn-danger">Excluir</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Toast Notificação -->
+    <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 2000;">
+
+        <div id="toastMessage" class="toast" data-delay="2500" data-autohide="false">
+
+            <div class="toast-header" id="toastHeader">
+                <strong class="mr-auto" id="toastTitle">Sistema</strong>
+                <small>Agora</small>
+            </div>
+
+            <div class="toast-body bg-white text-dark" id="toastBody"></div>
+
+        </div>
+
+    </div>
+    <!-- Scroll to Top -->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+    <!-- Scripts -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <script src="js/treinos.js"></script>
+
+</body>
+
+</html>
