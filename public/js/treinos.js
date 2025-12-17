@@ -156,24 +156,33 @@ async function salvarVideo() {
     }
 
     const formData = new FormData();
-    formData.append("video", file);
+    formData.append("file", file);
+    formData.append("upload_preset", "SEU_UPLOAD_PRESET"); // substitua pelo seu preset
 
     try {
-        const res = await authFetch(
-            `${API_URL}/personal/exercicios/${exercicioVideoId}/video`,
-            {
-                method: "PUT",
-                body: formData
-            }
-        );
+        // Upload direto para Cloudinary
+        const resCloud = await fetch(`https://api.cloudinary.com/v1_1/SEU_CLOUD_NAME/video/upload`, {
+            method: "POST",
+            body: formData
+        });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+        const dataCloud = await resCloud.json();
+        if (!resCloud.ok) throw new Error(dataCloud.error?.message || "Erro ao enviar vídeo");
+
+        const video_url = dataCloud.secure_url; // URL final do vídeo
+
+        // Agora atualiza o backend apenas com a URL
+        const resBackend = await authFetch(`${API_URL}/personal/exercicios/${exercicioVideoId}/video`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ video_url })
+        });
+
+        const data = await resBackend.json();
+        if (!resBackend.ok) throw new Error(data.message);
 
         mostrarToast("Sucesso", "Vídeo atualizado!", "success");
-
         $("#modalVideo").modal("hide");
-
         await carregarExercicios();
 
     } catch (err) {

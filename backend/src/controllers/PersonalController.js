@@ -219,41 +219,23 @@ async uploadFoto(req, res) {
 async uploadVideoExercicio(req, res) {
     try {
         const { id } = req.params;
+        const { video_url } = req.body;
 
-        if (!req.file) {
-            return res.status(400).json({ message: "Nenhum vídeo enviado." });
-        }
+        if (!video_url) return res.status(400).json({ message: "URL do vídeo é obrigatória" });
 
-        const exercicio = await database("exercicios")
-            .where({ id })
-            .first();
+        const exercicio = await database("exercicios").where({ id, personal_id: req.personalId }).first();
+        if (!exercicio) return res.status(404).json({ message: "Exercício não encontrado" });
 
-        if (!exercicio) {
-            return res.status(404).json({ message: "Exercício não encontrado." });
-        }
+        await database("exercicios").where({ id }).update({ video_url });
 
-        if (exercicio.personal_id !== req.personalId) {
-            return res.status(403).json({ message: "Sem permissão." });
-        }
+        return res.status(200).json({ message: "Vídeo atualizado com sucesso!", video_url });
 
-        const novoVideoUrl = req.file.path; // URL Cloudinary
-
-        await database("exercicios")
-            .where({ id })
-            .update({ video_url: novoVideoUrl });
-
-        return res.status(200).json({
-            message: "Vídeo atualizado com sucesso!",
-            video_url: novoVideoUrl
-        });
-
-    } catch (error) {
-        console.error("❌ Erro upload vídeo:", error);
-        return res.status(500).json({
-            message: "Erro ao salvar vídeo."
-        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Erro ao atualizar vídeo" });
     }
 }
+
 
 
 
