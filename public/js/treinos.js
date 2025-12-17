@@ -1,6 +1,6 @@
 const API_URL = "https://sistema-personal.vercel.app";
 const CLOUDINARY_CLOUD_NAME = "dvpftafqb"; // seu cloud_name
-const CLOUDINARY_UPLOAD_PRESET = "treinos_videos"; // seu preset unsigned
+const CLOUDINARY_UPLOAD_PRESET = "treinos_videos";
 
 let categorias = [];
 let exercicios = [];
@@ -162,7 +162,7 @@ async function salvarVideo() {
     formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
     try {
-        // Upload direto para Cloudinary
+        // 1️⃣ Upload direto para Cloudinary
         const resCloud = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`, {
             method: "POST",
             body: formData
@@ -173,7 +173,7 @@ async function salvarVideo() {
 
         const video_url = dataCloud.secure_url;
 
-        // Agora atualiza seu backend apenas com a URL
+        // 2️⃣ Atualiza o backend apenas com a URL do vídeo
         const resBackend = await authFetch(`${API_URL}/personal/exercicios/${exercicioVideoId}/video`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -189,6 +189,7 @@ async function salvarVideo() {
 
     } catch (err) {
         mostrarToast("Erro", err.message, "danger");
+        console.error(err);
     }
 }
 
