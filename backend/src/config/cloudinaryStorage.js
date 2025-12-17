@@ -24,6 +24,9 @@ const storageVideo = new CloudinaryStorage({
     }
 });
 
-const uploadVideo = multer({ storage: storageVideo });
+const uploadVideo = multer({
+    storage: storageVideo,
+    limits: { fileSize: 50 * 1024 * 1024 } // 50 MB
+});
 
 module.exports = { uploadFoto, uploadVideo };
