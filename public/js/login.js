@@ -1,4 +1,4 @@
-const API_URL = "https://sistema-personal.vercel.app";
+const API_URL = "http://localhost:5000";
 
 function mostrarToast(titulo, mensagem, tipo = "info") {
     const header = document.querySelector("#toastMessage .toast-header");

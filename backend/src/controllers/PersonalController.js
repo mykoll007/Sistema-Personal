@@ -194,37 +194,25 @@ class PersonalController {
     }
 
     // 📌 Upload de foto do personal
-    async uploadFoto(req, res) {
-        try {
-            if (!req.file) {
-                return res.status(400).json({ message: "Nenhuma foto enviada." });
-            }
-
-            const foto_url = `/uploads/${req.file.filename}`;
-
-            const personal = await database('personals')
-                .where({ id: req.personalId })
-                .first();
-
-            // remove foto antiga
-            if (personal?.foto_url && !personal.foto_url.includes('undraw')) {
-                const caminhoAntigo = path.join(__dirname, '../../', personal.foto_url);
-                if (fs.existsSync(caminhoAntigo)) {
-                    fs.unlinkSync(caminhoAntigo);
-                }
-            }
-
-            await database('personals')
-                .where({ id: req.personalId })
-                .update({ foto_url });
-
-            return res.status(200).json({ foto_url });
-
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: "Erro ao salvar foto." });
+async uploadFoto(req, res) {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "Nenhuma foto enviada." });
         }
+
+        const foto_url = req.file.path; // Cloudinary já retorna a URL completa
+
+        await database('personals')
+            .where({ id: req.personalId })
+            .update({ foto_url });
+
+        return res.status(200).json({ foto_url });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Erro ao salvar foto." });
     }
+}
 
 
 
@@ -236,56 +224,23 @@ async uploadVideoExercicio(req, res) {
             return res.status(400).json({ message: "Nenhum vídeo enviado." });
         }
 
-        // 🔍 Busca exercício
         const exercicio = await database("exercicios")
             .where({ id })
             .first();
 
         if (!exercicio) {
-            fs.unlinkSync(req.file.path);
             return res.status(404).json({ message: "Exercício não encontrado." });
         }
 
-        // 🔐 Valida dono
         if (exercicio.personal_id !== req.personalId) {
-            fs.unlinkSync(req.file.path);
             return res.status(403).json({ message: "Sem permissão." });
         }
 
-        /* ===============================
-           🧹 REMOVE VÍDEO ANTIGO (PRIMEIRO)
-        =============================== */
-        if (exercicio.video_url) {
-            const caminhoAntigo = path.resolve(
-                __dirname,
-                "../../",
-                exercicio.video_url.replace(/^\/+/, "")
-            );
+        const novoVideoUrl = req.file.path; // URL Cloudinary
 
-            console.log("🗑️ Tentando remover vídeo antigo:", caminhoAntigo);
-
-            if (fs.existsSync(caminhoAntigo)) {
-                fs.unlinkSync(caminhoAntigo);
-                console.log("✅ Vídeo antigo removido com sucesso!");
-            } else {
-                console.warn("⚠️ Vídeo antigo não encontrado no disco.");
-            }
-        }
-
-        /* ===============================
-           💾 ATUALIZA BANCO
-        =============================== */
-        const novoVideoUrl = `/uploads/videos/${req.file.filename}`;
-
-        const linhasAfetadas = await database("exercicios")
+        await database("exercicios")
             .where({ id })
             .update({ video_url: novoVideoUrl });
-
-        console.log("📦 Linhas afetadas no banco:", linhasAfetadas);
-
-        if (!linhasAfetadas) {
-            throw new Error("Banco não foi atualizado.");
-        }
 
         return res.status(200).json({
             message: "Vídeo atualizado com sucesso!",
@@ -294,17 +249,12 @@ async uploadVideoExercicio(req, res) {
 
     } catch (error) {
         console.error("❌ Erro upload vídeo:", error);
-
-        // remove vídeo novo se algo deu errado
-        if (req.file?.path && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-        }
-
         return res.status(500).json({
             message: "Erro ao salvar vídeo."
         });
     }
 }
+
 
 
 

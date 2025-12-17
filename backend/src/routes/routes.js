@@ -1,12 +1,14 @@
 const connection = require('../database/connection')
 // const limparVideosOrfaos = require('../jobs/limparVideosorfaos');
+const { uploadFoto, uploadVideo } = require('../config/cloudinaryStorage');
+
 
 const PersonalController = require('../controllers/PersonalController');
 const AlunoController = require('../controllers/AlunoController');
 const verificarPersonal = require('../middleware/authmiddleware');
 const authAluno = require('../middleware/authAluno');
-const uploadVideo = require('../config/uploadVideo');
-const uploadFoto = require('../config/uploadFoto');
+// const uploadVideo = require('../config/uploadVideo');
+// const uploadFoto = require('../config/uploadFoto');
 const express = require('express');
 const router = express.Router();
 
@@ -49,6 +51,7 @@ router.delete('/personal/categorias/:id', verificarPersonal, PersonalController.
 //Rota para subir imagens e videos
 router.post('/personal/upload-foto', verificarPersonal, uploadFoto.single('foto'), PersonalController.uploadFoto);
 router.put('/personal/exercicios/:id/video', verificarPersonal, uploadVideo.single('video'), PersonalController.uploadVideoExercicio);
+
 
 
 //Controllers do Aluno

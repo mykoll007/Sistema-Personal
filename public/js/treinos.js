@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:4000";
+const API_URL = "http://localhost:5000";
 
 let categorias = [];
 let exercicios = [];
@@ -57,8 +57,9 @@ async function carregarPersonalTopo() {
         document.getElementById("nomePersonal").textContent = personal.nome;
         document.getElementById("fotoTopbar").src =
             personal.foto_url
-                ? `${API_URL}${personal.foto_url}`
+                ? (personal.foto_url.startsWith('http') ? personal.foto_url : `${API_URL}${personal.foto_url}`)
                 : "img/undraw_profile.svg";
+
 
     } catch (err) {
         console.error(err);
@@ -126,9 +127,12 @@ function abrirVideo(id) {
     video.pause();
     video.removeAttribute("src");
 
-    if (exercicio?.video_url) {
-        video.src = `${API_URL}${exercicio.video_url}?v=${Date.now()}`;
-    }
+if (exercicio?.video_url) {
+    video.src = exercicio.video_url.startsWith('http')
+        ? exercicio.video_url
+        : `${API_URL}${exercicio.video_url}`;
+}
+
 
     video.load();
     $("#modalVideo").modal("show");

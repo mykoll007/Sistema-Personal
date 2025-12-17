@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:4000"; // ajuste se necessário
+const API_URL = "http://localhost:5000"; // ajuste se necessário
 let personal = null;
 
 (function protegerPagina() {
@@ -72,13 +72,13 @@ async function carregarPersonal() {
         document.getElementById("nomeUsuario").value = personal.nome;
         document.querySelector('input[type="email"]').value = personal.email;
 
-        // ⚡ Corrigido: adiciona API_URL à foto
         const foto = personal.foto_url
-            ? `${API_URL}${personal.foto_url}`
+            ? (personal.foto_url.startsWith('http') ? personal.foto_url : `${API_URL}${personal.foto_url}`)
             : "img/undraw_profile.svg";
 
         document.getElementById("fotoPreview").src = foto;
         document.getElementById("fotoTopbar").src = foto;
+
         document.getElementById("nomePersonal").textContent = personal.nome;
 
     } catch (err) {
@@ -132,10 +132,10 @@ async function salvarAlteracoes() {
         personal.nome = nome;
         personal.foto_url = foto_url;
 
-        // ⚡ Corrigido: adiciona API_URL ao mostrar a foto
         const fotoFinal = foto_url
-            ? `${API_URL}${foto_url}`
+            ? (foto_url.startsWith('http') ? foto_url : `${API_URL}${foto_url}`)
             : "img/undraw_profile.svg";
+
 
         document.getElementById("fotoPreview").src = fotoFinal;
         document.getElementById("fotoTopbar").src = fotoFinal;

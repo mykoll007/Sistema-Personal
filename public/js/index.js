@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:4000";
+const API_URL = "http://localhost:5000";
 let alunos = [];
 let dataTable;
 let alunoSelecionado = null; // usado para edição e exclusão
@@ -93,9 +93,10 @@ async function carregarPersonalLogado() {
 
         if (!personal) return;
 
-        const fotoFinal = personal.foto_url
-            ? `${API_URL}${personal.foto_url}`
-            : "img/undraw_profile.svg";
+const fotoFinal = personal.foto_url
+    ? (personal.foto_url.startsWith('http') ? personal.foto_url : `${API_URL}${personal.foto_url}`)
+    : "img/undraw_profile.svg";
+
 
         document.getElementById("nomePersonal").textContent = personal.nome;
         document.getElementById("fotoTopbar").src = fotoFinal;
