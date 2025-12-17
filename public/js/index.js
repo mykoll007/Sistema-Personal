@@ -1,4 +1,4 @@
-const API_URL = "sistema-personal.vercel.app";
+const API_URL = "https://sistema-personal.vercel.app";
 let alunos = [];
 let dataTable;
 let alunoSelecionado = null; // usado para edição e exclusão

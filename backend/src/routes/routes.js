@@ -1,5 +1,4 @@
 const connection = require('../database/connection')
-// const limparVideosOrfaos = require('../jobs/limparVideosorfaos');
 const { uploadFoto, uploadVideo } = require('../config/cloudinaryStorage');
 
 
@@ -7,8 +6,6 @@ const PersonalController = require('../controllers/PersonalController');
 const AlunoController = require('../controllers/AlunoController');
 const verificarPersonal = require('../middleware/authmiddleware');
 const authAluno = require('../middleware/authAluno');
-// const uploadVideo = require('../config/uploadVideo');
-// const uploadFoto = require('../config/uploadFoto');
 const express = require('express');
 const router = express.Router();
 
@@ -58,30 +55,6 @@ router.put('/personal/exercicios/:id/video', verificarPersonal, uploadVideo.sing
 router.post('/aluno/login', AlunoController.autenticarAluno);
 router.get('/aluno/treinos', authAluno, AlunoController.listarTreinos);
 
-// ================================
-// 🔁 CRON – Limpeza de vídeos órfãos
-// ================================
-
-// router.get('/cron/limpar-videos', async (req, res) => {
-//     const secret = req.headers['x-cron-secret'];
-
-//     console.log('Recebendo requisição de cron com segredo:', secret);
-
-//     if (secret !== process.env.CRON_SECRET) {
-//         console.log('Erro: segredo não confere');
-//         return res.status(403).json({ message: 'Não autorizado' });
-//     }
-
-//     try {
-//         console.log('Iniciando a limpeza dos vídeos...');
-//         await limparVideosOrfaos(); // Sua função
-//         console.log('Limpeza concluída com sucesso');
-//         res.json({ ok: true });
-//     } catch (err) {
-//         console.error('Erro ao executar cron:', err); // Log do erro completo
-//         res.status(500).json({ error: 'Erro ao executar limpeza' });
-//     }
-// });
 
 
 module.exports = router;

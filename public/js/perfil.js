@@ -1,4 +1,4 @@
-const API_URL = "sistema-personal.vercel.app"; // ajuste se necessário
+const API_URL = "https://sistema-personal.vercel.app"; // ajuste se necessário
 let personal = null;
 
 (function protegerPagina() {
@@ -73,7 +73,7 @@ async function carregarPersonal() {
         document.querySelector('input[type="email"]').value = personal.email;
 
         const foto = personal.foto_url
-            ? (personal.foto_url.startsWith('http') ? personal.foto_url : `${API_URL}${personal.foto_url}`)
+            ? (personal.foto_url.startsWith('https') ? personal.foto_url : `${API_URL}${personal.foto_url}`)
             : "img/undraw_profile.svg";
 
         document.getElementById("fotoPreview").src = foto;
@@ -110,9 +110,16 @@ async function salvarAlteracoes() {
                 body: formData
             });
 
-            const dataUpload = await resUpload.json();
-            if (!resUpload.ok) throw new Error(dataUpload.message || "Erro ao enviar foto");
-            foto_url = dataUpload.foto_url;
+            let dataUpload;
+            try {
+                dataUpload = await resUpload.json();
+            } catch {
+                throw new Error("Erro ao enviar foto: resposta não é JSON");
+            }
+
+            if (!resUpload.ok) throw new Error(dataUpload?.message || "Erro ao enviar foto");
+
+            foto_url = dataUpload.foto_url; // ✅ URL final do Cloudinary
         }
 
         // Atualiza nome e foto no backend
@@ -133,7 +140,7 @@ async function salvarAlteracoes() {
         personal.foto_url = foto_url;
 
         const fotoFinal = foto_url
-            ? (foto_url.startsWith('http') ? foto_url : `${API_URL}${foto_url}`)
+            ? (foto_url.startsWith('https') ? foto_url : `${API_URL}${foto_url}`)
             : "img/undraw_profile.svg";
 
 
