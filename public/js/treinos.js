@@ -1,4 +1,6 @@
 const API_URL = "https://sistema-personal.vercel.app";
+const CLOUDINARY_CLOUD_NAME = "dvpftafqb"; // seu cloud_name
+const CLOUDINARY_UPLOAD_PRESET = "treinos_videos"; // seu preset unsigned
 
 let categorias = [];
 let exercicios = [];
@@ -156,16 +158,30 @@ async function salvarVideo() {
     }
 
     const formData = new FormData();
-    formData.append("video", file); // nome "video" deve bater com uploadVideo.single('video')
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
     try {
-        const res = await authFetch(`${API_URL}/personal/exercicios/${exercicioVideoId}/video`, {
-            method: "PUT",
+        // Upload direto para Cloudinary
+        const resCloud = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`, {
+            method: "POST",
             body: formData
         });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+        const dataCloud = await resCloud.json();
+        if (!resCloud.ok) throw new Error(dataCloud.error?.message || "Erro ao enviar vídeo");
+
+        const video_url = dataCloud.secure_url;
+
+        // Agora atualiza seu backend apenas com a URL
+        const resBackend = await authFetch(`${API_URL}/personal/exercicios/${exercicioVideoId}/video`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ video_url })
+        });
+
+        const dataBackend = await resBackend.json();
+        if (!resBackend.ok) throw new Error(dataBackend.message);
 
         mostrarToast("Sucesso", "Vídeo atualizado!", "success");
         $("#modalVideo").modal("hide");
@@ -175,6 +191,7 @@ async function salvarVideo() {
         mostrarToast("Erro", err.message, "danger");
     }
 }
+
 
 
 // 🔥 LIMPA O VIDEO AO FECHAR
