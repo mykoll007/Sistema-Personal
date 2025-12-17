@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 const path = require('path');
 require('dotenv').config();
 
-// require("./src/jobs/limparVideosorfaos");
+
 
 const router = require('./src/routes/routes');
 

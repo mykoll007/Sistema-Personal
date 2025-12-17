@@ -219,12 +219,17 @@ async uploadFoto(req, res) {
 async uploadVideoExercicio(req, res) {
     try {
         const { id } = req.params;
-        const { video_url } = req.body;
 
-        if (!video_url) return res.status(400).json({ message: "URL do vídeo é obrigatória" });
+        if (!req.file) 
+            return res.status(400).json({ message: "Arquivo de vídeo é obrigatório" });
 
-        const exercicio = await database("exercicios").where({ id, personal_id: req.personalId }).first();
-        if (!exercicio) return res.status(404).json({ message: "Exercício não encontrado" });
+        const video_url = req.file.path; // URL do Cloudinary
+
+        const exercicio = await database("exercicios")
+            .where({ id, personal_id: req.personalId })
+            .first();
+        if (!exercicio) 
+            return res.status(404).json({ message: "Exercício não encontrado" });
 
         await database("exercicios").where({ id }).update({ video_url });
 
