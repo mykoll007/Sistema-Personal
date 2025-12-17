@@ -4,17 +4,23 @@ const mysql = require('mysql2');
 const path = require('path');
 require('dotenv').config();
 
-// require("./src/jobs/limparVideosorfaos");
-
 const router = require('./src/routes/routes');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+
+// 🔹 CORS: permite seu frontend local (ou use '*' para todas as origens)
+app.use(cors({
+    origin: 'http://127.0.0.1:5500', // ou '*' se quiser permitir qualquer origem
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// 🔹 Aumenta limite para JSON e URL-encoded (necessário para arquivos maiores, mas não resolve vídeos grandes >5MB no Vercel)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Serve arquivos da pasta uploads como públicos
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 
 app.use(router);
 
