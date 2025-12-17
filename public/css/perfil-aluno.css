@@ -125,7 +125,7 @@ nav a:hover {
 
 /* Container perfil */
 .container {
-    margin-top: 120px;
+    margin-top: 78px !important;
 }
 
 .card {
