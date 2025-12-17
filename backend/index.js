@@ -10,7 +10,7 @@ const app = express();
 
 // 🔹 CORS: permite seu frontend local (ou use '*' para todas as origens)
 app.use(cors({
-    origin: 'http://127.0.0.1:5500', // ou '*' se quiser permitir qualquer origem
+    origin: '*', // ou '*' se quiser permitir qualquer origem
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
