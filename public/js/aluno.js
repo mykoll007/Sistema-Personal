@@ -134,7 +134,7 @@ loginForm.addEventListener('submit', async (e) => {
     const senha = document.getElementById('password').value;
 
     try {
-        const response = await fetch('http://localhost:5000/aluno/login', {
+        const response = await fetch('sistema-personal.vercel.app/aluno/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, senha })

@@ -25,7 +25,7 @@ logoutBtn.addEventListener('click', () => {
 
 async function carregarTreinos() {
     try {
-        const response = await fetch('http://localhost:5000/aluno/treinos', {
+        const response = await fetch('sistema-personal.vercel.app/aluno/treinos', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -117,7 +117,7 @@ function abrirModalVideo(videoUrl, titulo) {
     // Se a URL começar com http, usa direto, senão concatena com localhost
     video.src = videoUrl.startsWith('http')
         ? videoUrl
-        : `http://localhost:5000${videoUrl}?t=${Date.now()}`;
+        : `sistema-personal.vercel.app${videoUrl}?t=${Date.now()}`;
 
     video.load();
     modal.style.display = 'flex';

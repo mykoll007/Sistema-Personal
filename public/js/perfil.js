@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000"; // ajuste se necessário
+const API_URL = "sistema-personal.vercel.app"; // ajuste se necessário
 let personal = null;
 
 (function protegerPagina() {
