@@ -738,6 +738,7 @@ footer {
 .video-modal-content video {
     width: 100%;
     border-radius: 8px;
+    max-height: 700px;
 }
 
 .video-modal-close {
