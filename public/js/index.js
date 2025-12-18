@@ -419,6 +419,7 @@ $("#btnSalvarTreinos").on("click", async function () {
 
                 treinosSelecionados.push({
                     exercicio_id: ex.id,
+                    treino: treinoAntigo?.treino || 'A',
                     exercicio_nome: ex.nome,
                     categoria_nome: ex.categoria_nome,
                     series: treinoAntigo?.series || 0,
@@ -454,6 +455,16 @@ $("#btnSalvarTreinos").on("click", async function () {
                     <label>Intervalo(seg)</label>
                     <input type="number" class="form-control input-intervalo" placeholder="Intervalo (seg)" data-id="${treino.exercicio_id}" value="${treino.intervalo_seg || ''}">
                 </div>
+                <div class="col">
+                    <label>Treino</label>
+                        <select class="form-control input-treino" data-id="${treino.exercicio_id}">
+                        <option value="A" ${treino.treino === 'A' ? 'selected' : ''}>A</option>
+                        <option value="B" ${treino.treino === 'B' ? 'selected' : ''}>B</option>
+                        <option value="C" ${treino.treino === 'C' ? 'selected' : ''}>C</option>
+                        <option value="D" ${treino.treino === 'D' ? 'selected' : ''}>D</option>
+                        <option value="E" ${treino.treino === 'E' ? 'selected' : ''}>E</option>
+                        </select>
+                </div>
             </div>
         </div>
     `;
@@ -479,6 +490,7 @@ $("#btnSalvarConfigTreinos").on("click", async function () {
         t.repeticoes = Number($(`.input-repeticoes[data-id="${t.exercicio_id}"]`).val());
         t.peso = Number($(`.input-peso[data-id="${t.exercicio_id}"]`).val());
         t.intervalo_seg = Number($(`.input-intervalo[data-id="${t.exercicio_id}"]`).val());
+        t.treino = $(`.input-treino[data-id="${t.exercicio_id}"]`).val();
     });
 
     try {
