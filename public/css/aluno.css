@@ -432,6 +432,61 @@ footer {
     color: white;
 }
 
+/* =============================== */
+/* ACCORDION TREINOS (A–E) */
+/* =============================== */
+
+.treino-accordion {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 25px auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(26, 35, 126, 0.15);
+    background: #fff;
+}
+
+/* Cabeçalho do treino (A, B, C...) */
+.treino-header {
+    background: linear-gradient(90deg, #1a237e, #5348c4);
+    color: #fff;
+    padding: 18px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.treino-header h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.treino-header i {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+/* Corpo do accordion */
+.treino-body {
+    padding: 25px 20px;
+    background-color: #f9f9ff;
+}
+
+/* Quando aberto (opcional – se quiser animar depois via JS) */
+.treino-accordion.aberto .treino-header i {
+    transform: rotate(180deg);
+}
+
+/* Dentro do accordion mantém seus cards */
+.treino-body .treino-card {
+    margin: 15px auto;
+}
+
+
 /* Responsividade */
 @media screen and (max-width: 1099px) {
     .hero-text {
@@ -516,10 +571,11 @@ footer {
 /* Container de todos os cards de treino */
 #treinos-container {
     display: flex;
-    gap: 30px;
-    flex-wrap: wrap; /* Permite quebrar linha em telas menores */
-    justify-content: center; /* Centraliza os cards */
+    flex-direction: column;
+    gap: 25px;
+    align-items: center;
 }
+
 .treinos-aluno-title {
         margin-top: 100px;
     font-size: 2.2rem;

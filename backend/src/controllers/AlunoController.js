@@ -52,6 +52,7 @@ class AlunoController {
                 .join('exercicios', 'aluno_treinos.exercicio_id', 'exercicios.id')
                 .join('categorias', 'exercicios.categoria_id', 'categorias.id')
                 .select(
+                    'aluno_treinos.treino',
                     'categorias.nome as categoria',
                     'exercicios.nome as exercicio',
                     'exercicios.video_url',

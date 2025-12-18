@@ -22,7 +22,6 @@ logoutBtn.addEventListener('click', () => {
 /* ============================= */
 /* Buscar treinos do backend */
 /* ============================= */
-
 async function carregarTreinos() {
     try {
         const response = await fetch('https://sistema-personal.vercel.app/aluno/treinos', {
@@ -36,6 +35,7 @@ async function carregarTreinos() {
         }
 
         const dados = await response.json();
+        console.log('Treinos recebidos:', dados); // 👈 DEBUG
         renderizarTreinos(dados);
 
     } catch (error) {
@@ -43,6 +43,7 @@ async function carregarTreinos() {
         alert('Erro ao carregar treinos');
     }
 }
+
 
 /* ============================= */
 /* Renderização */
@@ -52,56 +53,84 @@ function renderizarTreinos(dados) {
     const container = document.getElementById('treinos-container');
     container.innerHTML = '';
 
-    const agrupado = {};
+    // 🔹 Agrupar por treino (A–E)
+    const porTreino = {};
 
-    // Agrupa por categoria
     dados.forEach(item => {
-        if (!agrupado[item.categoria]) {
-            agrupado[item.categoria] = [];
+        if (!porTreino[item.treino]) {
+            porTreino[item.treino] = {};
         }
-        agrupado[item.categoria].push(item);
+
+        if (!porTreino[item.treino][item.categoria]) {
+            porTreino[item.treino][item.categoria] = [];
+        }
+
+        porTreino[item.treino][item.categoria].push(item);
     });
 
-    Object.keys(agrupado).forEach(categoria => {
-        const card = document.createElement('div');
-        card.classList.add('treino-card');
+    // Ordenar treinos A → E
+    Object.keys(porTreino).sort().forEach(letraTreino => {
 
-card.innerHTML = `
-    <h3 class="categoria-titulo">${categoria}</h3>
-    <div class="categoria-icone">
-        <i class="fa-solid fa-dumbbell"></i>
-    </div>
-`;
+        // Accordion container
+        const accordion = document.createElement('div');
+        accordion.classList.add('treino-accordion');
 
-        const lista = document.createElement('div');
-        lista.classList.add('exercicios-list');
+        accordion.innerHTML = `
+            <div class="treino-header">
+                <h3>Treino ${letraTreino}</h3>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="treino-body" style="display: none;"></div>
+        `;
 
-        agrupado[categoria].forEach(ex => {
-            const item = document.createElement('div');
-            item.classList.add('exercicio-item');
+        const body = accordion.querySelector('.treino-body');
 
-            item.innerHTML = `
-                <strong>${ex.exercicio}</strong>
-                <p>Séries: ${ex.series}</p>
-                <p>Repetições: ${ex.repeticoes}</p>
-                <p>Peso: ${ex.peso}kg</p>
-                <p>Intervalo: ${ex.intervalo_seg}s</p>
-                ${ex.video_url ? `
-                <button class="video-btn"
-                onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
-                Assistir Vídeo
-                </button>
-` : ''}
+        // 🔹 Dentro do treino, agrupa por categoria
+        Object.keys(porTreino[letraTreino]).forEach(categoria => {
+            const card = document.createElement('div');
+            card.classList.add('treino-card');
 
+            card.innerHTML = `
+                <h4 class="categoria-titulo">${categoria}</h4>
             `;
 
-            lista.appendChild(item);
+            const lista = document.createElement('div');
+            lista.classList.add('exercicios-list');
+
+            porTreino[letraTreino][categoria].forEach(ex => {
+                const item = document.createElement('div');
+                item.classList.add('exercicio-item');
+
+                item.innerHTML = `
+                    <strong>${ex.exercicio}</strong>
+                    <p>Séries: ${ex.series}</p>
+                    <p>Repetições: ${ex.repeticoes}</p>
+                    <p>Peso: ${ex.peso}kg</p>
+                    <p>Intervalo: ${ex.intervalo_seg}s</p>
+                    ${ex.video_url ? `
+                        <button class="video-btn"
+                            onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
+                            Assistir Vídeo
+                        </button>
+                    ` : ''}
+                `;
+
+                lista.appendChild(item);
+            });
+
+            card.appendChild(lista);
+            body.appendChild(card);
         });
 
-        card.appendChild(lista);
-        container.appendChild(card);
+        // 🔽 Toggle do accordion
+        accordion.querySelector('.treino-header').addEventListener('click', () => {
+            body.style.display = body.style.display === 'none' ? 'block' : 'none';
+        });
+
+        container.appendChild(accordion);
     });
 }
+
 
 /* ============================= */
 /* MODAL VÍDEO */
