@@ -35,7 +35,6 @@ async function carregarTreinos() {
         }
 
         const dados = await response.json();
-        console.log('Treinos recebidos:', dados); // 👈 DEBUG
         renderizarTreinos(dados);
 
     } catch (error) {
@@ -102,7 +101,11 @@ function renderizarTreinos(dados) {
                 item.classList.add('exercicio-item');
 
                 item.innerHTML = `
-                    <strong>${ex.exercicio}</strong>
+                   <div class="exercicio-header">
+                   <strong>${ex.exercicio}</strong>
+                   <i class="fa-solid fa-arrows-rotate altere-icon"
+                    title="Exercício alternativo"></i>
+                    </div>
                     <p>Séries: ${ex.series}</p>
                     <p>Repetições: ${ex.repeticoes}</p>
                     <p>Peso: ${ex.peso}kg</p>
