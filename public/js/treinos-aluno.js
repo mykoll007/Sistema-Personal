@@ -35,6 +35,7 @@ async function carregarTreinos() {
         }
 
         const dados = await response.json();
+
         renderizarTreinos(dados);
 
     } catch (error) {
@@ -71,8 +72,9 @@ function renderizarTreinos(dados) {
     Object.keys(porTreino).sort().forEach(letraTreino => {
 
         // Accordion container
-        const accordion = document.createElement('div');
-        accordion.classList.add('treino-accordion');
+const accordion = document.createElement('div');
+accordion.classList.add('treino-accordion', `treino-${letraTreino}`);
+
 
         accordion.innerHTML = `
             <div class="treino-header">
@@ -101,11 +103,12 @@ function renderizarTreinos(dados) {
                 item.classList.add('exercicio-item');
 
                 item.innerHTML = `
-                   <div class="exercicio-header">
-                   <strong>${ex.exercicio}</strong>
-                   <i class="fa-solid fa-arrows-rotate altere-icon"
-                    title="Exercício alternativo"></i>
-                    </div>
+                        <div class="exercicio-header">
+<i class="fa-solid fa-dumbbell altere-icon"
+   title="Exercício de força"></i>
+
+    </div>
+                    <strong>${ex.exercicio}</strong>
                     <p>Séries: ${ex.series}</p>
                     <p>Repetições: ${ex.repeticoes}</p>
                     <p>Peso: ${ex.peso}kg</p>

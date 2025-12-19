@@ -553,6 +553,8 @@ footer {
 
 /*Treinos-aluno.html*/
 
+
+
 /* Container que agrupa os cards de categoria */
 .categorias-container {
     display: flex;
@@ -649,6 +651,94 @@ footer {
     letter-spacing: 0.5px;
 }
 
+/* ============================= */
+/* 🎯 CORES POR TREINO (A–E) */
+/* ============================= */
+
+/* 🔵 TREINO A */
+.treino-A .treino-header {
+    background: linear-gradient(90deg, #1a237e, #3f51b5);
+}
+
+.treino-A .treino-body {
+    background-color: #eef1ff;
+}
+
+.treino-A .categoria-titulo,
+.treino-A .exercicio-item strong,
+.treino-A .altere-icon {
+    color: #3f51b5;
+}
+
+
+/* 🟢 TREINO B */
+.treino-B .treino-header {
+    background: linear-gradient(90deg, #1b5e20, #43a047);
+}
+
+.treino-B .treino-body {
+    background-color: #e8f5e9;
+}
+
+.treino-B .categoria-titulo,
+.treino-B .exercicio-item strong,
+.treino-B .altere-icon {
+    color: #43a047;
+}
+
+
+/* 🟠 TREINO C */
+.treino-C .treino-header {
+    background: linear-gradient(90deg, #e65100, #ff9800);
+}
+
+.treino-C .treino-body {
+    background-color: #fff3e0;
+}
+
+.treino-C .categoria-titulo,
+.treino-C .exercicio-item strong,
+.treino-C .altere-icon {
+    color: #ff9800;
+}
+
+
+/* 🔴 TREINO D */
+.treino-D .treino-header {
+    background: linear-gradient(90deg, #b71c1c, #e53935);
+}
+
+.treino-D .treino-body {
+    background-color: #ffebee;
+}
+
+.treino-D .categoria-titulo,
+.treino-D .exercicio-item strong,
+.treino-D .altere-icon {
+    color: #e53935;
+}
+
+
+/* 🟣 TREINO E */
+.treino-E .treino-header {
+    background: linear-gradient(90deg, #4a148c, #7b1fa2);
+}
+
+.treino-E .treino-body {
+    background-color: #f3e5f5;
+}
+
+.treino-E .categoria-titulo,
+.treino-E .exercicio-item strong,
+.treino-E .altere-icon {
+    color: #7b1fa2;
+}
+
+
+.categoria-titulo{
+    font-size: 25px;
+}
+
 /* Lista de exercícios dentro do card */
 .exercicios-list {
     text-align: left;
@@ -661,6 +751,21 @@ footer {
 /* Cada exercício */
 
 
+.exercicio-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.altere-icon {
+    cursor: pointer;
+    color: #666;
+    font-size: 14px;
+}
+
+.altere-icon:hover {
+    color: #000;
+}
 
 
 /* Nome do exercício */
@@ -668,7 +773,7 @@ footer {
     display: block;
     font-size: 1.2rem;
     margin-bottom: 10px;
-    color: #f4c542; /* destaque amarelo */
+
     letter-spacing: 0.5px;
 }
 
@@ -849,3 +954,4 @@ footer {
         gap: 20px;
     }
 }
+

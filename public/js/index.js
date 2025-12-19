@@ -346,51 +346,77 @@ $('#dataTable tbody').on('click', '.btn-excluir', function () {
 });
 
 $('#dataTable tbody').on('click', '.btn-treino', async function () {
-    const nome = $(this).data('nome');
-    alunoParaTreino = alunos.find(a => a.nome === nome);
-    if (!alunoParaTreino) return;
+    try {
+        // 🔥 RESET TOTAL DE ESTADO (ESSENCIAL)
+        treinosSelecionados = [];
+        $("#listaCategorias").html('');
+        $("#listaConfigsTreinos").html('');
 
-    $("#nomeAlunoTreino").text(alunoParaTreino.nome);
-    $("#modalTreinos").modal("show");
+        const nome = $(this).data('nome');
+        alunoParaTreino = alunos.find(a => a.nome === nome);
+        if (!alunoParaTreino) return;
 
-    // Carregar categorias e exercícios
-    categorias = await carregarCategoriasExerciciosComNomes();
+        // Atualiza nome no modal
+        $("#nomeAlunoTreino").text(alunoParaTreino.nome);
 
-    // Carregar treinos já vinculados
-    const treinosVinculados = await carregarTreinosDoAluno(alunoParaTreino.id);
-    const idsVinculados = treinosVinculados.map(t => t.exercicio_id);
+        // Abre modal
+        $("#modalTreinos").modal("show");
 
-    let html = '';
-    for (const cat of categorias) {
-        if (!cat.exercicios.length) continue;
+        // 🔹 Sempre buscar categorias + exercícios
+        categorias = await carregarCategoriasExerciciosComNomes();
 
-        let exHtml = '';
-        for (const ex of cat.exercicios) {
-            const checked = idsVinculados.includes(ex.id) ? 'checked' : '';
-            exHtml += `
-                <div class="form-check">
-                    <input class="form-check-input exercicio-checkbox" type="checkbox" 
-                           value="${ex.id}" id="exercicio-${ex.id}" ${checked}>
-                    <label class="form-check-label" for="exercicio-${ex.id}">
-                        ${ex.nome}
-                    </label>
+        // 🔹 SEMPRE buscar treinos ATUALIZADOS do banco
+        const treinosVinculados = await carregarTreinosDoAluno(alunoParaTreino.id);
+        const idsVinculados = treinosVinculados.map(t => Number(t.exercicio_id));
+
+        let html = '';
+
+        for (const cat of categorias) {
+            if (!cat.exercicios || !cat.exercicios.length) continue;
+
+            let exHtml = '';
+
+            for (const ex of cat.exercicios) {
+                const checked = idsVinculados.includes(Number(ex.id)) ? 'checked' : '';
+
+                exHtml += `
+                    <div class="form-check">
+                        <input class="form-check-input exercicio-checkbox"
+                               type="checkbox"
+                               value="${ex.id}"
+                               id="exercicio-${ex.id}"
+                               ${checked}>
+                        <label class="form-check-label" for="exercicio-${ex.id}">
+                            ${ex.nome}
+                        </label>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="card mb-2">
+                    <div class="card-header bg-light">
+                        ${cat.nome}
+                    </div>
+                    <div class="card-body">
+                        ${exHtml}
+                    </div>
                 </div>
             `;
         }
 
-        html += `<div class="card mb-2">
-                    <div class="card-header bg-light">${cat.nome}</div>
-                    <div class="card-body">
-                        ${exHtml}
-                    </div>
-                 </div>`;
+        // Renderiza categorias
+        $("#listaCategorias").html(html);
+
+        // 🔥 Guarda SEMPRE os treinos mais recentes
+        $("#modalTreinos").data('treinosVinculados', treinosVinculados);
+
+    } catch (err) {
+        console.error(err);
+        mostrarToast("Erro", "Erro ao carregar treinos do aluno", "danger");
     }
-
-    $("#listaCategorias").html(html);
-
-    // Guardar treinos vinculados para comparação
-    $("#modalTreinos").data('treinosVinculados', treinosVinculados);
 });
+
 
 
 $("#btnSalvarTreinos").on("click", async function () {
