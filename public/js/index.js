@@ -5,6 +5,8 @@ let alunoSelecionado = null; // usado para edição e exclusão
 let treinosSelecionados = [];
 let categorias = [];
 let alunoParaTreino = null;
+let cachePersonal = null; // cache global
+let cacheAlunos = null;
 
 // -----------------------------------
 // PEGAR TOKEN
@@ -32,6 +34,18 @@ document.getElementById("btnConfirmLogout")?.addEventListener("click", async fun
 });
 
 
+async function retryFetch(url, options = {}, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const res = await authFetch(url, options);
+            return res;
+        } catch (err) {
+            if (i === retries - 1) throw err;
+            const delay = 500 * Math.pow(2, i); // 0.5s, 1s, 2s
+            await new Promise(r => setTimeout(r, delay));
+        }
+    }
+}
 
 async function authFetch(url, options = {}) {
     const token = getToken();
@@ -98,30 +112,35 @@ $('#toastMessage').on('hidden.bs.toast', function () {
 // -----------------------------------
 // CARREGAR DADOS DO PERSONAL LOGADO
 // -----------------------------------
-async function carregarPersonalLogado() {
+async function carregarPersonalLogado(forceReload = false) {
+    if (!forceReload && cachePersonal) return cachePersonal;
+
     try {
         const token = getToken();
         if (!token) return;
 
-        const res = await authFetch(`${API_URL}/personal/logado`)
-
+        const res = await retryFetch(`${API_URL}/personal/logado`);
         if (!res.ok) throw new Error("Erro ao carregar dados do personal.");
 
         const data = await res.json();
         const personal = data.personal;
 
-        if (!personal) return;
+        if (!personal) throw new Error("Dados do personal não encontrados.");
 
         const fotoFinal = personal.foto_url
             ? (personal.foto_url.startsWith('http') ? personal.foto_url : `${API_URL}${personal.foto_url}`)
             : "img/undraw_profile.svg";
 
-
         document.getElementById("nomePersonal").textContent = personal.nome;
         document.getElementById("fotoTopbar").src = fotoFinal;
 
+        cachePersonal = personal; // salva no cache
+        return personal;
+
     } catch (err) {
         console.error(err);
+        mostrarToast("Erro", err.message, "danger");
+        return null;
     }
 }
 
@@ -550,6 +569,8 @@ function renderizarConfigTreinos() {
                                 <option value="A" ${t.treino === 'A' ? 'selected' : ''}>A</option>
                                 <option value="B" ${t.treino === 'B' ? 'selected' : ''}>B</option>
                                 <option value="C" ${t.treino === 'C' ? 'selected' : ''}>C</option>
+                                <option value="D" ${t.treino === 'D' ? 'selected' : ''}>D</option>
+                                <option value="E" ${t.treino === 'E' ? 'selected' : ''}>E</option>
                             </select>
                         </div>
 
