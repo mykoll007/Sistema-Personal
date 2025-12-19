@@ -96,35 +96,50 @@ class AlunoController {
     // =========================
     // Finalizar treino
     // =========================
-    async finalizarTreino(req, res) {
-        const alunoId = req.alunoId;
-        const { treinoId } = req.params;
+async finalizarTreino(req, res) {
+    const alunoId = req.alunoId;
+    const { treinoId } = req.params;
 
-        try {
-            const atualizado = await database('aluno_treinos')
-                .where({
-                    id: treinoId,
-                    aluno_id: alunoId,
-                    status: 'em_andamento'
-                })
-                .update({
-                    status: 'finalizado',
-                    finalizado_em: database.fn.now()
-                });
+    try {
+        const treino = await database('aluno_treinos')
+            .where({
+                id: treinoId,
+                aluno_id: alunoId
+            })
+            .first();
 
-            if (!atualizado) {
-                return res.status(404).json({
-                    message: 'Treino não encontrado ou já finalizado'
-                });
-            }
-
-            return res.json({ message: 'Treino finalizado com sucesso' });
-
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: 'Erro ao finalizar treino' });
+        if (!treino) {
+            return res.status(404).json({ message: 'Treino não encontrado' });
         }
+
+        // 🔁 TOGGLE
+        if (treino.status === 'finalizado') {
+            await database('aluno_treinos')
+                .where('id', treinoId)
+                .update({
+                    status: 'em_andamento',
+                    finalizado_em: null
+                });
+
+            return res.json({ status: 'em_andamento' });
+        }
+
+        // se estiver em andamento
+        await database('aluno_treinos')
+            .where('id', treinoId)
+            .update({
+                status: 'finalizado',
+                finalizado_em: database.fn.now()
+            });
+
+        return res.json({ status: 'finalizado' });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erro ao atualizar treino' });
     }
+}
+
 }
 
 module.exports = new AlunoController();

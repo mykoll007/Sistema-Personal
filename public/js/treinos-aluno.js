@@ -181,13 +181,14 @@ async function toggleFinalizarTreino(treinoId, botao) {
             throw new Error('Erro ao atualizar treino');
         }
 
-        // Atualiza visualmente
-        if (botao.classList.contains('finalizado')) {
-            botao.classList.remove('finalizado');
-            botao.innerHTML = 'Finalizar';
-        } else {
+        const data = await response.json();
+
+        if (data.status === 'finalizado') {
             botao.classList.add('finalizado');
             botao.innerHTML = '✅ Finalizado';
+        } else {
+            botao.classList.remove('finalizado');
+            botao.innerHTML = 'Finalizar';
         }
 
     } catch (error) {
@@ -195,6 +196,7 @@ async function toggleFinalizarTreino(treinoId, botao) {
         alert('Erro ao atualizar treino');
     }
 }
+
 
 
 
