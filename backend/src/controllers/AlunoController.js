@@ -60,7 +60,8 @@ class AlunoController {
                     'aluno_treinos.repeticoes',
                     'aluno_treinos.peso',
                     'aluno_treinos.intervalo_seg',
-                    'exercicios.descricao'
+                    'exercicios.descricao',
+                    'aluno_treinos.status'
                 )
                 .where('aluno_treinos.aluno_id', alunoId)
                 .orderBy('categorias.nome');

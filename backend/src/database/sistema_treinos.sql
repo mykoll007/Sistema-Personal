@@ -62,6 +62,7 @@ CREATE TABLE aluno_treinos (
     peso INT NOT NULL,
     intervalo_seg INT NOT NULL,
     treino VARCHAR(50) NOT NULL,
+    status ENUM('em_andamento', 'finalizado') DEFAULT 'em_andamento',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
     FOREIGN KEY (exercicio_id) REFERENCES exercicios(id) ON DELETE CASCADE

@@ -194,7 +194,7 @@ class PersonalController {
     }
 
     // 📌 Upload de foto do personal
-async uploadFoto(req, res) {
+    async uploadFoto(req, res) {
     try {
         if (!req.file) {
             return res.status(400).json({ message: "Nenhuma foto enviada." });
@@ -212,11 +212,11 @@ async uploadFoto(req, res) {
         console.error(error);
         return res.status(500).json({ message: "Erro ao salvar foto." });
     }
-}
+    }
 
 
 
-async uploadVideoExercicio(req, res) {
+    async uploadVideoExercicio(req, res) {
     try {
         const { id } = req.params;
         const { video_url } = req.body;
@@ -242,11 +242,6 @@ async uploadVideoExercicio(req, res) {
         return res.status(500).json({ message: "Erro ao atualizar vídeo" });
     }
 }
-
-
-
-
-
 
     // 📌 ADICIONAR ALUNO (com email + senha)
     async adicionarAluno(request, response) {
@@ -582,14 +577,6 @@ async uploadVideoExercicio(req, res) {
         }
     }
 
-
-
-
-
-
-
-
-
     // 📌 Categorias
     async criarCategoria(request, response) {
         const { nome } = request.body;
@@ -710,8 +697,8 @@ async uploadVideoExercicio(req, res) {
     }
 
 
-async adicionarExercicioAoAluno(request, response) {
-    const {
+    async adicionarExercicioAoAluno(request, response) {
+        const {
         aluno_id,
         exercicio_id,
         series,
@@ -785,7 +772,7 @@ async adicionarExercicioAoAluno(request, response) {
 
 
 // 📌 Listar treinos de um aluno
-async listarTreinosDoAluno(request, response) {
+    async listarTreinosDoAluno(request, response) {
     const { id: aluno_id } = request.params;
     const personal_id = request.personalId;
 
@@ -828,10 +815,10 @@ async listarTreinosDoAluno(request, response) {
             message: "Erro ao listar treinos do aluno."
         });
     }
-}
+    }
 
 
-async deletarTreinoDoAluno(req, res) {
+    async deletarTreinoDoAluno(req, res) {
     const { aluno_id, exercicio_id, treino } = req.params;
     const personal_id = req.personalId;
 
@@ -874,10 +861,10 @@ async deletarTreinoDoAluno(req, res) {
             message: "Erro ao remover treino."
         });
     }
-}
+    }
 
 
-async salvarTreinosDoAluno(req, res) {
+    async salvarTreinosDoAluno(req, res) {
     const { aluno_id, treinos } = req.body;
     const personal_id = req.personalId;
 
@@ -967,9 +954,7 @@ async salvarTreinosDoAluno(req, res) {
             message: "Erro ao salvar treinos do aluno."
         });
     }
-}
-
-
+    }
 
 }
 
