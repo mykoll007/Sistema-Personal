@@ -4,7 +4,7 @@ let dataTable;
 let alunoSelecionado = null; // usado para edição e exclusão
 let treinosSelecionados = [];
 let categorias = [];
-
+let alunoParaTreino = null;
 
 // -----------------------------------
 // PEGAR TOKEN
@@ -17,7 +17,20 @@ function logout() {
     window.location.href = "login.html";
 }
 
-document.getElementById("btnLogout")?.addEventListener("click", logout);
+document.getElementById("btnConfirmLogout")?.addEventListener("click", async function () {
+    setLoadingBotaoLogout(true);
+
+    try {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+    } catch (err) {
+        console.error(err);
+        mostrarToast("Erro", "Não foi possível sair.", "danger");
+    } finally {
+        setLoadingBotaoLogout(false);
+    }
+});
+
 
 
 async function authFetch(url, options = {}) {
@@ -62,19 +75,25 @@ function formatarData(dataStr) {
 // MOSTRAR TOAST
 // -----------------------------------
 function mostrarToast(titulo, mensagem, tipo = "info") {
-    const header = document.querySelector("#toastMessage .toast-header");
-    if (!header) return;
+    const toast = $("#toastMessage");
+    const header = toast.find(".toast-header");
 
-    header.classList.remove("bg-danger", "bg-success", "bg-primary", "text-white");
+    header.removeClass("bg-danger bg-success bg-primary text-white");
 
-    if (tipo === "success") header.classList.add("bg-success", "text-white");
-    if (tipo === "danger") header.classList.add("bg-danger", "text-white");
-    if (tipo === "primary") header.classList.add("bg-primary", "text-white");
+    if (tipo === "success") header.addClass("bg-success text-white");
+    if (tipo === "danger") header.addClass("bg-danger text-white");
+    if (tipo === "primary") header.addClass("bg-primary text-white");
 
-    document.getElementById("toastTitle").textContent = titulo;
-    document.getElementById("toastBody").textContent = mensagem;
-    $("#toastMessage").toast("show");
+    $("#toastTitle").text(titulo);
+    $("#toastBody").text(mensagem);
+
+    toast.css("display", "block"); // 🔥 MOSTRA
+    toast.toast("show");
 }
+
+$('#toastMessage').on('hidden.bs.toast', function () {
+    $(this).css("display", "none"); // 🔥 ESCONDE novamente
+});
 
 // -----------------------------------
 // CARREGAR DADOS DO PERSONAL LOGADO
@@ -93,9 +112,9 @@ async function carregarPersonalLogado() {
 
         if (!personal) return;
 
-const fotoFinal = personal.foto_url
-    ? (personal.foto_url.startsWith('http') ? personal.foto_url : `${API_URL}${personal.foto_url}`)
-    : "img/undraw_profile.svg";
+        const fotoFinal = personal.foto_url
+            ? (personal.foto_url.startsWith('http') ? personal.foto_url : `${API_URL}${personal.foto_url}`)
+            : "img/undraw_profile.svg";
 
 
         document.getElementById("nomePersonal").textContent = personal.nome;
@@ -231,8 +250,9 @@ async function criarAluno() {
         return;
     }
 
+    setLoadingBotaoCriar(true);
+
     try {
-        const token = getToken();
         const res = await authFetch(`${API_URL}/personal/alunos`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -248,17 +268,23 @@ async function criarAluno() {
         $("#modalCriarAluno").modal("hide");
         $("#formCriarAluno").trigger("reset");
         carregarAlunos();
+
     } catch (err) {
         console.error(err);
         mostrarToast("Erro", err.message, "danger");
+    } finally {
+        setLoadingBotaoCriar(false);
     }
 }
+
 
 // -----------------------------------
 // EDITAR ALUNO
 // -----------------------------------
 async function editarAluno() {
     if (!alunoSelecionado) return;
+
+    setLoadingBotaoEditar(true);
 
     const email = $("#editEmail").val();
     const nome = $("#editNome").val();
@@ -287,14 +313,19 @@ async function editarAluno() {
     } catch (err) {
         console.error(err);
         mostrarToast("Erro", err.message, "danger");
+    } finally {
+        setLoadingBotaoEditar(false);
     }
 }
+
 
 // -----------------------------------
 // EXCLUIR ALUNO
 // -----------------------------------
 async function excluirAluno() {
     if (!alunoSelecionado) return;
+
+    setLoadingBotaoExcluir(true);
 
     try {
         const token = getToken();
@@ -313,6 +344,8 @@ async function excluirAluno() {
     } catch (err) {
         console.error(err);
         mostrarToast("Erro", err.message, "danger");
+    } finally {
+        setLoadingBotaoExcluir(false);
     }
 }
 
@@ -345,171 +378,219 @@ $('#dataTable tbody').on('click', '.btn-excluir', function () {
     $("#modalExcluirAluno").modal("show");
 });
 
-$('#dataTable tbody').on('click', '.btn-treino', async function () {
-    try {
-        // 🔥 RESET TOTAL DE ESTADO (ESSENCIAL)
-        treinosSelecionados = [];
-        $("#listaCategorias").html('');
-        $("#listaConfigsTreinos").html('');
+$('#dataTable tbody').on('click', '.btn-treino', function () {
 
-        const nome = $(this).data('nome');
-        alunoParaTreino = alunos.find(a => a.nome === nome);
-        if (!alunoParaTreino) return;
+    treinosSelecionados = [];
+    $("#listaCategorias").empty();
+    $("#listaConfigsTreinos").empty();
 
-        // Atualiza nome no modal
-        $("#nomeAlunoTreino").text(alunoParaTreino.nome);
+    const nome = $(this).data('nome');
+    alunoParaTreino = alunos.find(a => a.nome === nome);
+    if (!alunoParaTreino) return;
 
-        // Abre modal
-        $("#modalTreinos").modal("show");
+    $("#nomeAlunoTreino").text(alunoParaTreino.nome);
 
-        // 🔹 Sempre buscar categorias + exercícios
-        categorias = await carregarCategoriasExerciciosComNomes();
+    // Abre o modal
+    $("#modalTreinos").modal("show");
 
-        // 🔹 SEMPRE buscar treinos ATUALIZADOS do banco
-        const treinosVinculados = await carregarTreinosDoAluno(alunoParaTreino.id);
-        const idsVinculados = treinosVinculados.map(t => Number(t.exercicio_id));
+    // 🔥 Quando o modal terminar de abrir
+    $("#modalTreinos").one('shown.bs.modal', async function () {
 
-        let html = '';
+        // MOSTRA LOADER
+        $("#loaderTreinosVincular").removeClass("d-none");
+        $("#listaCategorias").addClass("d-none");
 
-        for (const cat of categorias) {
-            if (!cat.exercicios || !cat.exercicios.length) continue;
+        try {
+            categorias = await carregarCategoriasExerciciosComNomes();
+            const treinosVinculados = await carregarTreinosDoAluno(alunoParaTreino.id);
 
-            let exHtml = '';
+            // 🔥 SALVA NO MODAL (ESSENCIAL)
+            $("#modalTreinos").data('treinosVinculados', treinosVinculados);
 
-            for (const ex of cat.exercicios) {
-                const checked = idsVinculados.includes(Number(ex.id)) ? 'checked' : '';
+            const idsVinculados = treinosVinculados.map(t => Number(t.exercicio_id));
 
-                exHtml += `
-                    <div class="form-check">
-                        <input class="form-check-input exercicio-checkbox"
-                               type="checkbox"
-                               value="${ex.id}"
-                               id="exercicio-${ex.id}"
-                               ${checked}>
-                        <label class="form-check-label" for="exercicio-${ex.id}">
-                            ${ex.nome}
-                        </label>
+            let html = '';
+
+            for (const cat of categorias) {
+                if (!cat.exercicios?.length) continue;
+
+                let exHtml = '';
+
+                for (const ex of cat.exercicios) {
+                    const checked = idsVinculados.includes(Number(ex.id)) ? 'checked' : '';
+
+                    exHtml += `
+                        <div class="form-check">
+                            <input class="form-check-input exercicio-checkbox"
+                                   type="checkbox"
+                                   value="${ex.id}"
+                                   id="exercicio-${ex.id}"
+                                   ${checked}>
+                            <label class="form-check-label" for="exercicio-${ex.id}">
+                                ${ex.nome}
+                            </label>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="card mb-2">
+                        <div class="card-header bg-light">${cat.nome}</div>
+                        <div class="card-body">${exHtml}</div>
                     </div>
                 `;
             }
 
-            html += `
-                <div class="card mb-2">
-                    <div class="card-header bg-light">
-                        ${cat.nome}
-                    </div>
-                    <div class="card-body">
-                        ${exHtml}
-                    </div>
-                </div>
-            `;
+            $("#listaCategorias").html(html);
+
+        } catch (err) {
+            console.error(err);
+            mostrarToast("Erro", "Erro ao carregar treinos", "danger");
+        } finally {
+            // ESCONDE LOADER
+            $("#loaderTreinosVincular").addClass("d-none");
+            $("#listaCategorias").removeClass("d-none");
         }
-
-        // Renderiza categorias
-        $("#listaCategorias").html(html);
-
-        // 🔥 Guarda SEMPRE os treinos mais recentes
-        $("#modalTreinos").data('treinosVinculados', treinosVinculados);
-
-    } catch (err) {
-        console.error(err);
-        mostrarToast("Erro", "Erro ao carregar treinos do aluno", "danger");
-    }
+    });
 });
+
+
+
 
 
 
 $("#btnSalvarTreinos").on("click", async function () {
-    const treinosVinculados = $("#modalTreinos").data('treinosVinculados'); // antigos
-    const idsVinculados = treinosVinculados.map(t => t.exercicio_id);
 
-    treinosSelecionados = [];
+    if ($(this).prop("disabled")) return;
+    setLoadingBotaoConfigurar(true);
 
-    // Novos selecionados
-    const idsSelecionados = $(".exercicio-checkbox:checked").map(function () {
-        return Number($(this).val());
-    }).get();
+    try {
+        const treinosVinculados = $("#modalTreinos").data('treinosVinculados') || [];
+        const idsVinculados = treinosVinculados.map(t => t.exercicio_id);
 
-    // 1️⃣ Treinos para adicionar (novos checkboxes)
-    const idsParaAdicionar = idsSelecionados.filter(id => !idsVinculados.includes(id));
+        treinosSelecionados = [];
 
-    // 2️⃣ Treinos para deletar (desmarcados que estavam no banco)
-    const idsParaDeletar = idsVinculados.filter(id => !idsSelecionados.includes(id));
+        const idsSelecionados = $(".exercicio-checkbox:checked").map(function () {
+            return Number($(this).val());
+        }).get();
 
-    // 3️⃣ Treinos selecionados para configuração (apenas os checkboxes marcados)
-    for (const cat of categorias) {
-        for (const ex of cat.exercicios) {
-            if (idsSelecionados.includes(ex.id)) {
-                // Verificar se já existia para pegar os valores antigos
-                const treinoAntigo = treinosVinculados.find(t => t.exercicio_id === ex.id);
+        const idsParaAdicionar = idsSelecionados.filter(id => !idsVinculados.includes(id));
+        const idsParaDeletar = idsVinculados.filter(id => !idsSelecionados.includes(id));
 
-                treinosSelecionados.push({
-                    exercicio_id: ex.id,
-                    treino: treinoAntigo?.treino || 'A',
-                    exercicio_nome: ex.nome,
-                    categoria_nome: ex.categoria_nome,
-                    series: treinoAntigo?.series || 0,
-                    repeticoes: treinoAntigo?.repeticoes || 0,
-                    peso: treinoAntigo?.peso || 0,
-                    intervalo_seg: treinoAntigo?.intervalo_seg || 0
-                });
+        for (const cat of categorias) {
+            for (const ex of cat.exercicios) {
+                if (idsSelecionados.includes(ex.id)) {
+                    const treinoAntigo = treinosVinculados.find(t => t.exercicio_id === ex.id);
+
+                    treinosSelecionados.push({
+                        exercicio_id: ex.id,
+                        treino: treinoAntigo?.treino || 'A',
+                        exercicio_nome: ex.nome,
+                        categoria_nome: ex.categoria_nome,
+                        series: treinoAntigo?.series || 0,
+                        repeticoes: treinoAntigo?.repeticoes || 0,
+                        peso: treinoAntigo?.peso || 0,
+                        intervalo_seg: treinoAntigo?.intervalo_seg || 0
+                    });
+                }
             }
         }
-    }
 
-    // Montar HTML dos inputs
-    let html = '';
-    for (const treino of treinosSelecionados) {
+        // Fecha o modal de seleção e abre o modal de configuração
+        $("#modalTreinos").modal("hide");
+        $("#modalConfigTreinos").modal("show");
+
+        // Salva IDs para adicionar/deletar no modal de configuração
+        $("#modalConfigTreinos").data('idsParaAdicionar', idsParaAdicionar);
+        $("#modalConfigTreinos").data('idsParaDeletar', idsParaDeletar);
+
+        // Renderiza os exercícios no modal de configuração quando abrir
+        $("#modalConfigTreinos").one("shown.bs.modal", () => {
+            renderizarConfigTreinos();   // 🔥 Renderiza os inputs
+            setLoadingBotaoConfigurar(false);
+        });
+
+    } catch (err) {
+        console.error(err);
+        mostrarToast("Erro", "Erro ao configurar treinos", "danger");
+        setLoadingBotaoConfigurar(false);
+    }
+});
+
+// Função para renderizar os exercícios selecionados no modal de configuração
+function renderizarConfigTreinos() {
+    let html = "";
+
+    treinosSelecionados.forEach(t => {
         html += `
-        <div class="card mb-2 p-2">
-            <h6 class="text-muted">${treino.categoria_nome}</h6> <!-- categoria -->
-            <h5>${treino.exercicio_nome}</h5>
-            <div class="form-row">
-                <div class="col">
-                    <label>Séries</label>
-                    <input type="number" class="form-control input-series" placeholder="Séries" data-id="${treino.exercicio_id}" value="${treino.series || ''}">
+            <div class="card mb-3">
+                <div class="card-header font-weight-bold">
+                    ${t.exercicio_nome}
+                    <span class="text-muted">(${t.categoria_nome})</span>
                 </div>
-                <div class="col">
-                    <label>Repetições</label>
-                    <input type="number" class="form-control input-repeticoes" placeholder="Repetições" data-id="${treino.exercicio_id}" value="${treino.repeticoes || ''}">
-                </div>
-                <div class="col">
-                    <label>Peso</label>
-                    <input type="number" class="form-control input-peso" placeholder="Peso (kg)" data-id="${treino.exercicio_id}" value="${treino.peso || ''}">
-                </div>
-                <div class="col">
-                    <label>Intervalo(seg)</label>
-                    <input type="number" class="form-control input-intervalo" placeholder="Intervalo (seg)" data-id="${treino.exercicio_id}" value="${treino.intervalo_seg || ''}">
-                </div>
-                <div class="col">
-                    <label>Treino</label>
-                        <select class="form-control input-treino" data-id="${treino.exercicio_id}">
-                        <option value="A" ${treino.treino === 'A' ? 'selected' : ''}>A</option>
-                        <option value="B" ${treino.treino === 'B' ? 'selected' : ''}>B</option>
-                        <option value="C" ${treino.treino === 'C' ? 'selected' : ''}>C</option>
-                        <option value="D" ${treino.treino === 'D' ? 'selected' : ''}>D</option>
-                        <option value="E" ${treino.treino === 'E' ? 'selected' : ''}>E</option>
-                        </select>
+
+                <div class="card-body">
+                    <div class="form-row d-flex flex-wrap">
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Treino</label>
+                            <select class="form-control input-treino" data-id="${t.exercicio_id}">
+                                <option value="A" ${t.treino === 'A' ? 'selected' : ''}>A</option>
+                                <option value="B" ${t.treino === 'B' ? 'selected' : ''}>B</option>
+                                <option value="C" ${t.treino === 'C' ? 'selected' : ''}>C</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Séries</label>
+                            <input type="number"
+                                   class="form-control input-series"
+                                   data-id="${t.exercicio_id}"
+                                   value="${t.series}">
+                        </div>
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Repetições</label>
+                            <input type="number"
+                                   class="form-control input-repeticoes"
+                                   data-id="${t.exercicio_id}"
+                                   value="${t.repeticoes}">
+                        </div>
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Peso</label>
+                            <input type="number"
+                                   class="form-control input-peso"
+                                   data-id="${t.exercicio_id}"
+                                   value="${t.peso}">
+                        </div>
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Intervalo (seg)</label>
+                            <input type="number"
+                                   class="form-control input-intervalo"
+                                   data-id="${t.exercicio_id}"
+                                   value="${t.intervalo_seg}">
+                        </div>
+
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-    }
-
+        `;
+    });
 
     $("#listaConfigsTreinos").html(html);
-    $("#modalTreinos").modal("hide");
-    $("#modalConfigTreinos").modal("show");
+}
 
-    // Guardar para salvar
-    $("#modalConfigTreinos").data('idsParaAdicionar', idsParaAdicionar);
-    $("#modalConfigTreinos").data('idsParaDeletar', idsParaDeletar);
-});
+
+
 
 
 
 
 $("#btnSalvarConfigTreinos").on("click", async function () {
+    setLoadingBotaoSalvarConfig(true);
+
     // Pegar valores digitados
     treinosSelecionados.forEach(t => {
         t.series = Number($(`.input-series[data-id="${t.exercicio_id}"]`).val());
@@ -538,6 +619,8 @@ $("#btnSalvarConfigTreinos").on("click", async function () {
     } catch (err) {
         console.error(err);
         mostrarToast("Erro", err.message, "danger");
+    }  finally {
+        setLoadingBotaoSalvarConfig(false); // termina o loading
     }
 });
 
@@ -683,7 +766,7 @@ document.querySelectorAll(".btnFecharToast").forEach(btn => {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     document.getElementById("fechar-btnAdd")?.addEventListener("click", () => {
         $("#modalCriarAluno").modal("hide");
     });
@@ -713,4 +796,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+// Funções de Loading (bolinha)
+function setLoadingBotaoCriar(loading) {
+    const btn = document.getElementById("btnCriarAluno");
+    if (!btn) return;
+
+    const text = btn.querySelector(".btn-text");
+    const spinner = btn.querySelector(".spinner-border");
+
+    if (loading) {
+        btn.disabled = true;
+        text.classList.add("d-none");
+        spinner.classList.remove("d-none");
+    } else {
+        btn.disabled = false;
+        text.classList.remove("d-none");
+        spinner.classList.add("d-none");
+    }
+}
+
+function setLoadingBotaoConfigurar(loading) {
+    const btn = document.getElementById("btnSalvarTreinos");
+    if (!btn) return;
+
+    const text = btn.querySelector(".btn-text");
+    const spinner = btn.querySelector(".spinner-border");
+
+    if (loading) {
+        btn.disabled = true;
+        text.classList.add("d-none");
+        spinner.classList.remove("d-none");
+    } else {
+        btn.disabled = false;
+        text.classList.remove("d-none");
+        spinner.classList.add("d-none");
+    }
+}
+
+function setLoadingBotaoSalvarConfig(loading) {
+    const btn = document.getElementById("btnSalvarConfigTreinos");
+    if (!btn) return;
+
+    const text = btn.querySelector(".btn-text");
+    const spinner = btn.querySelector(".spinner-border");
+
+    if (loading) {
+        btn.disabled = true;
+        text.classList.add("d-none");
+        spinner.classList.remove("d-none");
+    } else {
+        btn.disabled = false;
+        text.classList.remove("d-none");
+        spinner.classList.add("d-none");
+    }
+}
+function setLoadingBotaoLogout(loading) {
+    const btn = document.getElementById("btnConfirmLogout");
+    if (!btn) return;
+
+    const text = btn.querySelector(".btn-text");
+    const spinner = btn.querySelector(".spinner-border");
+
+    if (loading) {
+        btn.disabled = true;
+        text.classList.add("d-none");
+        spinner.classList.remove("d-none");
+    } else {
+        btn.disabled = false;
+        text.classList.remove("d-none");
+        spinner.classList.add("d-none");
+    }
+}
+function setLoadingBotaoEditar(loading) {
+    const btn = document.getElementById("btnSalvarAluno");
+    if (!btn) return;
+
+    const text = btn.querySelector(".btn-text");
+    const spinner = btn.querySelector(".spinner-border");
+
+    if (loading) {
+        btn.disabled = true;
+        text.classList.add("d-none");
+        spinner.classList.remove("d-none");
+    } else {
+        btn.disabled = false;
+        text.classList.remove("d-none");
+        spinner.classList.add("d-none");
+    }
+}
+function setLoadingBotaoExcluir(loading) {
+    const btn = document.getElementById("btnConfirmarExcluir");
+    if (!btn) return;
+
+    const text = btn.querySelector(".btn-text");
+    const spinner = btn.querySelector(".spinner-border");
+
+    if (loading) {
+        btn.disabled = true;
+        text.classList.add("d-none");
+        spinner.classList.remove("d-none");
+    } else {
+        btn.disabled = false;
+        text.classList.remove("d-none");
+        spinner.classList.add("d-none");
+    }
+}
 

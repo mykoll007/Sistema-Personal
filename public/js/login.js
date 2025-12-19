@@ -17,11 +17,14 @@ function mostrarToast(titulo, mensagem, tipo = "info") {
 async function loginPersonal(event) {
     event.preventDefault();
 
+    setLoadingLogin(true);
+
     const email = $("#exampleInputEmail").val();
     const senha = $("#exampleInputPassword").val();
 
     if (!email || !senha) {
         mostrarToast("Erro", "Preencha email e senha", "danger");
+        setLoadingLogin(false);
         return;
     }
 
@@ -41,7 +44,6 @@ async function loginPersonal(event) {
         sessionStorage.setItem("token", data.token);
         mostrarToast("Sucesso", "Login realizado!", "success");
 
-        // Aguarda 1 segundo para o toast aparecer e então redireciona
         setTimeout(() => {
             window.location.href = "index.html";
         }, 1000);
@@ -49,8 +51,11 @@ async function loginPersonal(event) {
     } catch (err) {
         console.error(err);
         mostrarToast("Erro", err.message, "danger");
+    } finally {
+        setLoadingLogin(false);
     }
 }
+
 
 $(document).ready(function () {
     // Captura submit do form
@@ -59,3 +64,21 @@ $(document).ready(function () {
     // Caso use <a> como botão de login
     $(".btn-user").on("click", loginPersonal);
 });
+
+function setLoadingLogin(loading) {
+    const btn = document.getElementById("btnLogin");
+    if (!btn) return;
+
+    const text = btn.querySelector(".btn-text");
+    const spinner = btn.querySelector(".spinner-border");
+
+    if (loading) {
+        btn.disabled = true;
+        text.classList.add("d-none");
+        spinner.classList.remove("d-none");
+    } else {
+        btn.disabled = false;
+        text.classList.remove("d-none");
+        spinner.classList.add("d-none");
+    }
+}

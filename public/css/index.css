@@ -22,10 +22,14 @@
     min-width: 150px;
 }
 #toastMessage {
+    display: none;
     z-index: 3000; /* abaixo do menu */
 }
-#modalTreinos, #modalConfigTreinos{
+#modalTreinos, #modalConfigTreinos, #modalExcluirAluno, #modalEditarAluno, #logoutModal{
     z-index: 3000;
+}
+#modalCriarAluno{
+    z-index: 1101;
 }
 #menuPerfil a {
     display: block;
@@ -49,7 +53,31 @@
     cursor: pointer;
     z-index: 1100; /* acima de outros elementos */
 }
+#btnSalvarTreinos:focus,
+#btnSalvarTreinos:active {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
 
 #dev{
     font-size: 16px;
+}
+
+/* ===================== */
+/* Loader modal */
+.loader-modal {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #e0e0e0;
+    border-top: 6px solid #f6c23e; /* amarelo do modal */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 40px auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }

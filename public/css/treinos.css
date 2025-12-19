@@ -23,10 +23,11 @@
     min-width: 150px;
 }
 #toastMessage {
-    z-index: 1000; /* abaixo do menu */
+    display: none;
+    z-index: 4000; /* abaixo do menu */
 }
 #modalCadastroTreino, #modalExcluirTreino{
-    z-index: 3000;
+    z-index: 1060;
 }
 
 #menuPerfil a {
@@ -49,5 +50,5 @@
 
 #btnPerfil {
     cursor: pointer;
-    z-index: 5000; /* acima de outros elementos */
+    z-index: 1000; 
 }

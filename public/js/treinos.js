@@ -327,22 +327,7 @@ function excluirTreino(id) {
     $("#modalExcluirTreino").modal("show");
 }
 
-document.getElementById("btnConfirmarExcluirTreino").onclick = async () => {
-    try {
-        await authFetch(
-            `${API_URL}/personal/exercicios/${idTreinoParaExcluir}`,
-            { method: "DELETE" }
-        );
 
-        mostrarToast("Sucesso", "Treino excluído!", "success");
-        carregarExercicios();
-
-    } catch {
-        mostrarToast("Erro", "Erro ao excluir treino", "danger");
-    }
-
-    $("#modalExcluirTreino").modal("hide");
-};
 
 /* ============================================================
    UTIL
@@ -371,22 +356,113 @@ $('#modalCadastroTreino').on('hidden.bs.modal', () => {
         .textContent = "Cadastrar Novo Treino";
 });
 
+function setLoadingBotao(id, loading) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+
+    const text = btn.querySelector(".btn-text");
+    const spinner = btn.querySelector(".spinner-border");
+
+    if (loading) {
+        btn.disabled = true;
+        text.classList.add("d-none");
+        spinner.classList.remove("d-none");
+    } else {
+        btn.disabled = false;
+        text.classList.remove("d-none");
+        spinner.classList.add("d-none");
+    }
+}
+
+document.getElementById("btnSalvarTreino").addEventListener("click", async () => {
+    setLoadingBotao("btnSalvarTreino", true);
+    try {
+        await salvarTreino(); // sua função existente
+    } finally {
+        setLoadingBotao("btnSalvarTreino", false);
+    }
+});
+
+document.getElementById("btnSalvarVideo").addEventListener("click", async () => {
+    setLoadingBotao("btnSalvarVideo", true);
+    try {
+        await salvarVideo(); // sua função existente
+    } finally {
+        setLoadingBotao("btnSalvarVideo", false);
+    }
+});
+
+document.getElementById("btnConfirmarExcluirTreino").addEventListener("click", async () => {
+    setLoadingBotao("btnConfirmarExcluirTreino", true);
+    try {
+        await authFetch(`${API_URL}/personal/exercicios/${idTreinoParaExcluir}`, { method: "DELETE" });
+        mostrarToast("Sucesso", "Treino excluído!", "success");
+        carregarExercicios();
+    } catch {
+        mostrarToast("Erro", "Erro ao excluir treino", "danger");
+    } finally {
+        setLoadingBotao("btnConfirmarExcluirTreino", false);
+        $("#modalExcluirTreino").modal("hide");
+    }
+});
+
+/* ============================================================
+   TOAST – MOSTRAR/OCULTAR
+============================================================ */
+$('#toastMessage').toast({ autohide: true, delay: 2000 });
+
+// Função para mostrar toast
+function mostrarToast(titulo, mensagem, tipo = "info") {
+    const toast = $("#toastMessage");
+    const header = toast.find(".toast-header");
+
+    // Limpa classes antigas
+    header.removeClass("bg-danger bg-success bg-primary text-white");
+
+    // Adiciona classe correta
+    if (tipo === "success") header.addClass("bg-success text-white");
+    if (tipo === "danger") header.addClass("bg-danger text-white");
+    if (tipo === "primary") header.addClass("bg-primary text-white");
+
+    // Seta título e mensagem
+    $("#toastTitle").text(titulo);
+    $("#toastBody").text(mensagem);
+
+    // Mostra o toast (display block)
+    toast.css("display", "block");
+    toast.toast("show");
+}
+
+// Ao esconder o toast, volta para display none
+$('#toastMessage').on('hidden.bs.toast', function () {
+    $(this).css("display", "none");
+});
+
+// Fechar toast ao clicar no botão X
+document.querySelectorAll(".btnFecharToast").forEach(btn => {
+    btn.addEventListener("click", () => {
+        $('#toastMessage').toast('hide');
+    });
+});
+
+
 
 /* ============================================================
    INIT
 ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
+    // ✅ Verifica token
     if (!getToken()) {
         logout();
         return;
     }
 
+    // ✅ Carrega informações do personal e dados iniciais
     carregarPersonalTopo();
     carregarCategorias();
     carregarExercicios();
-});
 
-document.addEventListener('DOMContentLoaded', () => {
+    // ✅ Menu do topo (perfil)
     const fotoTopbar = document.getElementById('btnPerfil');
     const menuPerfil = document.getElementById('menuPerfil');
 
@@ -406,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         $('#logoutModal').modal('show'); // abre o modal de confirmação
     });
-
 });
+
 
 

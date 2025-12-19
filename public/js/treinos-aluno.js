@@ -23,12 +23,25 @@ logoutBtn.addEventListener('click', () => {
 /* Buscar treinos do backend */
 /* ============================= */
 async function carregarTreinos() {
+    const loader = document.getElementById('loader-treinos');
+    const container = document.getElementById('treinos-container');
+
+    loader.style.display = 'block';
+    container.style.display = 'none';
+
     try {
         const response = await fetch('https://sistema-personal.vercel.app/aluno/treinos', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
+
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('tokenAluno');
+            localStorage.removeItem('nomeAluno');
+            window.location.replace('aluno.html');
+            return;
+        }
 
         if (!response.ok) {
             throw new Error('Erro ao buscar treinos');
@@ -38,11 +51,18 @@ async function carregarTreinos() {
 
         renderizarTreinos(dados);
 
+        // ✅ Mostra treinos
+        container.style.display = 'block';
+
     } catch (error) {
         console.error(error);
         alert('Erro ao carregar treinos');
+    } finally {
+        // 🔄 Sempre esconde o loader
+        loader.style.display = 'none';
     }
 }
+
 
 
 /* ============================= */
@@ -72,8 +92,8 @@ function renderizarTreinos(dados) {
     Object.keys(porTreino).sort().forEach(letraTreino => {
 
         // Accordion container
-const accordion = document.createElement('div');
-accordion.classList.add('treino-accordion', `treino-${letraTreino}`);
+        const accordion = document.createElement('div');
+        accordion.classList.add('treino-accordion', `treino-${letraTreino}`);
 
 
         accordion.innerHTML = `
@@ -103,16 +123,16 @@ accordion.classList.add('treino-accordion', `treino-${letraTreino}`);
                 item.classList.add('exercicio-item');
 
                 item.innerHTML = `
-                        <div class="exercicio-header">
-<i class="fa-solid fa-dumbbell altere-icon"
-   title="Exercício de força"></i>
-
-    </div>
+                    <div class="exercicio-header">
+                        <i class="fa-solid fa-dumbbell altere-icon"
+                        title="Exercício de força"></i>
+                    </div>
                     <strong>${ex.exercicio}</strong>
                     <p>Séries: ${ex.series}</p>
                     <p>Repetições: ${ex.repeticoes}</p>
                     <p>Peso: ${ex.peso}kg</p>
                     <p>Intervalo: ${ex.intervalo_seg}s</p>
+                    ${ex.descricao ? `<p>Descrição: ${ex.descricao}</p>` : ''}
                     ${ex.video_url ? `
                         <button class="video-btn"
                             onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
@@ -120,6 +140,7 @@ accordion.classList.add('treino-accordion', `treino-${letraTreino}`);
                         </button>
                     ` : ''}
                 `;
+
 
                 lista.appendChild(item);
             });

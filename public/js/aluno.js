@@ -130,14 +130,24 @@ const loginForm = document.getElementById('loginForm');
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById('username').value;
-    const senha = document.getElementById('password').value;
+    const email = document.getElementById('username');
+    const senha = document.getElementById('password');
+    const submitBtn = document.getElementById('loginSubmit');
+
+    // 🔄 Ativa loading
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    email.disabled = true;
+    senha.disabled = true;
 
     try {
         const response = await fetch('https://sistema-personal.vercel.app/aluno/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, senha })
+            body: JSON.stringify({
+                email: email.value,
+                senha: senha.value
+            })
         });
 
         const data = await response.json();
@@ -145,11 +155,13 @@ loginForm.addEventListener('submit', async (e) => {
         if (response.ok) {
             showToast("Bem-vindo!", `Olá ${data.nome}, você entrou com sucesso!`);
             fecharModal();
-            console.log(data);
+
             localStorage.setItem('tokenAluno', data.token);
             localStorage.setItem('nomeAluno', data.nome);
             localStorage.setItem('emailAluno', data.email);
+
             atualizarBotao();
+
         } else {
             showToast("Erro!", data.message || "Não foi possível logar.");
         }
@@ -157,7 +169,13 @@ loginForm.addEventListener('submit', async (e) => {
     } catch (error) {
         console.error("Erro ao logar:", error);
         showToast("Erro!", "Não foi possível conectar ao servidor.");
+    } finally {
+        // 🔁 Volta estado normal
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+        email.disabled = false;
+        senha.disabled = false;
     }
-    
 });
+
 
