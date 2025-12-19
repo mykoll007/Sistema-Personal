@@ -133,19 +133,22 @@ function renderizarTreinos(dados) {
                     <p>Peso: ${ex.peso}kg</p>
                     <p>Intervalo: ${ex.intervalo_seg}s</p>
                     ${ex.descricao ? `<p>Descrição: ${ex.descricao}</p>` : ''}
-                    ${ex.video_url ? `
-                        <div class="acoes-exercicio">
+                    <div class="acoes-exercicio">
+
+                        ${ex.video_url ? `
                             <button class="video-btn"
                                 onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
                                 Assistir Vídeo
                             </button>
+                        ` : ''}
 
-                            <button class="finalizar-btn ${ex.status === 'finalizado' ? 'finalizado' : ''}"
-                                onclick="toggleFinalizarTreino(${ex.id}, this)">
-                                ${ex.status === 'finalizado' ? '✅ Finalizado' : 'Finalizar'}
-                            </button>
-                        </div>
-                    ` : ''}
+                        <button class="finalizar-btn ${ex.status === 'finalizado' ? 'finalizado' : ''}"
+                            onclick="toggleFinalizarTreino(${ex.id}, this)">
+                            ${ex.status === 'finalizado' ? '✅ Finalizado' : 'Finalizar'}
+                        </button>
+
+                    </div>
+
 
                 `;
 

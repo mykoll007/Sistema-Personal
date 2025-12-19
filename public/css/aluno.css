@@ -733,29 +733,44 @@ footer {
 }
 
 .acoes-exercicio {
-    display: flex;
+display: flex;
+    align-items: center;
     gap: 10px;
     margin-top: 10px;
+    justify-content: flex-start;
 }
 
 .finalizar-btn {
-    padding: 10px 14px;
-    border: none;
+    padding: 8px 14px;
+    margin-top: 10px;
+    border: 1px solid;
     border-radius: 6px;
+    font-size: 15px;
     cursor: pointer;
+    box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
     font-weight: 600;
-    background-color: #e0e0e0;
-    transition: 0.3s;
+    height: 33px;
+    width: 124px; /* 🔒 largura fixa */
+    color: white;
+    display: flex;              /* 🔥 */
+    align-items: center;        /* 🔥 */
+    justify-content: center;    /* 🔥 */
+    transition: background-color 0.3s, box-shadow 0.3s;
+    background: linear-gradient(90deg, #1a237e, #5348c4);
 }
+
+.finalizar-btn.finalizado {
+    background: linear-gradient(90deg, #2e7d32, #43a047);
+    color: #fff;
+    font-size: 14px;
+}
+
 
 .finalizar-btn:hover {
     background-color: #d5d5d5;
 }
 
-.finalizar-btn.finalizado {
-    background-color: #2e7d32;
-    color: #fff;
-}
+
 
 
 .categoria-titulo{
