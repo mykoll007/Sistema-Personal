@@ -2,11 +2,11 @@ const database = require('../database/connection');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
-
 class AlunoController {
 
+    // =========================
     // Autenticar aluno
+    // =========================
     async autenticarAluno(req, res) {
         const { email, senha } = req.body;
 
@@ -31,11 +31,15 @@ class AlunoController {
 
             const token = jwt.sign(
                 { aluno_id: aluno.id },
-                process.env.SALT, // mesma chave do seu backend
+                process.env.SALT,
                 { expiresIn: '1h' }
             );
 
-            return res.status(200).json({ token, nome: aluno.nome, email: aluno.email});
+            return res.status(200).json({
+                token,
+                nome: aluno.nome,
+                email: aluno.email
+            });
 
         } catch (error) {
             console.error("Erro ao autenticar aluno:", error);
@@ -43,15 +47,29 @@ class AlunoController {
         }
     }
 
-    // Buscar treinos do aluno logado
+    // =========================
+    // Buscar treinos do aluno
+    // (com RESET automático)
+    // =========================
     async listarTreinos(req, res) {
         const alunoId = req.alunoId;
 
         try {
+            // 🔁 RESET AUTOMÁTICO (24h)
+            await database('aluno_treinos')
+                .where('status', 'finalizado')
+                .where('finalizado_em', '<', database.raw('NOW() - INTERVAL 1 DAY'))
+                .update({
+                    status: 'em_andamento',
+                    finalizado_em: null
+                });
+
+            // 📥 BUSCAR TREINOS
             const rows = await database('aluno_treinos')
                 .join('exercicios', 'aluno_treinos.exercicio_id', 'exercicios.id')
                 .join('categorias', 'exercicios.categoria_id', 'categorias.id')
                 .select(
+                    'aluno_treinos.id',
                     'aluno_treinos.treino',
                     'categorias.nome as categoria',
                     'exercicios.nome as exercicio',
@@ -61,7 +79,8 @@ class AlunoController {
                     'aluno_treinos.peso',
                     'aluno_treinos.intervalo_seg',
                     'exercicios.descricao',
-                    'aluno_treinos.status'
+                    'aluno_treinos.status',
+                    'aluno_treinos.finalizado_em'
                 )
                 .where('aluno_treinos.aluno_id', alunoId)
                 .orderBy('categorias.nome');
@@ -74,9 +93,38 @@ class AlunoController {
         }
     }
 
+    // =========================
+    // Finalizar treino
+    // =========================
+    async finalizarTreino(req, res) {
+        const alunoId = req.alunoId;
+        const { treinoId } = req.params;
 
+        try {
+            const atualizado = await database('aluno_treinos')
+                .where({
+                    id: treinoId,
+                    aluno_id: alunoId,
+                    status: 'em_andamento'
+                })
+                .update({
+                    status: 'finalizado',
+                    finalizado_em: database.fn.now()
+                });
 
+            if (!atualizado) {
+                return res.status(404).json({
+                    message: 'Treino não encontrado ou já finalizado'
+                });
+            }
 
+            return res.json({ message: 'Treino finalizado com sucesso' });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Erro ao finalizar treino' });
+        }
+    }
 }
 
 module.exports = new AlunoController();

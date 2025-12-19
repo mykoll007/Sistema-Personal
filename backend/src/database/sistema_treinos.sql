@@ -55,8 +55,8 @@ CREATE TABLE exercicios (
 -- Tabela aluno_treinos
 CREATE TABLE aluno_treinos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    aluno_id INT,
-    exercicio_id INT,
+    aluno_id INT NOT NULL,
+    exercicio_id INT NOT NULL,
     series INT NOT NULL,
     repeticoes INT NOT NULL,
     peso INT NOT NULL,
@@ -64,6 +64,7 @@ CREATE TABLE aluno_treinos (
     treino VARCHAR(50) NOT NULL,
     status ENUM('em_andamento', 'finalizado') DEFAULT 'em_andamento',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    finalizado_em DATETIME NULL,
     FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
     FOREIGN KEY (exercicio_id) REFERENCES exercicios(id) ON DELETE CASCADE
 );

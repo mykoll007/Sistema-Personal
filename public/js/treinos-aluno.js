@@ -134,11 +134,19 @@ function renderizarTreinos(dados) {
                     <p>Intervalo: ${ex.intervalo_seg}s</p>
                     ${ex.descricao ? `<p>Descrição: ${ex.descricao}</p>` : ''}
                     ${ex.video_url ? `
-                        <button class="video-btn"
-                            onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
-                            Assistir Vídeo
-                        </button>
+                        <div class="acoes-exercicio">
+                            <button class="video-btn"
+                                onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
+                                Assistir Vídeo
+                            </button>
+
+                            <button class="finalizar-btn ${ex.status === 'finalizado' ? 'finalizado' : ''}"
+                                onclick="toggleFinalizarTreino(${ex.id}, this)">
+                                ${ex.status === 'finalizado' ? '✅ Finalizado' : 'Finalizar'}
+                            </button>
+                        </div>
                     ` : ''}
+
                 `;
 
 
@@ -157,6 +165,37 @@ function renderizarTreinos(dados) {
         container.appendChild(accordion);
     });
 }
+async function toggleFinalizarTreino(treinoId, botao) {
+    try {
+        const response = await fetch(
+            `https://sistema-personal.vercel.app/aluno/treinos/${treinoId}/finalizar`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('Erro ao atualizar treino');
+        }
+
+        // Atualiza visualmente
+        if (botao.classList.contains('finalizado')) {
+            botao.classList.remove('finalizado');
+            botao.innerHTML = 'Finalizar';
+        } else {
+            botao.classList.add('finalizado');
+            botao.innerHTML = '✅ Finalizado';
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert('Erro ao atualizar treino');
+    }
+}
+
 
 
 /* ============================= */

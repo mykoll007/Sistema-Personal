@@ -54,6 +54,7 @@ router.put('/personal/exercicios/:id/video', verificarPersonal, uploadVideo.sing
 //Controllers do Aluno
 router.post('/aluno/login', AlunoController.autenticarAluno);
 router.get('/aluno/treinos', authAluno, AlunoController.listarTreinos);
+router.put('/aluno/treinos/:treinoId/finalizar', authAluno, AlunoController.finalizarTreino);
 
 
 

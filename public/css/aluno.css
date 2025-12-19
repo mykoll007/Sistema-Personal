@@ -732,6 +732,31 @@ footer {
     color: #7b1fa2;
 }
 
+.acoes-exercicio {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.finalizar-btn {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    background-color: #e0e0e0;
+    transition: 0.3s;
+}
+
+.finalizar-btn:hover {
+    background-color: #d5d5d5;
+}
+
+.finalizar-btn.finalizado {
+    background-color: #2e7d32;
+    color: #fff;
+}
+
 
 .categoria-titulo{
     font-size: 25px;
