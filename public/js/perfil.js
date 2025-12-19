@@ -38,8 +38,32 @@ function mostrarToast(titulo, mensagem, tipo = "info") {
 
     document.getElementById("toastTitle").textContent = titulo;
     document.getElementById("toastBody").textContent = mensagem;
-    $("#toastMessage").toast("show");
+
+    // Mostra o toast
+    const toastEl = document.getElementById("toastMessage");
+    if (toastEl) {
+        toastEl.style.display = "block"; // 🔥 mostra
+        $("#toastMessage").toast("show");
+    }
 }
+
+
+// -------------------------------
+// INICIALIZAÇÃO DO TOAST
+// -------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+    const toastEl = document.getElementById("toastMessage");
+    if (toastEl) {
+        // Esconde o toast inicialmente
+        toastEl.style.display = "none";
+
+        // Quando o toast terminar de sumir, garante que continue escondido
+        $('#toastMessage').on('hidden.bs.toast', function () {
+            toastEl.style.display = "none";
+        });
+    }
+});
+
 
 // -------------------------------
 // CARREGAR DADOS DO PERSONAL
