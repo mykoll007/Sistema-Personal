@@ -141,27 +141,32 @@
                             </button>
                         </div>
 
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Nome</th>
-                                            <th>Foco</th>
-                                            <th>Idade</th>
-                                            <th>Data da Matrícula</th>
-                                            <th style="min-width: 100px;">Ações</th>
-                                        </tr>
-                                    </thead>
+<div class="card-body">
+    <!-- LOADER -->
+    <div id="loaderTabelaAlunos" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Carregando...</span>
+        </div>
+        <p class="text-muted mt-2">Carregando alunos...</p>
+    </div>
 
-                                    <tbody id="listaAlunos">
+    <div class="table-responsive" id="tabelaAlunosWrapper" style="display:none;">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Foco</th>
+                    <th>Idade</th>
+                    <th>Data da Matrícula</th>
+                    <th style="min-width: 100px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaAlunos">
+            </tbody>
+        </table>
+    </div>
+</div>
 
-                                    </tbody>
-                                </table>
-
-
-                            </div>
-                        </div>
                     </div>
 
                 </div>

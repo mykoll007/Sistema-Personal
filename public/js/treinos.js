@@ -95,20 +95,21 @@ async function carregarCategorias() {
    EXERCÍCIOS
 ============================================================ */
 async function carregarExercicios() {
-    try {
-        const res = await authFetch(
-            `${API_URL}/personal/exercicios?t=${Date.now()}`
-        );
+    setLoadingTreinos(true); // mostra loader
 
+    try {
+        const res = await authFetch(`${API_URL}/personal/exercicios?t=${Date.now()}`);
         exercicios = await res.json();
         renderTreinos();
-
     } catch (err) {
         exercicios = [];
         renderTreinos();
         mostrarToast("Erro", err.message, "danger");
+    } finally {
+        setLoadingTreinos(false); // esconde loader
     }
 }
+
 
 /* ============================================================
    MODAL VÍDEO
@@ -373,6 +374,20 @@ function setLoadingBotao(id, loading) {
         spinner.classList.add("d-none");
     }
 }
+
+function setLoadingTreinos(loading) {
+    const loader = document.getElementById("treinosLoader");
+    const lista = document.getElementById("listaCategoriasTreinos");
+
+    if (loading) {
+        loader.style.display = "block";
+        lista.style.display = "none";
+    } else {
+        loader.style.display = "none";
+        lista.style.display = "block";
+    }
+}
+
 
 document.getElementById("btnSalvarTreino").addEventListener("click", async () => {
     setLoadingBotao("btnSalvarTreino", true);

@@ -214,6 +214,12 @@ function renderAlunos() {
 // CARREGAR ALUNOS
 // -----------------------------------
 async function carregarAlunos() {
+    const loader = document.getElementById("loaderTabelaAlunos");
+    const tabelaWrapper = document.getElementById("tabelaAlunosWrapper");
+
+    loader.style.display = "block";      // mostrar loader
+    tabelaWrapper.style.display = "none"; // esconder tabela
+
     try {
         const token = getToken();
         if (!token) throw new Error("Token não encontrado. Faça login novamente.");
@@ -227,11 +233,17 @@ async function carregarAlunos() {
 
         alunos = await res.json();
         renderAlunos();
+
+        tabelaWrapper.style.display = "block"; // mostrar tabela
     } catch (err) {
         console.error(err);
         mostrarToast("Erro", err.message, "danger");
+    } finally {
+        loader.style.display = "none"; // esconder loader
     }
 }
+
+
 
 // -----------------------------------
 // CRIAR ALUNO
