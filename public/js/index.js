@@ -465,11 +465,28 @@ $('#dataTable tbody').on('click', '.btn-treino', function () {
                 }
 
                 html += `
-                    <div class="card mb-2">
-                        <div class="card-header bg-light">${cat.nome}</div>
-                        <div class="card-body">${exHtml}</div>
+                    <div class="card mb-2 card-categoria">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center header-categoria"
+                            style="cursor: pointer;">
+
+                            <span>
+                                <i class="fas fa-chevron-down mr-2 toggle-icon-categoria"></i>
+                                ${cat.nome}
+                            </span>
+
+                            <span class="badge badge-secondary">
+                                ${cat.exercicios.length}
+                            </span>
+                        </div>
+
+                        <!-- BODY (ACCORDION) -->
+                        <div class="card-body body-categoria">
+                            ${exHtml}
+                        </div>
+
                     </div>
                 `;
+
             }
 
             $("#listaCategorias").html(html);
@@ -521,7 +538,8 @@ $("#btnSalvarTreinos").on("click", async function () {
                         series: treinoAntigo?.series || 0,
                         repeticoes: treinoAntigo?.repeticoes || 0,
                         peso: treinoAntigo?.peso || 0,
-                        intervalo_seg: treinoAntigo?.intervalo_seg || 0
+                        intervalo_seg: treinoAntigo?.intervalo_seg || 0,
+                        ordem: treinoAntigo?.ordem || 0
                     });
                 }
             }
@@ -554,13 +572,26 @@ function renderizarConfigTreinos() {
 
     treinosSelecionados.forEach(t => {
         html += `
-            <div class="card mb-3">
-                <div class="card-header font-weight-bold">
-                    ${t.exercicio_nome}
-                    <span class="text-muted">(${t.categoria_nome})</span>
+            <div class="card mb-3 card-treino"
+                data-id="${t.exercicio_id}"
+                data-treino="${t.treino}">
+
+                <!-- HEADER CLICÁVEL -->
+                <div class="card-header d-flex justify-content-between align-items-center font-weight-bold header-treino"
+                    style="cursor: pointer;">
+
+                    <div>
+                        <i class="fas fa-chevron-down mr-2 toggle-icon"></i>
+                        ${t.exercicio_nome}
+                        <span class="text-muted">(${t.categoria_nome})</span>
+                    </div>
+
+                    <span class="badge badge-primary badge-treino" data-id="${t.exercicio_id}">
+                        Treino ${t.treino}
+                    </span>
                 </div>
 
-                <div class="card-body">
+                <div class="card-body body-treino">
                     <div class="form-row d-flex flex-wrap">
 
                         <div class="form-group col-6 col-sm-4 col-md-2">
@@ -572,6 +603,15 @@ function renderizarConfigTreinos() {
                                 <option value="D" ${t.treino === 'D' ? 'selected' : ''}>D</option>
                                 <option value="E" ${t.treino === 'E' ? 'selected' : ''}>E</option>
                             </select>
+                        </div>
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Ordem</label>
+                            <input type="number"
+                                class="form-control input-ordem"
+                                data-id="${t.exercicio_id}"
+                                value="${t.ordem}"
+                                min="1">
                         </div>
 
                         <div class="form-group col-6 col-sm-4 col-md-2">
@@ -615,10 +655,84 @@ function renderizarConfigTreinos() {
     $("#listaConfigsTreinos").html(html);
 }
 
+// Filtro de treinos no modal de configuração
+$(document).on("click", ".filtro-treino", function (e) {
+    e.preventDefault();
 
+    const treinoSelecionado = $(this).data("treino");
 
+    $(".card-treino").each(function () {
+        const treinoCard = $(this).data("treino");
 
+        if (treinoSelecionado === "todos" || treinoCard === treinoSelecionado) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+});
 
+// Atualizar badge e data-treino quando mudar o treino
+$(document).on("change", ".input-treino", function () {
+    const exercicioId = $(this).data("id");
+    const novoTreino = $(this).val();
+
+    // Atualiza o card
+    const card = $(`.card-treino[data-id="${exercicioId}"], 
+                    .card-treino:has(.input-treino[data-id="${exercicioId}"])`);
+
+    card.attr("data-treino", novoTreino);
+
+    // Atualiza o badge
+    const badge = $(`.badge-treino[data-id="${exercicioId}"]`);
+    badge.text(`Treino ${novoTreino}`);
+
+    // Atualiza o objeto em memória
+    const treinoObj = treinosSelecionados.find(t => t.exercicio_id === exercicioId);
+    if (treinoObj) treinoObj.treino = novoTreino;
+});
+
+// Accordion dos exercícios
+$(document).on("click", ".header-treino", function (e) {
+
+    // Evita fechar quando clicar no select ou badge
+    if ($(e.target).is("select, option, .badge, .badge *")) return;
+
+    const card = $(this).closest(".card");
+    const body = card.find(".body-treino");
+    const icon = $(this).find(".toggle-icon");
+
+    body.slideToggle(200);
+    icon.toggleClass("fa-chevron-down fa-chevron-right");
+});
+
+// Accordion das categorias no modal de vincular treinos
+$(document).on("click", ".header-categoria", function (e) {
+
+    // Evita conflito ao clicar no checkbox
+    if ($(e.target).is("input, label")) return;
+
+    const card = $(this).closest(".card-categoria");
+    const body = card.find(".body-categoria");
+    const icon = $(this).find(".toggle-icon-categoria");
+
+    body.slideToggle(200);
+    icon.toggleClass("fa-chevron-down fa-chevron-right");
+});
+
+// 🔥 Atualiza a ordem em tempo real
+$(document).on("input change", ".input-ordem", function () {
+    const exercicioId = Number($(this).data("id"));
+    const valor = Number($(this).val());
+
+    const treino = treinosSelecionados.find(
+        t => t.exercicio_id === exercicioId
+    );
+
+    if (treino) {
+        treino.ordem = valor;
+    }
+});
 
 
 $("#btnSalvarConfigTreinos").on("click", async function () {
@@ -626,6 +740,7 @@ $("#btnSalvarConfigTreinos").on("click", async function () {
 
     // Pegar valores digitados
     treinosSelecionados.forEach(t => {
+        t.ordem = Number($(`.input-ordem[data-id="${t.exercicio_id}"]`).val()) || 0;
         t.series = Number($(`.input-series[data-id="${t.exercicio_id}"]`).val());
         t.repeticoes = Number($(`.input-repeticoes[data-id="${t.exercicio_id}"]`).val());
         t.peso = Number($(`.input-peso[data-id="${t.exercicio_id}"]`).val());

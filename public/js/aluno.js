@@ -18,11 +18,11 @@ function updateCarouselHero() {
     trackHero.style.transform = `translateX(${-indexHero * 100}%)`;
 }
 
-// Autoplay a cada 5 segundos
+// Autoplay a cada 2 segundos
 setInterval(() => {
     indexHero = (indexHero + 1) % itemsHero.length;
     updateCarouselHero();
-}, 5000);
+}, 2500);
 
 /* ===================== */
 /* Modal Login */

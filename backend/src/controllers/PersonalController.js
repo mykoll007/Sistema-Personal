@@ -195,53 +195,53 @@ class PersonalController {
 
     // 📌 Upload de foto do personal
     async uploadFoto(req, res) {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: "Nenhuma foto enviada." });
+        try {
+            if (!req.file) {
+                return res.status(400).json({ message: "Nenhuma foto enviada." });
+            }
+
+            const foto_url = req.file.path; // Cloudinary já retorna a URL completa
+
+            await database('personals')
+                .where({ id: req.personalId })
+                .update({ foto_url });
+
+            return res.status(200).json({ foto_url });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Erro ao salvar foto." });
         }
-
-        const foto_url = req.file.path; // Cloudinary já retorna a URL completa
-
-        await database('personals')
-            .where({ id: req.personalId })
-            .update({ foto_url });
-
-        return res.status(200).json({ foto_url });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Erro ao salvar foto." });
-    }
     }
 
 
 
     async uploadVideoExercicio(req, res) {
-    try {
-        const { id } = req.params;
-        const { video_url } = req.body;
+        try {
+            const { id } = req.params;
+            const { video_url } = req.body;
 
-        if (!video_url) 
-            return res.status(400).json({ message: "URL do vídeo é obrigatória" });
+            if (!video_url)
+                return res.status(400).json({ message: "URL do vídeo é obrigatória" });
 
-        const exercicio = await database("exercicios")
-            .where({ id, personal_id: req.personalId })
-            .first();
+            const exercicio = await database("exercicios")
+                .where({ id, personal_id: req.personalId })
+                .first();
 
-        if (!exercicio) 
-            return res.status(404).json({ message: "Exercício não encontrado" });
+            if (!exercicio)
+                return res.status(404).json({ message: "Exercício não encontrado" });
 
-        await database("exercicios")
-            .where({ id })
-            .update({ video_url });
+            await database("exercicios")
+                .where({ id })
+                .update({ video_url });
 
-        return res.status(200).json({ message: "Vídeo atualizado com sucesso!", video_url });
+            return res.status(200).json({ message: "Vídeo atualizado com sucesso!", video_url });
 
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Erro ao atualizar vídeo" });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Erro ao atualizar vídeo" });
+        }
     }
-}
 
     // 📌 ADICIONAR ALUNO (com email + senha)
     async adicionarAluno(request, response) {
@@ -485,7 +485,7 @@ class PersonalController {
 
     async atualizarExercicio(request, response) {
         const { id } = request.params;
-        const { categoria_id, nome, descricao} = request.body;
+        const { categoria_id, nome, descricao } = request.body;
         const personal_id = request.personalId;
 
         if (!nome || !categoria_id) {
@@ -699,56 +699,6 @@ class PersonalController {
 
     async adicionarExercicioAoAluno(request, response) {
         const {
-        aluno_id,
-        exercicio_id,
-        series,
-        repeticoes,
-        peso,
-        intervalo_seg,
-        treino
-    } = request.body;
-
-    const personal_id = request.personalId;
-
-    if (
-        !aluno_id ||
-        !exercicio_id ||
-        !series ||
-        !repeticoes ||
-        !peso ||
-        !intervalo_seg ||
-        !treino
-    ) {
-        return response.status(400).json({
-            message: "Todos os campos são obrigatórios."
-        });
-    }
-
-    try {
-        // 🔍 Verificar se o aluno pertence ao personal
-        const aluno = await database('alunos')
-            .where({ id: aluno_id, personal_id })
-            .first();
-
-        if (!aluno) {
-            return response.status(403).json({
-                message: "Este aluno não pertence ao seu perfil."
-            });
-        }
-
-        // 🔍 Verificar se o exercício pertence ao personal
-        const exercicio = await database('exercicios')
-            .where({ id: exercicio_id, personal_id })
-            .first();
-
-        if (!exercicio) {
-            return response.status(403).json({
-                message: "Este exercício não pertence ao seu perfil."
-            });
-        }
-
-        // 📌 Inserir treino
-        await database('aluno_treinos').insert({
             aluno_id,
             exercicio_id,
             series,
@@ -756,204 +706,259 @@ class PersonalController {
             peso,
             intervalo_seg,
             treino
-        });
+        } = request.body;
 
-        return response.status(201).json({
-            message: "Exercício adicionado ao treino do aluno com sucesso!"
-        });
+        const personal_id = request.personalId;
 
-    } catch (error) {
-        console.error("Erro ao adicionar exercício ao aluno:", error);
-        return response.status(500).json({
-            message: "Erro ao adicionar exercício ao treino."
-        });
-    }
-}
-
-
-// 📌 Listar treinos de um aluno
-    async listarTreinosDoAluno(request, response) {
-    const { id: aluno_id } = request.params;
-    const personal_id = request.personalId;
-
-    if (!aluno_id) {
-        return response.status(400).json({ message: "ID do aluno é obrigatório." });
-    }
-
-    try {
-        // Verifica se o aluno pertence ao personal
-        const aluno = await database('alunos')
-            .where({ id: aluno_id, personal_id })
-            .first();
-
-        if (!aluno) {
-            return response.status(403).json({
-                message: "Este aluno não pertence ao seu perfil."
+        if (
+            !aluno_id ||
+            !exercicio_id ||
+            !series ||
+            !repeticoes ||
+            !peso ||
+            !intervalo_seg ||
+            !treino
+        ) {
+            return response.status(400).json({
+                message: "Todos os campos são obrigatórios."
             });
         }
 
-        // Busca treinos vinculados
-        const treinos = await database('aluno_treinos as at')
-            .join('exercicios as e', 'at.exercicio_id', 'e.id')
-            .select(
-                'at.exercicio_id',
-                'at.treino',          // ✅ NOVO CAMPO
-                'at.series',
-                'at.repeticoes',
-                'at.peso',
-                'at.intervalo_seg',
-                'e.nome as exercicio_nome',
-                'e.categoria_id'
-            )
-            .where({ aluno_id });
+        try {
+            // 🔍 Verificar se o aluno pertence ao personal
+            const aluno = await database('alunos')
+                .where({ id: aluno_id, personal_id })
+                .first();
 
-        return response.status(200).json(treinos);
+            if (!aluno) {
+                return response.status(403).json({
+                    message: "Este aluno não pertence ao seu perfil."
+                });
+            }
 
-    } catch (error) {
-        console.error("Erro ao listar treinos do aluno:", error);
-        return response.status(500).json({
-            message: "Erro ao listar treinos do aluno."
-        });
+            // 🔍 Verificar se o exercício pertence ao personal
+            const exercicio = await database('exercicios')
+                .where({ id: exercicio_id, personal_id })
+                .first();
+
+            if (!exercicio) {
+                return response.status(403).json({
+                    message: "Este exercício não pertence ao seu perfil."
+                });
+            }
+
+            // 📌 Inserir treino
+            await database('aluno_treinos').insert({
+                aluno_id,
+                exercicio_id,
+                series,
+                repeticoes,
+                peso,
+                intervalo_seg,
+                treino
+            });
+
+            return response.status(201).json({
+                message: "Exercício adicionado ao treino do aluno com sucesso!"
+            });
+
+        } catch (error) {
+            console.error("Erro ao adicionar exercício ao aluno:", error);
+            return response.status(500).json({
+                message: "Erro ao adicionar exercício ao treino."
+            });
+        }
     }
+
+
+    // 📌 Listar treinos de um aluno
+    async listarTreinosDoAluno(request, response) {
+        const { id: aluno_id } = request.params;
+        const personal_id = request.personalId;
+
+        if (!aluno_id) {
+            return response.status(400).json({ message: "ID do aluno é obrigatório." });
+        }
+
+        try {
+            // Verifica se o aluno pertence ao personal
+            const aluno = await database('alunos')
+                .where({ id: aluno_id, personal_id })
+                .first();
+
+            if (!aluno) {
+                return response.status(403).json({
+                    message: "Este aluno não pertence ao seu perfil."
+                });
+            }
+
+            // Busca treinos vinculados
+            const treinos = await database('aluno_treinos as at')
+                .join('exercicios as e', 'at.exercicio_id', 'e.id')
+                .select(
+                    'at.exercicio_id',
+                    'at.treino',
+                    'at.series',
+                    'at.repeticoes',
+                    'at.peso',
+                    'at.intervalo_seg',
+                    'at.ordem',
+                    'e.nome as exercicio_nome',
+                    'e.categoria_id'
+                )
+                .where({ aluno_id })
+                .orderBy('at.treino')
+                .orderBy('at.ordem');
+
+            return response.status(200).json(treinos);
+
+        } catch (error) {
+            console.error("Erro ao listar treinos do aluno:", error);
+            return response.status(500).json({
+                message: "Erro ao listar treinos do aluno."
+            });
+        }
     }
 
 
     async deletarTreinoDoAluno(req, res) {
-    const { aluno_id, exercicio_id, treino } = req.params;
-    const personal_id = req.personalId;
+        const { aluno_id, exercicio_id, treino } = req.params;
+        const personal_id = req.personalId;
 
-    if (!treino) {
-        return res.status(400).json({ message: "Treino é obrigatório." });
-    }
-
-    try {
-        const registro = await database('aluno_treinos as at')
-            .join('alunos as a', 'at.aluno_id', 'a.id')
-            .where({
-                'at.aluno_id': aluno_id,
-                'at.exercicio_id': exercicio_id,
-                'at.treino': treino,
-                'a.personal_id': personal_id
-            })
-            .first();
-
-        if (!registro) {
-            return res.status(403).json({
-                message: "Treino não encontrado ou não pertence ao seu aluno."
-            });
+        if (!treino) {
+            return res.status(400).json({ message: "Treino é obrigatório." });
         }
 
-        await database('aluno_treinos')
-            .where({
-                aluno_id,
-                exercicio_id,
-                treino
-            })
-            .del();
+        try {
+            const registro = await database('aluno_treinos as at')
+                .join('alunos as a', 'at.aluno_id', 'a.id')
+                .where({
+                    'at.aluno_id': aluno_id,
+                    'at.exercicio_id': exercicio_id,
+                    'at.treino': treino,
+                    'a.personal_id': personal_id
+                })
+                .first();
 
-        return res.status(200).json({
-            message: "Treino removido com sucesso!"
-        });
+            if (!registro) {
+                return res.status(403).json({
+                    message: "Treino não encontrado ou não pertence ao seu aluno."
+                });
+            }
 
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            message: "Erro ao remover treino."
-        });
-    }
+            await database('aluno_treinos')
+                .where({
+                    aluno_id,
+                    exercicio_id,
+                    treino
+                })
+                .del();
+
+            return res.status(200).json({
+                message: "Treino removido com sucesso!"
+            });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                message: "Erro ao remover treino."
+            });
+        }
     }
 
 
     async salvarTreinosDoAluno(req, res) {
-    const { aluno_id, treinos } = req.body;
-    const personal_id = req.personalId;
+        const { aluno_id, treinos } = req.body;
+        const personal_id = req.personalId;
 
-    if (!aluno_id) {
-        return res.status(400).json({ message: "Aluno obrigatório." });
-    }
-
-    try {
-        // 1️⃣ Buscar treinos atuais (considerando treino)
-        const treinosAtuais = await database('aluno_treinos as at')
-            .join('alunos as a', 'at.aluno_id', 'a.id')
-            .where('at.aluno_id', aluno_id)
-            .andWhere('a.personal_id', personal_id)
-            .select('at.exercicio_id', 'at.treino');
-
-        const atuais = treinosAtuais.map(t => ({
-            exercicio_id: t.exercicio_id,
-            treino: t.treino
-        }));
-
-        const novos = treinos.map(t => ({
-            exercicio_id: t.exercicio_id,
-            treino: t.treino
-        }));
-
-        // 2️⃣ Deletar treinos removidos
-        const paraDeletar = atuais.filter(a =>
-            !novos.some(n =>
-                n.exercicio_id === a.exercicio_id &&
-                n.treino === a.treino
-            )
-        );
-
-        if (paraDeletar.length > 0) {
-            await database('aluno_treinos')
-                .where('aluno_id', aluno_id)
-                .whereIn(
-                    database.raw('(exercicio_id, treino)'),
-                    paraDeletar.map(t => [t.exercicio_id, t.treino])
-                )
-                .del();
+        if (!aluno_id) {
+            return res.status(400).json({ message: "Aluno obrigatório." });
         }
 
-        // 3️⃣ Inserir ou atualizar
-        for (const t of treinos) {
-            const existe = atuais.some(a =>
-                a.exercicio_id === t.exercicio_id &&
-                a.treino === t.treino
+        try {
+            // 1️⃣ Buscar treinos atuais (considerando treino)
+            const treinosAtuais = await database('aluno_treinos as at')
+                .join('alunos as a', 'at.aluno_id', 'a.id')
+                .where('at.aluno_id', aluno_id)
+                .andWhere('a.personal_id', personal_id)
+                .select('at.exercicio_id', 'at.treino');
+
+            const atuais = treinosAtuais.map(t => ({
+                exercicio_id: t.exercicio_id,
+                treino: t.treino
+            }));
+
+            const novos = treinos.map(t => ({
+                exercicio_id: t.exercicio_id,
+                treino: t.treino
+            }));
+
+            // 2️⃣ Deletar treinos removidos
+            const paraDeletar = atuais.filter(a =>
+                !novos.some(n =>
+                    n.exercicio_id === a.exercicio_id &&
+                    n.treino === a.treino
+                )
             );
 
-            if (existe) {
-                // 🔄 Atualiza
+            if (paraDeletar.length > 0) {
                 await database('aluno_treinos')
-                    .where({
-                        aluno_id,
-                        exercicio_id: t.exercicio_id,
-                        treino: t.treino
-                    })
-                    .update({
-                        series: t.series,
-                        repeticoes: t.repeticoes,
-                        peso: t.peso,
-                        intervalo_seg: t.intervalo_seg
-                    });
-            } else {
-                // ➕ Insere
-                await database('aluno_treinos')
-                    .insert({
-                        aluno_id,
-                        exercicio_id: t.exercicio_id,
-                        treino: t.treino,
-                        series: t.series,
-                        repeticoes: t.repeticoes,
-                        peso: t.peso,
-                        intervalo_seg: t.intervalo_seg
-                    });
+                    .where('aluno_id', aluno_id)
+                    .whereIn(
+                        database.raw('(exercicio_id, treino)'),
+                        paraDeletar.map(t => [t.exercicio_id, t.treino])
+                    )
+                    .del();
             }
+
+            // 3️⃣ Inserir ou atualizar
+            for (const t of treinos) {
+                const existe = atuais.some(a =>
+                    a.exercicio_id === t.exercicio_id &&
+                    a.treino === t.treino
+                );
+
+                if (existe) {
+                    // 🔄 Atualiza
+                    await database('aluno_treinos')
+                        .where({
+                            aluno_id,
+                            exercicio_id: t.exercicio_id,
+                            treino: t.treino
+                        })
+                        .update({
+                            series: t.series,
+                            repeticoes: t.repeticoes,
+                            peso: t.peso,
+                            intervalo_seg: t.intervalo_seg,
+                            ordem: t.ordem
+                        });
+                } else {
+                    // ➕ Insere
+                    await database('aluno_treinos')
+                        .insert({
+                            aluno_id,
+                            exercicio_id: t.exercicio_id,
+                            treino: t.treino,
+                            series: t.series,
+                            repeticoes: t.repeticoes,
+                            peso: t.peso,
+                            intervalo_seg: t.intervalo_seg,
+                            ordem: t.ordem
+                        });
+                }
+            }
+
+            return res.status(200).json({
+                message: "Treinos salvos com sucesso!"
+            });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                message: "Erro ao salvar treinos do aluno."
+            });
         }
-
-        return res.status(200).json({
-            message: "Treinos salvos com sucesso!"
-        });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            message: "Erro ao salvar treinos do aluno."
-        });
-    }
     }
 
 }

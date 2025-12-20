@@ -1,3 +1,21 @@
+/* Dropdown do filtro de treino dentro do modal */
+#dropdownFiltroTreino + .dropdown-menu {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+/* Garantir que nunca seja cortado */
+.modal,
+.modal-content,
+.modal-header {
+    overflow: visible !important;
+}
+
+
+.dropdown-menu {
+    z-index: 2000;
+}
+
 #fotoTopbar {
     cursor: pointer;
 }
@@ -57,6 +75,10 @@
 #btnSalvarTreinos:active {
     box-shadow: none !important;
     outline: none !important;
+}
+
+.badge-secondary{
+    background-color: #f6c23e !important;
 }
 
 

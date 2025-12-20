@@ -141,31 +141,31 @@
                             </button>
                         </div>
 
-<div class="card-body">
-    <!-- LOADER -->
-    <div id="loaderTabelaAlunos" class="text-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Carregando...</span>
-        </div>
-        <p class="text-muted mt-2">Carregando alunos...</p>
-    </div>
+                        <div class="card-body">
+                            <!-- LOADER -->
+                            <div id="loaderTabelaAlunos" class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Carregando...</span>
+                                </div>
+                                <p class="text-muted mt-2">Carregando alunos...</p>
+                            </div>
 
-    <div class="table-responsive" id="tabelaAlunosWrapper" style="display:none;">
-        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Foco</th>
-                    <th>Idade</th>
-                    <th>Data da Matrícula</th>
-                    <th style="min-width: 100px;">Ações</th>
-                </tr>
-            </thead>
-            <tbody id="listaAlunos">
-            </tbody>
-        </table>
-    </div>
-</div>
+                            <div class="table-responsive" id="tabelaAlunosWrapper" style="display:none;">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Foco</th>
+                                            <th>Idade</th>
+                                            <th>Data da Matrícula</th>
+                                            <th style="min-width: 100px;">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="listaAlunos">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
                     </div>
 
@@ -408,7 +408,26 @@
 
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">Configurar Treinos Selecionados</h5>
+                    <!-- Filtro de Treino -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="dropdownFiltroTreino"
+                            data-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false"
+                            title="Filtrar por treino">
+                            <i class="fas fa-filter"></i>
+                        </button>
+
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item filtro-treino" data-treino="todos" href="#">Todos</a>
+                            <a class="dropdown-item filtro-treino" data-treino="A" href="#">Treino A</a>
+                            <a class="dropdown-item filtro-treino" data-treino="B" href="#">Treino B</a>
+                            <a class="dropdown-item filtro-treino" data-treino="C" href="#">Treino C</a>
+                            <a class="dropdown-item filtro-treino" data-treino="D" href="#">Treino D</a>
+                            <a class="dropdown-item filtro-treino" data-treino="E" href="#">Treino E</a>
+                        </div>
+                    </div>
                 </div>
+
+
 
                 <div class="modal-body">
 
