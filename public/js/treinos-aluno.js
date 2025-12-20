@@ -117,19 +117,13 @@ function renderizarTreinos(dados) {
 
             const lista = document.createElement('div');
             lista.classList.add('exercicios-list');
-            console.log(
-  porTreino[letraTreino][categoria].map(e => ({
-    nome: e.exercicio,
-    ordem: e.ordem
-  }))
-);
             porTreino[letraTreino][categoria]
                 .sort((a, b) => (a.ordem || 999) - (b.ordem || 999))
                 .forEach(ex => {
-                const item = document.createElement('div');
-                item.classList.add('exercicio-item');
+                    const item = document.createElement('div');
+                    item.classList.add('exercicio-item');
 
-                item.innerHTML = `
+                    item.innerHTML = `
                     <div class="exercicio-header">
                         <i class="fa-solid fa-dumbbell altere-icon"
                         title="Exercício de força"></i>
@@ -160,8 +154,8 @@ function renderizarTreinos(dados) {
                 `;
 
 
-                lista.appendChild(item);
-            });
+                    lista.appendChild(item);
+                });
 
             card.appendChild(lista);
             body.appendChild(card);
