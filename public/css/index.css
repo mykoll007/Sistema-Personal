@@ -80,6 +80,23 @@
 .badge-secondary{
     background-color: #f6c23e !important;
 }
+.drag-handle {
+   touch-action: none;
+    cursor: grab;
+}
+
+.drag-ghost {
+    opacity: 0.4;
+}
+
+.drag-chosen {
+    background-color: #f8f9fa;
+}
+#listaConfigsTreinos {
+    max-height: 70vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
 
 
 #dev{

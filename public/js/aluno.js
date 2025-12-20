@@ -1,3 +1,4 @@
+
 /* ===================== */
 /* Hamburger */
 const hamburger = document.getElementById('hamburger');

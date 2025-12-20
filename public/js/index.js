@@ -7,6 +7,7 @@ let categorias = [];
 let alunoParaTreino = null;
 let cachePersonal = null; // cache global
 let cacheAlunos = null;
+let sortableTreinos = null;
 
 // -----------------------------------
 // PEGAR TOKEN
@@ -568,6 +569,18 @@ $("#btnSalvarTreinos").on("click", async function () {
 
 // Função para renderizar os exercícios selecionados no modal de configuração
 function renderizarConfigTreinos() {
+    // 🔥 GARANTE ORDEM CORRETA ANTES DE RENDERIZAR
+    treinosSelecionados.sort((a, b) => {
+        // 1️⃣ Primeiro ordena por letra do treino (A, B, C…)
+        if (a.treino !== b.treino) {
+            return a.treino.localeCompare(b.treino);
+        }
+
+        // 2️⃣ Depois pela ordem salva no banco
+        const ordemA = Number(a.ordem) || 999;
+        const ordemB = Number(b.ordem) || 999;
+        return ordemA - ordemB;
+    });
     let html = "";
 
     treinosSelecionados.forEach(t => {
@@ -575,12 +588,12 @@ function renderizarConfigTreinos() {
             <div class="card mb-3 card-treino"
                 data-id="${t.exercicio_id}"
                 data-treino="${t.treino}">
-
+                
                 <!-- HEADER CLICÁVEL -->
                 <div class="card-header d-flex justify-content-between align-items-center font-weight-bold header-treino"
                     style="cursor: pointer;">
-
                     <div>
+                        <i class="fas fa-grip-vertical mr-2 text-muted drag-handle"></i>
                         <i class="fas fa-chevron-down mr-2 toggle-icon"></i>
                         ${t.exercicio_nome}
                         <span class="text-muted">(${t.categoria_nome})</span>
@@ -603,15 +616,6 @@ function renderizarConfigTreinos() {
                                 <option value="D" ${t.treino === 'D' ? 'selected' : ''}>D</option>
                                 <option value="E" ${t.treino === 'E' ? 'selected' : ''}>E</option>
                             </select>
-                        </div>
-
-                        <div class="form-group col-6 col-sm-4 col-md-2">
-                            <label>Ordem</label>
-                            <input type="number"
-                                class="form-control input-ordem"
-                                data-id="${t.exercicio_id}"
-                                value="${t.ordem}"
-                                min="1">
                         </div>
 
                         <div class="form-group col-6 col-sm-4 col-md-2">
@@ -653,7 +657,103 @@ function renderizarConfigTreinos() {
     });
 
     $("#listaConfigsTreinos").html(html);
+    ativarDragOrdem();
 }
+function atualizarOrdemTreinos() {
+    $("#listaConfigsTreinos .card-treino").each(function (index) {
+        const id = Number($(this).data("id"));
+
+        const treino = treinosSelecionados.find(t => t.exercicio_id === id);
+        if (treino) {
+            treino.ordem = index + 1; // começa em 1
+        }
+    });
+}
+
+function ativarDragOrdem() {
+    const container = document.getElementById("listaConfigsTreinos");
+
+    // 🔥 DESTROI INSTÂNCIA ANTIGA
+    if (sortableTreinos) {
+        sortableTreinos.destroy();
+        sortableTreinos = null;
+    }
+
+    sortableTreinos = Sortable.create(container, {
+        animation: 150,
+        handle: ".drag-handle",
+
+        forceFallback: true,
+        fallbackOnBody: true,
+
+        scroll: true,
+        scrollSensitivity: 60,
+        scrollSpeed: 15,
+
+        touchStartThreshold: 5,
+
+        ghostClass: "drag-ghost",
+        chosenClass: "drag-chosen",
+
+        onEnd() {
+            atualizarOrdemTreinos();
+        }
+    });
+}
+
+
+
+function normalizarOrdemPorCategoria(treinos) {
+
+    const resultado = [];
+
+    // Agrupa por treino (A, B, C…)
+    const porTreino = {};
+
+    treinos.forEach(t => {
+        if (!porTreino[t.treino]) {
+            porTreino[t.treino] = [];
+        }
+        porTreino[t.treino].push(t);
+    });
+
+    // Para cada treino
+    Object.keys(porTreino)
+        .sort() // A → E
+        .forEach(treinoLetra => {
+
+            const lista = porTreino[treinoLetra];
+
+            // 🔹 Ordena inicialmente pela ordem atual
+            lista.sort((a, b) => (a.ordem || 999) - (b.ordem || 999));
+
+            // 🔹 Agrupa por categoria mantendo a ordem de aparição
+            const categoriasMap = new Map();
+
+            lista.forEach(item => {
+                const cat = item.categoria_nome || 'Outros';
+
+                if (!categoriasMap.has(cat)) {
+                    categoriasMap.set(cat, []);
+                }
+                categoriasMap.get(cat).push(item);
+            });
+
+            // 🔹 Recria a ordem final
+            let ordemGlobal = 1;
+
+            categoriasMap.forEach(listaCategoria => {
+                listaCategoria.forEach(item => {
+                    item.ordem = ordemGlobal++;
+                    resultado.push(item);
+                });
+            });
+        });
+
+    return resultado;
+}
+
+
 
 // Filtro de treinos no modal de configuração
 $(document).on("click", ".filtro-treino", function (e) {
@@ -727,13 +827,16 @@ $("#btnSalvarConfigTreinos").on("click", async function () {
 
     // Pegar valores digitados
     treinosSelecionados.forEach(t => {
-        t.ordem = Number($(`.input-ordem[data-id="${t.exercicio_id}"]`).val()) || 0;
         t.series = Number($(`.input-series[data-id="${t.exercicio_id}"]`).val());
         t.repeticoes = Number($(`.input-repeticoes[data-id="${t.exercicio_id}"]`).val());
         t.peso = Number($(`.input-peso[data-id="${t.exercicio_id}"]`).val());
         t.intervalo_seg = Number($(`.input-intervalo[data-id="${t.exercicio_id}"]`).val());
         t.treino = $(`.input-treino[data-id="${t.exercicio_id}"]`).val();
     });
+    
+    atualizarOrdemTreinos();
+    // 🔥 NORMALIZA PARA NÃO QUEBRAR CATEGORIAS
+    treinosSelecionados = normalizarOrdemPorCategoria(treinosSelecionados);
 
     try {
         const res = await authFetch(`${API_URL}/personal/alunos/treinos/salvar`, {
@@ -754,7 +857,7 @@ $("#btnSalvarConfigTreinos").on("click", async function () {
     } catch (err) {
         console.error(err);
         mostrarToast("Erro", err.message, "danger");
-    }  finally {
+    } finally {
         setLoadingBotaoSalvarConfig(false); // termina o loading
     }
 });
