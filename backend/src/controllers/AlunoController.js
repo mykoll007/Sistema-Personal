@@ -71,6 +71,7 @@ class AlunoController {
                 .select(
                     'aluno_treinos.id',
                     'aluno_treinos.treino',
+                    'aluno_treinos.ordem',
                     'categorias.nome as categoria',
                     'exercicios.nome as exercicio',
                     'exercicios.video_url',
@@ -83,7 +84,8 @@ class AlunoController {
                     'aluno_treinos.finalizado_em'
                 )
                 .where('aluno_treinos.aluno_id', alunoId)
-                .orderBy('categorias.nome');
+                .orderBy('aluno_treinos.treino')
+                .orderBy('aluno_treinos.ordem');
 
             return res.json(rows);
 
@@ -96,49 +98,49 @@ class AlunoController {
     // =========================
     // Finalizar treino
     // =========================
-async finalizarTreino(req, res) {
-    const alunoId = req.alunoId;
-    const { treinoId } = req.params;
+    async finalizarTreino(req, res) {
+        const alunoId = req.alunoId;
+        const { treinoId } = req.params;
 
-    try {
-        const treino = await database('aluno_treinos')
-            .where({
-                id: treinoId,
-                aluno_id: alunoId
-            })
-            .first();
+        try {
+            const treino = await database('aluno_treinos')
+                .where({
+                    id: treinoId,
+                    aluno_id: alunoId
+                })
+                .first();
 
-        if (!treino) {
-            return res.status(404).json({ message: 'Treino não encontrado' });
-        }
+            if (!treino) {
+                return res.status(404).json({ message: 'Treino não encontrado' });
+            }
 
-        // 🔁 TOGGLE
-        if (treino.status === 'finalizado') {
+            // 🔁 TOGGLE
+            if (treino.status === 'finalizado') {
+                await database('aluno_treinos')
+                    .where('id', treinoId)
+                    .update({
+                        status: 'em_andamento',
+                        finalizado_em: null
+                    });
+
+                return res.json({ status: 'em_andamento' });
+            }
+
+            // se estiver em andamento
             await database('aluno_treinos')
                 .where('id', treinoId)
                 .update({
-                    status: 'em_andamento',
-                    finalizado_em: null
+                    status: 'finalizado',
+                    finalizado_em: database.fn.now()
                 });
 
-            return res.json({ status: 'em_andamento' });
+            return res.json({ status: 'finalizado' });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Erro ao atualizar treino' });
         }
-
-        // se estiver em andamento
-        await database('aluno_treinos')
-            .where('id', treinoId)
-            .update({
-                status: 'finalizado',
-                finalizado_em: database.fn.now()
-            });
-
-        return res.json({ status: 'finalizado' });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Erro ao atualizar treino' });
     }
-}
 
 }
 

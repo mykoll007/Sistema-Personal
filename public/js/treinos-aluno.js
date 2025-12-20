@@ -117,8 +117,15 @@ function renderizarTreinos(dados) {
 
             const lista = document.createElement('div');
             lista.classList.add('exercicios-list');
-
-            porTreino[letraTreino][categoria].forEach(ex => {
+            console.log(
+  porTreino[letraTreino][categoria].map(e => ({
+    nome: e.exercicio,
+    ordem: e.ordem
+  }))
+);
+            porTreino[letraTreino][categoria]
+                .sort((a, b) => (a.ordem || 999) - (b.ordem || 999))
+                .forEach(ex => {
                 const item = document.createElement('div');
                 item.classList.add('exercicio-item');
 
