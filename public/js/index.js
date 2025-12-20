@@ -659,16 +659,96 @@ function renderizarConfigTreinos() {
     $("#listaConfigsTreinos").html(html);
     ativarDragOrdem();
 }
+function renderizarPorFiltroTreino(treinoFiltro) {
+
+    let lista = [...treinosSelecionados];
+
+    if (treinoFiltro !== "todos") {
+        lista = lista.filter(t => t.treino === treinoFiltro);
+    }
+
+    let html = "";
+
+    lista.forEach(t => {
+        html += `
+            <div class="card mb-3 card-treino"
+                 data-id="${t.exercicio_id}"
+                 data-treino="${t.treino}">
+                
+                <div class="card-header d-flex justify-content-between align-items-center font-weight-bold header-treino">
+                    <div>
+                        <i class="fas fa-grip-vertical mr-2 text-muted drag-handle"></i>
+                        <i class="fas fa-chevron-down mr-2 toggle-icon"></i>
+                        ${t.exercicio_nome}
+                        <span class="text-muted">(${t.categoria_nome})</span>
+                    </div>
+
+                    <span class="badge badge-primary badge-treino" data-id="${t.exercicio_id}">
+                        Treino ${t.treino}
+                    </span>
+                </div>
+
+                <div class="card-body body-treino">
+                    <div class="form-row d-flex flex-wrap">
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Treino</label>
+                            <select class="form-control input-treino" data-id="${t.exercicio_id}">
+                                ${['A','B','C','D','E'].map(l =>
+                                    `<option value="${l}" ${t.treino === l ? 'selected' : ''}>${l}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Séries</label>
+                            <input type="number" class="form-control input-series"
+                                   data-id="${t.exercicio_id}" value="${t.series}">
+                        </div>
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Repetições</label>
+                            <input type="number" class="form-control input-repeticoes"
+                                   data-id="${t.exercicio_id}" value="${t.repeticoes}">
+                        </div>
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Peso</label>
+                            <input type="number" class="form-control input-peso"
+                                   data-id="${t.exercicio_id}" value="${t.peso}">
+                        </div>
+
+                        <div class="form-group col-6 col-sm-4 col-md-2">
+                            <label>Intervalo</label>
+                            <input type="number" class="form-control input-intervalo"
+                                   data-id="${t.exercicio_id}" value="${t.intervalo_seg}">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    $("#listaConfigsTreinos").html(html);
+    ativarDragOrdem();
+}
+
 function atualizarOrdemTreinos() {
+    const ordemPorId = {};
+
     $("#listaConfigsTreinos .card-treino").each(function (index) {
         const id = Number($(this).data("id"));
+        ordemPorId[id] = index + 1;
+    });
 
-        const treino = treinosSelecionados.find(t => t.exercicio_id === id);
-        if (treino) {
-            treino.ordem = index + 1; // começa em 1
+    treinosSelecionados.forEach(t => {
+        if (ordemPorId[t.exercicio_id] != null) {
+            t.ordem = ordemPorId[t.exercicio_id];
         }
     });
 }
+
 
 function ativarDragOrdem() {
     const container = document.getElementById("listaConfigsTreinos");
@@ -761,16 +841,13 @@ $(document).on("click", ".filtro-treino", function (e) {
 
     const treinoSelecionado = $(this).data("treino");
 
-    $(".card-treino").each(function () {
-        const treinoCard = $(this).data("treino");
+    // 🔥 NORMALIZA ANTES DE FILTRAR
+    treinosSelecionados = normalizarOrdemPorCategoria(treinosSelecionados);
 
-        if (treinoSelecionado === "todos" || treinoCard === treinoSelecionado) {
-            $(this).show();
-        } else {
-            $(this).hide();
-        }
-    });
+    renderizarPorFiltroTreino(treinoSelecionado);
 });
+
+
 
 // Atualizar badge e data-treino quando mudar o treino
 $(document).on("change", ".input-treino", function () {
@@ -826,13 +903,21 @@ $("#btnSalvarConfigTreinos").on("click", async function () {
     setLoadingBotaoSalvarConfig(true);
 
     // Pegar valores digitados
-    treinosSelecionados.forEach(t => {
-        t.series = Number($(`.input-series[data-id="${t.exercicio_id}"]`).val());
-        t.repeticoes = Number($(`.input-repeticoes[data-id="${t.exercicio_id}"]`).val());
-        t.peso = Number($(`.input-peso[data-id="${t.exercicio_id}"]`).val());
-        t.intervalo_seg = Number($(`.input-intervalo[data-id="${t.exercicio_id}"]`).val());
-        t.treino = $(`.input-treino[data-id="${t.exercicio_id}"]`).val();
-    });
+// 🔥 ATUALIZA APENAS OS CARDS VISÍVEIS
+$("#listaConfigsTreinos .card-treino").each(function () {
+
+    const exercicioId = Number($(this).data("id"));
+
+    const treinoObj = treinosSelecionados.find(t => t.exercicio_id === exercicioId);
+    if (!treinoObj) return;
+
+    treinoObj.series = Number($(this).find(".input-series").val());
+    treinoObj.repeticoes = Number($(this).find(".input-repeticoes").val());
+    treinoObj.peso = Number($(this).find(".input-peso").val());
+    treinoObj.intervalo_seg = Number($(this).find(".input-intervalo").val());
+    treinoObj.treino = $(this).find(".input-treino").val();
+});
+
     
     atualizarOrdemTreinos();
     // 🔥 NORMALIZA PARA NÃO QUEBRAR CATEGORIAS
