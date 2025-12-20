@@ -720,19 +720,19 @@ $(document).on("click", ".header-categoria", function (e) {
     icon.toggleClass("fa-chevron-down fa-chevron-right");
 });
 
-// 🔥 Atualiza a ordem em tempo real
-$(document).on("input change", ".input-ordem", function () {
-    const exercicioId = Number($(this).data("id"));
-    const valor = Number($(this).val());
+// // 🔥 Atualiza a ordem em tempo real
+// $(document).on("input change", ".input-ordem", function () {
+//     const exercicioId = Number($(this).data("id"));
+//     const valor = Number($(this).val());
 
-    const treino = treinosSelecionados.find(
-        t => t.exercicio_id === exercicioId
-    );
+//     const treino = treinosSelecionados.find(
+//         t => t.exercicio_id === exercicioId
+//     );
 
-    if (treino) {
-        treino.ordem = valor;
-    }
-});
+//     if (treino) {
+//         treino.ordem = valor;
+//     }
+// });
 
 
 $("#btnSalvarConfigTreinos").on("click", async function () {
