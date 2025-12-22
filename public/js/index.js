@@ -748,6 +748,20 @@ function atualizarOrdemTreinos() {
         }
     });
 }
+function salvarValoresInputsVisiveis() {
+    $("#listaConfigsTreinos .card-treino").each(function () {
+
+        const exercicioId = Number($(this).data("id"));
+        const treinoObj = treinosSelecionados.find(t => t.exercicio_id === exercicioId);
+        if (!treinoObj) return;
+
+        treinoObj.series = Number($(this).find(".input-series").val()) || 0;
+        treinoObj.repeticoes = Number($(this).find(".input-repeticoes").val()) || 0;
+        treinoObj.peso = Number($(this).find(".input-peso").val()) || 0;
+        treinoObj.intervalo_seg = Number($(this).find(".input-intervalo").val()) || 0;
+        treinoObj.treino = $(this).find(".input-treino").val();
+    });
+}
 
 
 function ativarDragOrdem() {
@@ -838,6 +852,9 @@ function normalizarOrdemPorCategoria(treinos) {
 // Filtro de treinos no modal de configuração
 $(document).on("click", ".filtro-treino", function (e) {
     e.preventDefault();
+
+        // 🔥 SALVA O QUE O USUÁRIO DIGITOU
+    salvarValoresInputsVisiveis();
 
     const treinoSelecionado = $(this).data("treino");
 
