@@ -142,7 +142,7 @@ class AlunoController {
         }
     }
 
-    async atualizarCargaTreino(req, res) {
+   async atualizarCargaTreino(req, res) {
     const alunoId = req.alunoId;
     const { treinoId } = req.params;
     const { campo, valor } = req.body;
@@ -154,7 +154,7 @@ class AlunoController {
     }
 
     try {
-        await database('aluno_treinos')
+        const linhasAfetadas = await database('aluno_treinos')
             .where({
                 id: treinoId,
                 aluno_id: alunoId
@@ -163,6 +163,12 @@ class AlunoController {
                 [campo]: valor
             });
 
+        if (linhasAfetadas === 0) {
+            return res.status(404).json({
+                message: 'Treino não encontrado ou não pertence ao aluno'
+            });
+        }
+
         return res.json({ success: true });
 
     } catch (error) {
@@ -170,6 +176,7 @@ class AlunoController {
         return res.status(500).json({ message: 'Erro ao atualizar treino' });
     }
 }
+
 
 
 }

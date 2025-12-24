@@ -227,16 +227,20 @@ async function toggleFinalizarTreino(treinoId, botao) {
 
 function alterarValor(treinoId, campo, delta) {
     const span = document.getElementById(`${campo}-${treinoId}`);
-    let valorAtual = parseInt(span.innerText);
 
+    if (!span) return;
+
+    let valorAtual = parseInt(span.innerText, 10);
     let novoValor = valorAtual + delta;
 
-    // ❌ Não permitir valores negativos
     if (novoValor < 0) novoValor = 0;
 
     span.innerText = novoValor;
 
+    // ✅ SALVA NO BACKEND
+    atualizarTreinoBackend(treinoId, campo, novoValor);
 }
+
 
 async function atualizarTreinoBackend(treinoId, campo, valor) {
     try {
