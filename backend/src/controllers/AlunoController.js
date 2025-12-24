@@ -142,6 +142,36 @@ class AlunoController {
         }
     }
 
+    async atualizarCargaTreino(req, res) {
+    const alunoId = req.alunoId;
+    const { treinoId } = req.params;
+    const { campo, valor } = req.body;
+
+    const camposPermitidos = ['series', 'repeticoes', 'peso', 'intervalo_seg'];
+
+    if (!camposPermitidos.includes(campo)) {
+        return res.status(400).json({ message: 'Campo inválido' });
+    }
+
+    try {
+        await database('aluno_treinos')
+            .where({
+                id: treinoId,
+                aluno_id: alunoId
+            })
+            .update({
+                [campo]: valor
+            });
+
+        return res.json({ success: true });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erro ao atualizar treino' });
+    }
+}
+
+
 }
 
 module.exports = new AlunoController();

@@ -129,10 +129,33 @@ function renderizarTreinos(dados) {
                         title="Exercício de força"></i>
                     </div>
                     <strong>${ex.exercicio}</strong>
-                    <p>Séries: ${ex.series}</p>
-                    <p>Repetições: ${ex.repeticoes}</p>
-                    <p>Peso: ${ex.peso}kg</p>
-                    <p>Intervalo: ${ex.intervalo_seg}s</p>
+                    <p>
+                    Séries:
+                    <button class="btn-menos" onclick="alterarValor(${ex.id}, 'series', -1)">−</button>
+                    <span id="series-${ex.id}">${ex.series}</span>
+                    <button class="btn-mais" onclick="alterarValor(${ex.id}, 'series', 1)">+</button>
+                    </p>
+                    <p>
+                    Repetições:
+                    <button onclick="alterarValor(${ex.id}, 'repeticoes', -1)">−</button>
+                    <span id="repeticoes-${ex.id}">${ex.repeticoes}</span>
+                    <button onclick="alterarValor(${ex.id}, 'repeticoes', 1)">+</button>
+                    </p>
+
+                    <p>
+                    Peso:
+                    <button onclick="alterarValor(${ex.id}, 'peso', -1)">−</button>
+                    <span id="peso-${ex.id}">${ex.peso}</span>kg
+                    <button onclick="alterarValor(${ex.id}, 'peso', 1)">+</button>
+                    </p>
+
+                    <p>
+                    Intervalo:
+                    <button onclick="alterarValor(${ex.id}, 'intervalo_seg', -10)">−</button>
+                    <span id="intervalo_seg-${ex.id}">${ex.intervalo_seg}</span>s
+                    <button onclick="alterarValor(${ex.id}, 'intervalo_seg', 10)">+</button>
+                    </p>
+
                     ${ex.descricao ? `<p>Descrição: ${ex.descricao}</p>` : ''}
                     <div class="acoes-exercicio">
 
@@ -201,6 +224,45 @@ async function toggleFinalizarTreino(treinoId, botao) {
     }
 }
 
+
+function alterarValor(treinoId, campo, delta) {
+    const span = document.getElementById(`${campo}-${treinoId}`);
+    let valorAtual = parseInt(span.innerText);
+
+    let novoValor = valorAtual + delta;
+
+    // ❌ Não permitir valores negativos
+    if (novoValor < 0) novoValor = 0;
+
+    span.innerText = novoValor;
+
+}
+
+async function atualizarTreinoBackend(treinoId, campo, valor) {
+    try {
+        const response = await fetch(
+            `https://sistema-personal.vercel.app/aluno/treinos/${treinoId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    campo: campo,
+                    valor: valor
+                })
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('Erro ao atualizar treino');
+        }
+
+    } catch (error) {
+        console.error('Erro ao salvar alteração:', error);
+    }
+}
 
 
 

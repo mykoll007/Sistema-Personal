@@ -558,6 +558,7 @@ footer {
 
 
 
+
 /* Container que agrupa os cards de categoria */
 .categorias-container {
     display: flex;
@@ -850,6 +851,22 @@ display: flex;
        margin-top: 331px;
 }
 
+.btn-mais, .btn-menos {
+    background: #1a237e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.btn-mais:hover,
+.btn-menos:hover {
+    background: #3949ab;
+}
+
+
 /* Container do toast */
 #toastMessage {
     min-width: 250px;
@@ -1037,6 +1054,8 @@ display: flex;
     display: none;
     position: absolute;
 }
+
+
 
 @keyframes spin {
     to {
