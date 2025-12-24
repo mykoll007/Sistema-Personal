@@ -49,8 +49,8 @@ class AlunoController {
 
     // =========================
     // Buscar treinos do aluno
-    // (com RESET automático)
     // =========================
+
     async listarTreinos(req, res) {
         const alunoId = req.alunoId;
 
@@ -142,6 +142,10 @@ class AlunoController {
         }
     }
 
+    // =========================
+    // Aluno atualizar os treinos
+    // =========================
+
    async atualizarCargaTreino(req, res) {
     const alunoId = req.alunoId;
     const { treinoId } = req.params;
@@ -176,8 +180,6 @@ class AlunoController {
         return res.status(500).json({ message: 'Erro ao atualizar treino' });
     }
 }
-
-
 
 }
 
