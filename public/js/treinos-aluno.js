@@ -137,23 +137,23 @@ function renderizarTreinos(dados) {
                     </p>
                     <p>
                     Repetições:
-                    <button onclick="alterarValor(${ex.id}, 'repeticoes', -1)">−</button>
+                    <button class="btn-menos" onclick="alterarValor(${ex.id}, 'repeticoes', -1)">−</button>
                     <span id="repeticoes-${ex.id}">${ex.repeticoes}</span>
-                    <button onclick="alterarValor(${ex.id}, 'repeticoes', 1)">+</button>
+                    <button class="btn-mais"onclick="alterarValor(${ex.id}, 'repeticoes', 1)">+</button>
                     </p>
 
                     <p>
                     Peso:
-                    <button onclick="alterarValor(${ex.id}, 'peso', -1)">−</button>
+                    <button class="btn-menos" onclick="alterarValor(${ex.id}, 'peso', -1)">−</button>
                     <span id="peso-${ex.id}">${ex.peso}</span>kg
-                    <button onclick="alterarValor(${ex.id}, 'peso', 1)">+</button>
+                    <button class="btn-mais" onclick="alterarValor(${ex.id}, 'peso', 1)">+</button>
                     </p>
 
                     <p>
                     Intervalo:
-                    <button onclick="alterarValor(${ex.id}, 'intervalo_seg', -10)">−</button>
+                    <button class="btn-menos" onclick="alterarValor(${ex.id}, 'intervalo_seg', -10)">−</button>
                     <span id="intervalo_seg-${ex.id}">${ex.intervalo_seg}</span>s
-                    <button onclick="alterarValor(${ex.id}, 'intervalo_seg', 10)">+</button>
+                    <button class="btn-mais"onclick="alterarValor(${ex.id}, 'intervalo_seg', 10)">+</button>
                     </p>
 
                     ${ex.descricao ? `<p>Descrição: ${ex.descricao}</p>` : ''}
