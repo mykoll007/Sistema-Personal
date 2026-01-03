@@ -54,6 +54,12 @@ async function carregarTreinos() {
         // ✅ Mostra treinos
         container.style.display = 'block';
 
+
+        // ⚠️ inicializa carrosséis APÓS renderização
+        if (window.innerWidth <= 706) {
+            iniciarCarrosseis();
+        }
+
     } catch (error) {
         console.error(error);
         alert('Erro ao carregar treinos');
@@ -101,10 +107,13 @@ function renderizarTreinos(dados) {
                 <h3>Treino ${letraTreino}</h3>
                 <i class="fa-solid fa-chevron-down"></i>
             </div>
-            <div class="treino-body" style="display: none;"></div>
+            <div class="treino-body">
+                <div class="treino-body-inner"></div>
+            </div>
         `;
 
         const body = accordion.querySelector('.treino-body');
+
 
         // 🔹 Dentro do treino, agrupa por categoria
         Object.keys(porTreino[letraTreino]).forEach(categoria => {
@@ -114,6 +123,17 @@ function renderizarTreinos(dados) {
             card.innerHTML = `
                 <h4 class="categoria-titulo">${categoria}</h4>
             `;
+            const controles = document.createElement('div');
+            controles.classList.add('carousel-controls');
+
+            controles.innerHTML = `
+    <button class="carousel-prev">‹</button>
+    <span class="carousel-indicator">1 / 1</span>
+    <button class="carousel-next">›</button>
+`;
+
+            card.appendChild(controles);
+
 
             const lista = document.createElement('div');
             lista.classList.add('exercicios-list');
@@ -129,40 +149,55 @@ function renderizarTreinos(dados) {
                         title="Exercício de força"></i>
                     </div>
                     <strong>${ex.exercicio}</strong>
-                    <p>
-                    Séries:
-                    <button class="btn-menos" onclick="alterarValor(${ex.id}, 'series', -1)">−</button>
-                    <span id="series-${ex.id}">${ex.series}</span>
-                    <button class="btn-mais" onclick="alterarValor(${ex.id}, 'series', 1)">+</button>
-                    </p>
-                    <p>
-                    Repetições:
-                    <button class="btn-menos" onclick="alterarValor(${ex.id}, 'repeticoes', -1)">−</button>
-                    <span id="repeticoes-${ex.id}">${ex.repeticoes}</span>
-                    <button class="btn-mais"onclick="alterarValor(${ex.id}, 'repeticoes', 1)">+</button>
-                    </p>
+                    <div class="exercicio-metricas">
 
-                    <p>
-                    Peso:
-                    <button class="btn-menos" onclick="alterarValor(${ex.id}, 'peso', -1)">−</button>
-                    <span id="peso-${ex.id}">${ex.peso}</span>kg
-                    <button class="btn-mais" onclick="alterarValor(${ex.id}, 'peso', 1)">+</button>
-                    </p>
+                        <div class="metrica-box">
+                            <span class="metrica-label">Séries</span>
+                            <div class="metrica-controls">
+                                <button class="btn-menos" onclick="alterarValor(${ex.id}, 'series', -1)">−</button>
+                                <span id="series-${ex.id}">${ex.series}</span>
+                                <button class="btn-mais" onclick="alterarValor(${ex.id}, 'series', 1)">+</button>
+                            </div>
+                        </div>
 
-                    <p>
-                    Intervalo:
-                    <button class="btn-menos" onclick="alterarValor(${ex.id}, 'intervalo_seg', -10)">−</button>
-                    <span id="intervalo_seg-${ex.id}">${ex.intervalo_seg}</span>s
-                    <button class="btn-mais"onclick="alterarValor(${ex.id}, 'intervalo_seg', 10)">+</button>
-                    </p>
+                        <div class="metrica-box">
+                            <span class="metrica-label">Reps</span>
+                            <div class="metrica-controls">
+                                <button class="btn-menos" onclick="alterarValor(${ex.id}, 'repeticoes', -1)">−</button>
+                                <span id="repeticoes-${ex.id}">${ex.repeticoes}</span>
+                                <button class="btn-mais" onclick="alterarValor(${ex.id}, 'repeticoes', 1)">+</button>
+                            </div>
+                        </div>
 
-                    ${ex.descricao ? `<p>Descrição: ${ex.descricao}</p>` : ''}
+                        <div class="metrica-box">
+                            <span class="metrica-label">Peso (kg)</span>
+                            <div class="metrica-controls">
+                                <button class="btn-menos" onclick="alterarValor(${ex.id}, 'peso', -1)">−</button>
+                                <span id="peso-${ex.id}">${ex.peso}</span>
+                                <button class="btn-mais" onclick="alterarValor(${ex.id}, 'peso', 1)">+</button>
+                            </div>
+                        </div>
+
+                        <div class="metrica-box">
+                            <span class="metrica-label">Intervalo</span>
+                            <div class="metrica-controls">
+                                <button class="btn-menos" onclick="alterarValor(${ex.id}, 'intervalo_seg', -5)">−</button>
+                                <span id="intervalo_seg-${ex.id}">${ex.intervalo_seg}</span>
+                                <small>s</small>
+                                <button class="btn-mais" onclick="alterarValor(${ex.id}, 'intervalo_seg', 5)">+</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    ${ex.descricao ? `<p class="descricao-label">Descrição: ${ex.descricao}</p>` : ''}
                     <div class="acoes-exercicio">
 
                         ${ex.video_url ? `
                             <button class="video-btn"
                                 onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
-                                Assistir Vídeo
+                                Vídeo
                             </button>
                         ` : ''}
 
@@ -181,12 +216,27 @@ function renderizarTreinos(dados) {
                 });
 
             card.appendChild(lista);
-            body.appendChild(card);
+            const inner = body.querySelector('.treino-body-inner');
+            inner.appendChild(card);
         });
 
         // 🔽 Toggle do accordion
         accordion.querySelector('.treino-header').addEventListener('click', () => {
-            body.style.display = body.style.display === 'none' ? 'block' : 'none';
+
+
+
+
+            // 🔒 Fecha todos os outros accordions
+            document.querySelectorAll('.treino-body.aberto').forEach(outroBody => {
+                if (outroBody !== body) {
+                    outroBody.classList.remove('aberto');
+                    outroBody.previousElementSibling.classList.remove('ativo');
+                }
+            });
+
+            // 🔁 Toggle do atual
+            body.classList.toggle('aberto');
+            accordion.querySelector('.treino-header').classList.toggle('ativo');
         });
 
         container.appendChild(accordion);
@@ -301,6 +351,55 @@ function fecharModalVideo() {
 
     modal.style.display = 'none';
 }
+
+function iniciarCarrosseis() {
+    if (window.innerWidth > 706) return;
+
+    document.querySelectorAll('.treino-card').forEach(card => {
+        const track = card.querySelector('.exercicios-list');
+        const prev = card.querySelector('.carousel-prev');
+        const next = card.querySelector('.carousel-next');
+        const indicator = card.querySelector('.carousel-indicator');
+
+        if (!track || !prev || !next) return;
+
+        const items = track.children;
+        const total = items.length;
+        let index = 0;
+
+        if (total <= 1) {
+            prev.style.display = 'none';
+            next.style.display = 'none';
+            indicator.style.display = 'none';
+            return;
+        }
+
+        function update() {
+            track.style.transform = `translateX(-${index * 100}%)`;
+            indicator.textContent = `${index + 1} / ${total}`;
+        }
+
+        prev.onclick = () => {
+            if (index > 0) {
+                index--;
+                update();
+            }
+        };
+
+        next.onclick = () => {
+            if (index < total - 1) {
+                index++;
+                update();
+            }
+        };
+
+        update();
+    });
+}
+
+
+
+
 
 
 // 🚀 Inicializa

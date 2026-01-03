@@ -1,3 +1,39 @@
+/* ============================= */
+/* 🎨 VARIÁVEIS DE COR POR TREINO */
+/* ============================= */
+
+.treino-A {
+    --cor-treino: #3f51b5;
+    --cor-treino-dark: #1a237e;
+    --cor-treino-bg: #eef1ff;
+}
+
+.treino-B {
+    --cor-treino: #43a047;
+    --cor-treino-dark: #1b5e20;
+    --cor-treino-bg: #e8f5e9;
+}
+
+.treino-C {
+    --cor-treino: #ff9800;
+    --cor-treino-dark: #e65100;
+    --cor-treino-bg: #fff3e0;
+}
+
+.treino-D {
+    --cor-treino: #e53935;
+    --cor-treino-dark: #b71c1c;
+    --cor-treino-bg: #ffebee;
+}
+
+.treino-E {
+    --cor-treino: #7b1fa2;
+    --cor-treino-dark: #4a148c;
+    --cor-treino-bg: #f3e5f5;
+}
+
+/* Fim das variáveis */
+
 * {
     margin: 0;
     padding: 0;
@@ -472,21 +508,47 @@ footer {
     font-size: 1.2rem;
     transition: transform 0.3s ease;
 }
-
-/* Corpo do accordion */
-.treino-body {
-    padding: 25px 20px;
-    background-color: #f9f9ff;
-}
-
-/* Quando aberto (opcional – se quiser animar depois via JS) */
-.treino-accordion.aberto .treino-header i {
+.treino-header.ativo i {
     transform: rotate(180deg);
 }
 
+/* ===== Corpo do accordion (animação real) ===== */
+
+.treino-body {
+    display: grid;
+    grid-template-rows: 0fr;      /* fechado */
+    overflow: hidden;
+    opacity: 0;
+    transition: grid-template-rows 0.35s ease, opacity 0.25s ease;
+    padding: 0 20px;
+    background-color: #f9f9ff;
+}
+
+.treino-body > * {
+    overflow: hidden;
+}
+
+.treino-body.aberto {
+    grid-template-rows: 1fr;      /* aberto */
+    opacity: 1;
+    padding: 25px 20px;
+}
+
+/* layout interno continua flex */
+.treino-body-inner {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+
+
+
 /* Dentro do accordion mantém seus cards */
 .treino-body .treino-card {
-    margin: 15px auto;
+    margin: 15px;
+    max-height: max-content;
 }
 
 
@@ -599,7 +661,7 @@ footer {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 20px;
-    padding: 30px 20px;
+    padding: 30px 16px;
     flex: 0 1 300px; /* largura mínima de 300px, pode crescer */
     max-width: 350px; /* largura máxima para não ocupar a tela inteira */
     text-align: center;
@@ -608,32 +670,10 @@ footer {
     overflow: hidden;
 }
 
-/* Efeito de brilho ao passar o mouse */
-.treino-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(244,197,66,0.2) 0%, transparent 70%);
-    transform: rotate(45deg);
-    transition: all 0.5s ease;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.treino-card:hover::before {
-    opacity: 1;
-}
-
-.treino-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 15px 30px rgba(26, 35, 126, 0.25);
-}
 
 /* Ícone da categoria */
 .treino-card i {
+    color: var(--cor-treino);
     display: block;
     margin: 0 auto 15px auto;
     font-size: 3.2rem;
@@ -653,88 +693,30 @@ footer {
     letter-spacing: 0.5px;
 }
 
-/* ============================= */
-/* 🎯 CORES POR TREINO (A–E) */
-/* ============================= */
-
-/* 🔵 TREINO A */
-.treino-A .treino-header {
-    background: linear-gradient(90deg, #1a237e, #3f51b5);
+/* Header do accordion */
+.treino-header {
+    background: linear-gradient(
+        90deg,
+        var(--cor-treino-dark),
+        var(--cor-treino)
+    );
 }
 
-.treino-A .treino-body {
-    background-color: #eef1ff;
+/* Corpo do accordion */
+.treino-body {
+    background-color: var(--cor-treino-bg);
 }
 
-.treino-A .categoria-titulo,
-.treino-A .exercicio-item strong,
-.treino-A .altere-icon {
-    color: #3f51b5;
-}
-
-
-/* 🟢 TREINO B */
-.treino-B .treino-header {
-    background: linear-gradient(90deg, #1b5e20, #43a047);
-}
-
-.treino-B .treino-body {
-    background-color: #e8f5e9;
-}
-
-.treino-B .categoria-titulo,
-.treino-B .exercicio-item strong,
-.treino-B .altere-icon {
-    color: #43a047;
+/* Textos e ícones */
+.categoria-titulo,
+.exercicio-item strong,
+.altere-icon,
+.descricao-label {
+    color: var(--cor-treino);
 }
 
 
-/* 🟠 TREINO C */
-.treino-C .treino-header {
-    background: linear-gradient(90deg, #e65100, #ff9800);
-}
 
-.treino-C .treino-body {
-    background-color: #fff3e0;
-}
-
-.treino-C .categoria-titulo,
-.treino-C .exercicio-item strong,
-.treino-C .altere-icon {
-    color: #ff9800;
-}
-
-
-/* 🔴 TREINO D */
-.treino-D .treino-header {
-    background: linear-gradient(90deg, #b71c1c, #e53935);
-}
-
-.treino-D .treino-body {
-    background-color: #ffebee;
-}
-
-.treino-D .categoria-titulo,
-.treino-D .exercicio-item strong,
-.treino-D .altere-icon {
-    color: #e53935;
-}
-
-
-/* 🟣 TREINO E */
-.treino-E .treino-header {
-    background: linear-gradient(90deg, #4a148c, #7b1fa2);
-}
-
-.treino-E .treino-body {
-    background-color: #f3e5f5;
-}
-
-.treino-E .categoria-titulo,
-.treino-E .exercicio-item strong,
-.treino-E .altere-icon {
-    color: #7b1fa2;
-}
 
 .acoes-exercicio {
 display: flex;
@@ -778,7 +760,7 @@ display: flex;
 
 
 .categoria-titulo{
-    font-size: 25px;
+    font-size: 28px;
 }
 
 /* Lista de exercícios dentro do card */
@@ -786,14 +768,16 @@ display: flex;
     text-align: left;
     margin-top: 20px;
     display: flex;
-    flex-direction: column;
+
     gap: 15px;
 }
+
 
 /* Cada exercício */
 
 
 .exercicio-header {
+    margin-top: 17px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -816,16 +800,71 @@ display: flex;
     letter-spacing: 0.5px;
 }
 
+/* ============================= */
+/* 📊 MÉTRICAS DO EXERCÍCIO */
+/* ============================= */
+
+.exercicio-metricas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 15px 0;
+}
+
+/* Cada retângulo */
+.metrica-box {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 12px;
+    padding: 12px 2px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Label (Séries, Reps...) */
+.metrica-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+}
+
+/* Controles */
+.metrica-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.metrica-controls span {
+    min-width: 22px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-treino);
+}
+
+/* Botões + - */
+.metrica-controls .btn-mais,
+.metrica-controls .btn-menos {
+    padding: 4px 10px;
+    font-size: 1rem;
+    border-radius: 6px;
+}
+
+
 /* Séries, repetições, peso, intervalo */
 .exercicio-item p {
     margin: 4px 0;
     font-size: 1rem;
     line-height: 1.5;
-    color: #555;
+
 }
 
 /* Botão de vídeo */
 .exercicio-item .video-btn {
+    width: 124px;
     margin-top: 10px;
     display: inline-block;
     font-size: 0.95rem;
@@ -852,7 +891,7 @@ display: flex;
 }
 
 .btn-mais, .btn-menos {
-    background: #1a237e;
+    background: var(--cor-treino);
     color: white;
     border: none;
     border-radius: 4px;
@@ -861,10 +900,6 @@ display: flex;
     cursor: pointer;
 }
 
-.btn-mais:hover,
-.btn-menos:hover {
-    background: #3949ab;
-}
 
 
 /* Container do toast */
@@ -1063,3 +1098,143 @@ display: flex;
     }
 }
 
+/* Mobile: deixa as metricas mais confortáveis */
+@media (max-width: 500px) {
+    .exercicio-metricas {
+        gap: 10px;
+    }
+
+    .metrica-box {
+        padding: 10px 1px;
+    }
+}
+
+.descricao-label{
+    color: var(--cor-treino);
+    font-weight: 600;
+        word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+
+    max-width: 100%;
+}
+@media (max-width: 706px) {
+
+        .treino-card {
+                    padding-left: 0;
+        padding-right: 0;
+        overflow: hidden; /* ✅ viewport */
+    }
+
+    .exercicios-list {
+        display: flex;
+        flex-direction: row;   /* 🔥 essencial */
+        flex-wrap: nowrap;
+        width: 100%;
+        gap: 0;
+        transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+        will-change: transform;
+    }
+
+    .exercicio-item {
+        flex: 0 0 100%;
+        min-width: 100%;
+        padding: 0px 16px;
+    }
+
+    .carousel-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .carousel-prev,
+    .carousel-next {
+        background: var(--cor-treino);
+        color: #fff;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .carousel-prev:disabled,
+    .carousel-next:disabled {
+        opacity: 0.4;
+        cursor: default;
+    }
+
+    .carousel-indicator {
+        font-weight: 600;
+        color: var(--cor-treino);
+    }
+}
+
+
+
+@media (min-width: 707px) {
+
+    .treino-body-inner {
+        flex-direction: column; /* categorias uma embaixo da outra */
+        align-items: stretch;
+    }
+
+    .treino-card {
+        width: 100%;
+        max-width: 100%;
+        flex: none;
+    }
+    .exercicios-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+    }
+       .carousel-controls {
+        display: none; /* 🔥 some com botões */
+    }
+    .exercicio-item {
+                flex: unset;
+        max-width: none;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 6px 18px rgba(26, 35, 126, 0.12);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+         gap: 12px;
+    }
+        .exercicio-metricas {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .metrica-box {
+        min-width: 0;
+    }
+    .metrica-controls{
+        gap: 0px !important;
+    }
+    .acoes-exercicio {
+        margin-top: auto; /* empurra botões pra base do card */
+    }
+    .treino-card{
+        max-width: 1031px;
+    }
+    .btn-mais, .btn-menos{
+        margin: 0px 3px !important;
+    }
+        /* ===== ANIMAÇÃO ESPECÍFICA DO ACCORDION (DESKTOP) ===== */
+
+    .treino-body {
+        transition:
+            max-height 0.55s cubic-bezier(.4,0,.2,1),
+            opacity 0.35s ease;
+        will-change: max-height, opacity;
+    }
+}
