@@ -1078,17 +1078,30 @@ async function carregarCategoriasExerciciosComNomes() {
 }
 
 async function carregarTreinosDoAluno(alunoId) {
-    try {
-        const res = await authFetch(`${API_URL}/personal/alunos/${alunoId}/treinos`);
-        if (!res.ok) throw new Error("Erro ao carregar treinos do aluno");
-        const treinos = await res.json();
-        return treinos; // array de objetos { exercicio_id, ... }
-    } catch (err) {
-        console.error(err);
-        mostrarToast("Erro", err.message, "danger");
-        return [];
-    }
+  try {
+    const res = await authFetch(`${API_URL}/personal/alunos/${alunoId}/treinos`);
+    if (!res.ok) throw new Error("Erro ao carregar treinos do aluno");
+
+    const treinos = await res.json();
+
+    // 🔥 AQUI ESTÁ O AJUSTE
+    nomesTreinos = {};   // zera antes
+
+    treinos.forEach(t => {
+      if (t.treino && t.nome_treino) {
+        nomesTreinos[t.treino] = t.nome_treino;
+      }
+    });
+
+    return treinos;
+
+  } catch (err) {
+    console.error(err);
+    mostrarToast("Erro", err.message, "danger");
+    return [];
+  }
 }
+
 
 
 
@@ -1267,4 +1280,3 @@ function setLoadingBotaoExcluir(loading) {
         spinner.classList.add("d-none");
     }
 }
-

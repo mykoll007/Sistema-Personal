@@ -429,7 +429,7 @@
 
                 <!-- Modal Nomear Treinos -->
                 <div class="modal fade" id="modalNomearTreinos" tabindex="-1">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog modal-dialog-scrollable modal-lg">
                         <div class="modal-content">
 
                             <div class="modal-header bg-info text-white">
@@ -437,6 +437,10 @@
                             </div>
 
                             <div class="modal-body">
+                                <div id="loaderNomearTreinos" class="text-center d-none">
+                                    <div class="spinner-border text-info" role="status"></div>
+                                    <p class="text-muted mt-2">Carregando nomes...</p>
+                                </div>
 
                                 <div class="form-group">
                                     <label>Treino A</label>
