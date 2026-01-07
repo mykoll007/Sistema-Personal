@@ -71,6 +71,7 @@ class AlunoController {
                 .select(
                     'aluno_treinos.id',
                     'aluno_treinos.treino',
+                    'aluno_treinos.nome_treino',
                     'aluno_treinos.ordem',
                     'categorias.nome as categoria',
                     'exercicios.nome as exercicio',

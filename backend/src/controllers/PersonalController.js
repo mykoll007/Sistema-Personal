@@ -876,7 +876,6 @@ class PersonalController {
     async salvarTreinosDoAluno(req, res) {
         const { aluno_id, treinos } = req.body;
         const personal_id = req.personalId;
-        console.log("BODY:", req.body);
 
 
         if (!aluno_id) {

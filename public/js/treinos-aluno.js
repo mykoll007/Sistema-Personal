@@ -102,15 +102,34 @@ function renderizarTreinos(dados) {
         accordion.classList.add('treino-accordion', `treino-${letraTreino}`);
 
 
+        // Descobre o nome do treino (pega o primeiro que tiver)
+        let nomeTreino = '';
+
+        Object.values(porTreino[letraTreino]).some(lista =>
+            lista.some(item => {
+                if (item.nome_treino) {
+                    nomeTreino = item.nome_treino;
+                    return true;
+                }
+                return false;
+            })
+        );
+
+        // Monta o título
+        const tituloTreino = nomeTreino
+            ? `Treino ${letraTreino} - ${nomeTreino}`
+            : `Treino ${letraTreino}`;
+
         accordion.innerHTML = `
-            <div class="treino-header">
-                <h3>Treino ${letraTreino}</h3>
-                <i class="fa-solid fa-chevron-down"></i>
-            </div>
-            <div class="treino-body">
-                <div class="treino-body-inner"></div>
-            </div>
-        `;
+    <div class="treino-header">
+        <h3>${tituloTreino}</h3>
+        <i class="fa-solid fa-chevron-down"></i>
+    </div>
+    <div class="treino-body">
+        <div class="treino-body-inner"></div>
+    </div>
+`;
+
 
         const body = accordion.querySelector('.treino-body');
 
