@@ -8,13 +8,7 @@ let alunoParaTreino = null;
 let cachePersonal = null; // cache global
 let cacheAlunos = null;
 let sortableTreinos = null;
-let nomesTreinos = {
-  A: "",
-  B: "",
-  C: "",
-  D: "",
-  E: ""
-};
+let nomesTreinos = {};
 
 
 // -----------------------------------
@@ -121,23 +115,20 @@ $('#toastMessage').on('hidden.bs.toast', function () {
 });
 
 // 2️⃣ Botão SALVAR NOMES DOS TREINOS
-$("#btnSalvarNomeTreinos").on("click", async function () {
+$("#btnSalvarNomeTreinos").on("click", function () {
 
-  // Captura nomes
+  if (!nomesTreinos) nomesTreinos = {};
+
   $(".input-nome-treino").each(function () {
     const treino = $(this).data("treino");
-    const nome = $(this).val().trim();
-    if (nome) nomesTreinos[treino] = nome;
+    nomesTreinos[treino] = $(this).val().trim();
   });
 
-  // Injeta nos exercícios
   treinosSelecionados.forEach(t => {
     t.nome_treino = nomesTreinos[t.treino] || null;
   });
 
   $("#modalNomearTreinos").modal("hide");
-
-  // 🔥 AGORA SIM SALVA
   salvarTreinosNoBackend();
 });
 
@@ -152,6 +143,20 @@ $(document).on("click", "#btnSalvarConfigTreinos", function () {
     setLoadingBotaoSalvarConfig(false);
 
     $("#modalNomearTreinos").modal("show");
+});
+
+function preencherModalNomeTreinos() {
+  if (!nomesTreinos) nomesTreinos = {};
+
+  $(".input-nome-treino").each(function () {
+    const treino = $(this).data("treino");
+    $(this).val(nomesTreinos[treino] ?? "");
+  });
+}
+
+
+$("#modalNomearTreinos").on("shown.bs.modal", function () {
+  preencherModalNomeTreinos();
 });
 
 
