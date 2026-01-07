@@ -8,6 +8,14 @@ let alunoParaTreino = null;
 let cachePersonal = null; // cache global
 let cacheAlunos = null;
 let sortableTreinos = null;
+let nomesTreinos = {
+  A: "",
+  B: "",
+  C: "",
+  D: "",
+  E: ""
+};
+
 
 // -----------------------------------
 // PEGAR TOKEN
@@ -106,9 +114,75 @@ function mostrarToast(titulo, mensagem, tipo = "info") {
     toast.toast("show");
 }
 
+
+
 $('#toastMessage').on('hidden.bs.toast', function () {
     $(this).css("display", "none"); // 🔥 ESCONDE novamente
 });
+
+// 2️⃣ Botão SALVAR NOMES DOS TREINOS
+$("#btnSalvarNomeTreinos").on("click", async function () {
+
+  // Captura nomes
+  $(".input-nome-treino").each(function () {
+    const treino = $(this).data("treino");
+    const nome = $(this).val().trim();
+    if (nome) nomesTreinos[treino] = nome;
+  });
+
+  // Injeta nos exercícios
+  treinosSelecionados.forEach(t => {
+    t.nome_treino = nomesTreinos[t.treino] || null;
+  });
+
+  $("#modalNomearTreinos").modal("hide");
+
+  // 🔥 AGORA SIM SALVA
+  salvarTreinosNoBackend();
+});
+
+//  Botão SALVAR CONFIGURAÇÕES
+$(document).on("click", "#btnSalvarConfigTreinos", function () {
+    setLoadingBotaoSalvarConfig(true);
+
+    salvarValoresInputsVisiveis();
+    atualizarOrdemTreinos();
+    treinosSelecionados = normalizarOrdemPorCategoria(treinosSelecionados);
+
+    setLoadingBotaoSalvarConfig(false);
+
+    $("#modalNomearTreinos").modal("show");
+});
+
+
+
+// 3️⃣ Função única de salvar no backend
+async function salvarTreinosNoBackend() {
+  setLoadingBotaoSalvarConfig(true);
+
+  try {
+    const res = await authFetch(`${API_URL}/personal/alunos/treinos/salvar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        aluno_id: alunoParaTreino.id,
+        treinos: treinosSelecionados
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Erro ao salvar treinos");
+
+    mostrarToast("Sucesso", "Treinos atualizados com sucesso!", "success");
+    $("#modalConfigTreinos").modal("hide");
+
+  } catch (err) {
+    console.error(err);
+    mostrarToast("Erro", err.message, "danger");
+  } finally {
+    setLoadingBotaoSalvarConfig(false);
+  }
+}
 
 // -----------------------------------
 // CARREGAR DADOS DO PERSONAL LOGADO
@@ -913,59 +987,6 @@ $(document).on("click", ".header-categoria", function (e) {
     body.slideToggle(200);
     icon.toggleClass("fa-chevron-down fa-chevron-right");
 });
-
-
-
-$("#btnSalvarConfigTreinos").on("click", async function () {
-    setLoadingBotaoSalvarConfig(true);
-
-    // Pegar valores digitados
-// 🔥 ATUALIZA APENAS OS CARDS VISÍVEIS
-$("#listaConfigsTreinos .card-treino").each(function () {
-
-    const exercicioId = Number($(this).data("id"));
-
-    const treinoObj = treinosSelecionados.find(t => t.exercicio_id === exercicioId);
-    if (!treinoObj) return;
-
-    treinoObj.series = Number($(this).find(".input-series").val());
-    treinoObj.repeticoes = Number($(this).find(".input-repeticoes").val());
-    treinoObj.peso = Number($(this).find(".input-peso").val());
-    treinoObj.intervalo_seg = Number($(this).find(".input-intervalo").val());
-    treinoObj.treino = $(this).find(".input-treino").val();
-});
-
-    
-    atualizarOrdemTreinos();
-    // 🔥 NORMALIZA PARA NÃO QUEBRAR CATEGORIAS
-    treinosSelecionados = normalizarOrdemPorCategoria(treinosSelecionados);
-
-    try {
-        const res = await authFetch(`${API_URL}/personal/alunos/treinos/salvar`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                aluno_id: alunoParaTreino.id,
-                treinos: treinosSelecionados
-            })
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Erro ao salvar treinos");
-
-        mostrarToast("Sucesso", "Treinos atualizados com sucesso!", "success");
-        $("#modalConfigTreinos").modal("hide");
-
-    } catch (err) {
-        console.error(err);
-        mostrarToast("Erro", err.message, "danger");
-    } finally {
-        setLoadingBotaoSalvarConfig(false); // termina o loading
-    }
-});
-
-
-
 
 
 function carregarPersonalTopo() {

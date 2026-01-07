@@ -705,8 +705,10 @@ class PersonalController {
             repeticoes,
             peso,
             intervalo_seg,
-            treino
+            treino,
+            nome_treino
         } = request.body;
+
 
         const personal_id = request.personalId;
 
@@ -751,12 +753,14 @@ class PersonalController {
             await database('aluno_treinos').insert({
                 aluno_id,
                 exercicio_id,
+                treino,
+                nome_treino: nome_treino || null,
                 series,
                 repeticoes,
                 peso,
-                intervalo_seg,
-                treino
+                intervalo_seg
             });
+
 
             return response.status(201).json({
                 message: "Exercício adicionado ao treino do aluno com sucesso!"
@@ -798,6 +802,7 @@ class PersonalController {
                 .select(
                     'at.exercicio_id',
                     'at.treino',
+                    'at.nome_treino',
                     'at.series',
                     'at.repeticoes',
                     'at.peso',
@@ -806,6 +811,7 @@ class PersonalController {
                     'e.nome as exercicio_nome',
                     'e.categoria_id'
                 )
+
                 .where({ aluno_id })
                 .orderBy('at.treino')
                 .orderBy('at.ordem');
@@ -870,6 +876,8 @@ class PersonalController {
     async salvarTreinosDoAluno(req, res) {
         const { aluno_id, treinos } = req.body;
         const personal_id = req.personalId;
+        console.log("BODY:", req.body);
+
 
         if (!aluno_id) {
             return res.status(400).json({ message: "Aluno obrigatório." });
@@ -902,13 +910,16 @@ class PersonalController {
             );
 
             if (paraDeletar.length > 0) {
-                await database('aluno_treinos')
-                    .where('aluno_id', aluno_id)
-                    .whereIn(
-                        database.raw('(exercicio_id, treino)'),
-                        paraDeletar.map(t => [t.exercicio_id, t.treino])
-                    )
-                    .del();
+                for (const t of paraDeletar) {
+                    await database('aluno_treinos')
+                        .where({
+                            aluno_id,
+                            exercicio_id: t.exercicio_id,
+                            treino: t.treino
+                        })
+                        .del();
+                }
+
             }
 
             // 3️⃣ Inserir ou atualizar
@@ -927,12 +938,14 @@ class PersonalController {
                             treino: t.treino
                         })
                         .update({
+                            nome_treino: t.nome_treino || null,
                             series: t.series,
                             repeticoes: t.repeticoes,
                             peso: t.peso,
                             intervalo_seg: t.intervalo_seg,
                             ordem: t.ordem
                         });
+
                 } else {
                     // ➕ Insere
                     await database('aluno_treinos')
@@ -940,12 +953,14 @@ class PersonalController {
                             aluno_id,
                             exercicio_id: t.exercicio_id,
                             treino: t.treino,
+                            nome_treino: t.nome_treino || null,
                             series: t.series,
                             repeticoes: t.repeticoes,
                             peso: t.peso,
                             intervalo_seg: t.intervalo_seg,
                             ordem: t.ordem
                         });
+
                 }
             }
 
@@ -959,7 +974,9 @@ class PersonalController {
                 message: "Erro ao salvar treinos do aluno."
             });
         }
+        
     }
+    
 
 }
 

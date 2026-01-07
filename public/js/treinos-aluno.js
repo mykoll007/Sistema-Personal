@@ -220,13 +220,13 @@ function renderizarTreinos(dados) {
             inner.appendChild(card);
         });
 
-        // 🔽 Toggle do accordion
+        //  Toggle do accordion
         accordion.querySelector('.treino-header').addEventListener('click', () => {
 
 
 
 
-            // 🔒 Fecha todos os outros accordions
+            //  Fecha todos os outros accordions
             document.querySelectorAll('.treino-body.aberto').forEach(outroBody => {
                 if (outroBody !== body) {
                     outroBody.classList.remove('aberto');
@@ -234,7 +234,7 @@ function renderizarTreinos(dados) {
                 }
             });
 
-            // 🔁 Toggle do atual
+            //  Toggle do atual
             body.classList.toggle('aberto');
             accordion.querySelector('.treino-header').classList.toggle('ativo');
         });
