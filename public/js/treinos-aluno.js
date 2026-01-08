@@ -283,21 +283,21 @@ async function toggleFinalizarTreino(treinoId, botao) {
 
         const data = await response.json();
 
-if (data.status === 'finalizado') {
+        if (data.status === 'finalizado') {
 
-    // 1️⃣ primeiro marca como finalizado
-    botao.classList.add('finalizado');
-    botao.innerHTML = '✅ Finalizado';
+            // 1️⃣ primeiro marca como finalizado
+            botao.classList.add('finalizado');
+            botao.innerHTML = '✅ Finalizado';
 
-    // 2️⃣ depois verifica se o treino inteiro terminou
-    const accordion = botao.closest('.treino-accordion');
-    const classes = accordion.className;
-    const match = classes.match(/treino-([A-Z])/);
+            // 2️⃣ depois verifica se o treino inteiro terminou
+            const accordion = botao.closest('.treino-accordion');
+            const classes = accordion.className;
+            const match = classes.match(/treino-([A-Z])/);
 
-    if (match) {
-        const letraTreino = match[1];
-        verificarTreinoConcluido(letraTreino);
-    }
+            if (match) {
+                const letraTreino = match[1];
+                verificarTreinoConcluido(letraTreino);
+            }
 
         } else {
             botao.classList.remove('finalizado');
@@ -431,10 +431,14 @@ document.getElementById('cancelarFeedback').addEventListener('click', () => {
 
 document.getElementById('enviarFeedback').addEventListener('click', async () => {
 
+    const erro = document.getElementById('erroEstrelas');
+
     if (estrelasSelecionadas === 0) {
-        alert('Selecione pelo menos 1 estrela ⭐');
+        erro.innerText = 'Selecione pelo menos 1 estrela ⭐';
+        erro.style.display = 'block';
         return;
     }
+
 
     const mensagem = document.getElementById('feedbackMensagem').value;
 
@@ -459,11 +463,11 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
             throw new Error('Erro ao enviar feedback');
         }
 
-// fecha modal de feedback
-document.getElementById('feedbackModal').style.display = 'none';
+        // fecha modal de feedback
+        document.getElementById('feedbackModal').style.display = 'none';
 
-// abre modal de agradecimento
-document.getElementById('obrigadoModal').style.display = 'flex';
+        // abre modal de agradecimento
+        document.getElementById('obrigadoModal').style.display = 'flex';
 
     } catch (error) {
         console.error(error);

@@ -923,6 +923,7 @@ display: flex;
     border-radius: 12px;
     text-align: center;
     animation: zoomIn 0.25s ease;
+    font-family: 'Poppins', sans-serif;
 }
 
 .feedback-modal-content h3 {
@@ -968,12 +969,14 @@ display: flex;
 /* 🎯 Botões */
 .feedback-actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 10px;
 }
 
 .btn-cancelar {
-    background: #ccc;
+    background: red;
+    color: white;
+    width: 69px;
     border: none;
     padding: 8px 14px;
     border-radius: 6px;
@@ -992,6 +995,15 @@ display: flex;
 .btn-enviar:hover {
     opacity: 0.9;
 }
+
+.erro-estrelas {
+    color: #e53935;
+    font-size: 14px;
+    margin-top: 8px;
+    text-align: center;
+    display: none;
+}
+
 
 /* 🎬 Animação */
 @keyframes zoomIn {
