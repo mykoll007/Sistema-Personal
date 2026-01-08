@@ -185,61 +185,6 @@ class AlunoController {
 // =========================
 // Enviar feedback do aluno
 // =========================
-// async enviarFeedback(req, res) {
-//     const alunoId = req.alunoId;
-//     const { estrelas, mensagem, treino } = req.body;
-
-//     if (!estrelas || !treino) {
-//         return res.status(400).json({
-//             message: 'Estrelas e treino são obrigatórios'
-//         });
-//     }
-
-//     try {
-//         // 🔎 Descobre o personal responsável
-//         const aluno = await database('alunos')
-//             .select('personal_id')
-//             .where('id', alunoId)
-//             .first();
-
-//         if (!aluno) {
-//             return res.status(404).json({ message: 'Aluno não encontrado' });
-//         }
-
-//         // 📅 evita duplicidade no mesmo dia
-//         const hoje = new Date().toISOString().slice(0, 10);
-
-//         const jaExiste = await database('feedbacks')
-//             .where({
-//                 aluno_id: alunoId,
-//                 treino: treino
-//             })
-//             .where('criado_em', '>=', `${hoje} 00:00:00`)
-//             .first();
-
-//         if (jaExiste) {
-//             return res.status(409).json({
-//                 message: 'Feedback já enviado para esse treino hoje'
-//             });
-//         }
-
-//         // 💾 Salvar feedback
-//         await database('feedbacks').insert({
-//             aluno_id: alunoId,
-//             personal_id: aluno.personal_id,
-//             estrelas,
-//             mensagem: mensagem || null,
-//             treino
-//         });
-
-//         return res.status(201).json({ success: true });
-
-//     } catch (error) {
-//         console.error('Erro ao salvar feedback:', error);
-//         return res.status(500).json({ message: 'Erro ao salvar feedback' });
-//     }
-// }
-
 async enviarFeedback(req, res) {
     const alunoId = req.alunoId;
     const { estrelas, mensagem, treino } = req.body;
@@ -261,12 +206,29 @@ async enviarFeedback(req, res) {
             return res.status(404).json({ message: 'Aluno não encontrado' });
         }
 
-        // 💾 Salvar feedback (sem bloqueio)
+        // 📅 evita duplicidade no mesmo dia
+        const hoje = new Date().toISOString().slice(0, 10);
+
+        const jaExiste = await database('feedbacks')
+            .where({
+                aluno_id: alunoId,
+                treino: treino
+            })
+            .where('criado_em', '>=', `${hoje} 00:00:00`)
+            .first();
+
+        if (jaExiste) {
+            return res.status(409).json({
+                message: 'Feedback já enviado para esse treino hoje'
+            });
+        }
+
+        // 💾 Salvar feedback
         await database('feedbacks').insert({
             aluno_id: alunoId,
             personal_id: aluno.personal_id,
             estrelas,
-            mensagem,
+            mensagem: mensagem || null,
             treino
         });
 
@@ -277,6 +239,8 @@ async enviarFeedback(req, res) {
         return res.status(500).json({ message: 'Erro ao salvar feedback' });
     }
 }
+
+
 
 
 }
