@@ -324,7 +324,7 @@ function abrirModalFeedback(letraTreino) {
 }
 
 
-function verificarTreinoConcluido(letraTreino) {
+async function verificarTreinoConcluido(letraTreino) {
     const treinoAccordion = document.querySelector(`.treino-${letraTreino}`);
     if (!treinoAccordion) return;
 
@@ -334,10 +334,33 @@ function verificarTreinoConcluido(letraTreino) {
         btn.classList.contains('finalizado')
     );
 
-    if (todosFinalizados) {
-        abrirModalFeedback(letraTreino);
+    if (!todosFinalizados) return;
+
+    try {
+        const response = await fetch(
+            `https://sistema-personal.vercel.app/aluno/feedbacks/pode-avaliar/${letraTreino}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        if (data.podeAvaliar) {
+            abrirModalFeedback(letraTreino);
+        } else {
+            console.log('Feedback já enviado hoje para este treino.');
+        }
+
+    } catch (error) {
+        console.error('Erro ao verificar se pode avaliar:', error);
     }
 }
+
 
 
 

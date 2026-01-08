@@ -240,6 +240,35 @@ async enviarFeedback(req, res) {
     }
 }
 
+// =========================
+// Verifica se ja foi avaliado no dia
+// =========================
+async podeAvaliar(req, res) {
+    const alunoId = req.alunoId;
+    const { treino } = req.params;
+
+    const hoje = new Date().toISOString().slice(0, 10);
+
+    try {
+        const jaExiste = await database('feedbacks')
+            .where({
+                aluno_id: alunoId,
+                treino: treino
+            })
+            .where('criado_em', '>=', `${hoje} 00:00:00`)
+            .first();
+
+        return res.json({
+            podeAvaliar: !jaExiste
+        });
+
+    } catch (error) {
+        console.error('Erro ao verificar feedback:', error);
+        return res.status(500).json({ message: 'Erro ao verificar feedback' });
+    }
+}
+
+
 
 
 
