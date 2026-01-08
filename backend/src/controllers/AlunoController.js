@@ -206,13 +206,15 @@ async enviarFeedback(req, res) {
             return res.status(404).json({ message: 'Aluno não encontrado' });
         }
 
-        // ❌ Evita feedback duplicado pro mesmo treino no mesmo dia
+        // 📅 evita duplicidade no mesmo dia
+        const hoje = new Date().toISOString().slice(0, 10);
+
         const jaExiste = await database('feedbacks')
             .where({
                 aluno_id: alunoId,
                 treino: treino
             })
-            .whereRaw('DATE(criado_em) = CURDATE()')
+            .where('criado_em', '>=', `${hoje} 00:00:00`)
             .first();
 
         if (jaExiste) {
@@ -226,7 +228,7 @@ async enviarFeedback(req, res) {
             aluno_id: alunoId,
             personal_id: aluno.personal_id,
             estrelas,
-            mensagem,
+            mensagem: mensagem || null,
             treino
         });
 
@@ -237,6 +239,7 @@ async enviarFeedback(req, res) {
         return res.status(500).json({ message: 'Erro ao salvar feedback' });
     }
 }
+
 
 }
 

@@ -283,18 +283,22 @@ async function toggleFinalizarTreino(treinoId, botao) {
 
         const data = await response.json();
 
-        if (data.status === 'finalizado') {
-            // 🔎 Descobre qual treino (A, B, C...)
-const accordion = botao.closest('.treino-accordion');
-const classes = accordion.className;
-const match = classes.match(/treino-([A-Z])/);
+if (data.status === 'finalizado') {
 
-if (match) {
-    const letraTreino = match[1];
-    verificarTreinoConcluido(letraTreino);
-}
-            botao.classList.add('finalizado');
-            botao.innerHTML = '✅ Finalizado';
+    // 1️⃣ primeiro marca como finalizado
+    botao.classList.add('finalizado');
+    botao.innerHTML = '✅ Finalizado';
+
+    // 2️⃣ depois verifica se o treino inteiro terminou
+    const accordion = botao.closest('.treino-accordion');
+    const classes = accordion.className;
+    const match = classes.match(/treino-([A-Z])/);
+
+    if (match) {
+        const letraTreino = match[1];
+        verificarTreinoConcluido(letraTreino);
+    }
+
         } else {
             botao.classList.remove('finalizado');
             botao.innerHTML = 'Finalizar';
