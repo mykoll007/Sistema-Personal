@@ -62,9 +62,25 @@ CREATE TABLE aluno_treinos (
     peso INT NOT NULL,
     intervalo_seg INT NOT NULL,
     treino VARCHAR(50) NOT NULL,
+    nome_treino VARCHAR(100),
     status ENUM('em_andamento', 'finalizado') DEFAULT 'em_andamento',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     finalizado_em DATETIME NULL,
     FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
     FOREIGN KEY (exercicio_id) REFERENCES exercicios(id) ON DELETE CASCADE
 );
+
+
+-- Tabela de feedbacks (feedback dado pelo aluno)
+CREATE TABLE feedbacks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    aluno_id INT NOT NULL,
+    personal_id INT NOT NULL,
+    mensagem TEXT NOT NULL,
+    estrelas TINYINT NOT NULL CHECK (estrelas BETWEEN 1 AND 5),
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
+    FOREIGN KEY (personal_id) REFERENCES personals(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

@@ -1,3 +1,6 @@
+let treinoAtualFeedback = null;
+let estrelasSelecionadas = 0;
+
 // 🔐 Proteção da página
 const token = localStorage.getItem('tokenAluno');
 
@@ -261,6 +264,7 @@ function renderizarTreinos(dados) {
         container.appendChild(accordion);
     });
 }
+
 async function toggleFinalizarTreino(treinoId, botao) {
     try {
         const response = await fetch(
@@ -280,6 +284,15 @@ async function toggleFinalizarTreino(treinoId, botao) {
         const data = await response.json();
 
         if (data.status === 'finalizado') {
+            // 🔎 Descobre qual treino (A, B, C...)
+const accordion = botao.closest('.treino-accordion');
+const classes = accordion.className;
+const match = classes.match(/treino-([A-Z])/);
+
+if (match) {
+    const letraTreino = match[1];
+    verificarTreinoConcluido(letraTreino);
+}
             botao.classList.add('finalizado');
             botao.innerHTML = '✅ Finalizado';
         } else {
@@ -292,6 +305,36 @@ async function toggleFinalizarTreino(treinoId, botao) {
         alert('Erro ao atualizar treino');
     }
 }
+
+function abrirModalFeedback(letraTreino) {
+    treinoAtualFeedback = letraTreino;
+    estrelasSelecionadas = 0;
+
+    document.getElementById('feedbackMensagem').value = '';
+
+    document.querySelectorAll('#starsContainer i').forEach(star => {
+        star.className = 'fa-regular fa-star';
+    });
+
+    document.getElementById('feedbackModal').style.display = 'flex';
+}
+
+
+function verificarTreinoConcluido(letraTreino) {
+    const treinoAccordion = document.querySelector(`.treino-${letraTreino}`);
+    if (!treinoAccordion) return;
+
+    const botoes = treinoAccordion.querySelectorAll('.finalizar-btn');
+
+    const todosFinalizados = [...botoes].every(btn =>
+        btn.classList.contains('finalizado')
+    );
+
+    if (todosFinalizados) {
+        abrirModalFeedback(letraTreino);
+    }
+}
+
 
 
 function alterarValor(treinoId, campo, delta) {
@@ -337,6 +380,66 @@ async function atualizarTreinoBackend(treinoId, campo, valor) {
     }
 }
 
+//Sistema de estrelas ⭐
+document.querySelectorAll('#starsContainer i').forEach(star => {
+    star.addEventListener('click', () => {
+        estrelasSelecionadas = parseInt(star.dataset.value);
+
+        document.querySelectorAll('#starsContainer i').forEach(s => {
+            const val = parseInt(s.dataset.value);
+            s.className =
+                val <= estrelasSelecionadas
+                    ? 'fa-solid fa-star'
+                    : 'fa-regular fa-star';
+        });
+    });
+});
+
+// Fechar modal de feedback
+document.getElementById('cancelarFeedback').addEventListener('click', () => {
+    document.getElementById('feedbackModal').style.display = 'none';
+});
+
+// Enviar feedback
+
+document.getElementById('enviarFeedback').addEventListener('click', async () => {
+
+    if (estrelasSelecionadas === 0) {
+        alert('Selecione pelo menos 1 estrela ⭐');
+        return;
+    }
+
+    const mensagem = document.getElementById('feedbackMensagem').value;
+
+    try {
+        const response = await fetch(
+            'https://sistema-personal.vercel.app/aluno/feedbacks',
+            {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    treino: treinoAtualFeedback,
+                    estrelas: estrelasSelecionadas,
+                    mensagem: mensagem
+                })
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('Erro ao enviar feedback');
+        }
+
+        alert('Obrigado pelo seu feedback! 💪');
+        document.getElementById('feedbackModal').style.display = 'none';
+
+    } catch (error) {
+        console.error(error);
+        alert('Erro ao enviar feedback');
+    }
+});
 
 
 /* ============================= */
@@ -415,11 +518,5 @@ function iniciarCarrosseis() {
         update();
     });
 }
-
-
-
-
-
-
 // 🚀 Inicializa
 carregarTreinos();

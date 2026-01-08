@@ -56,6 +56,7 @@ router.post('/aluno/login', AlunoController.autenticarAluno);
 router.get('/aluno/treinos', authAluno, AlunoController.listarTreinos);
 router.put('/aluno/treinos/:treinoId/finalizar', authAluno, AlunoController.finalizarTreino);
 router.put('/aluno/treinos/:treinoId', authAluno, AlunoController.atualizarCargaTreino);
+router.post('/aluno/feedbacks', authAluno, AlunoController.enviarFeedback);
 
 
 
