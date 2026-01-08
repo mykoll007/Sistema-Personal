@@ -45,7 +45,7 @@
 
         <!-- 🔄 Loader -->
         <div id="loader-treinos" class="loader"></div>
-        
+
         <div id="treinos-container">
             <!-- Os treinos serão inseridos aqui via JS -->
         </div>
@@ -67,30 +67,42 @@
     </div>
 
     <!-- ================= MODAL FEEDBACK ================= -->
-<div id="feedbackModal" class="feedback-modal">
-    <div class="feedback-modal-content">
-        <h3>Avalie seu treino ⭐</h3>
+    <div id="feedbackModal" class="feedback-modal">
+        <div class="feedback-modal-content">
+            <h3>Avalie seu treino ⭐</h3>
 
-        <!-- Estrelas -->
-        <div class="stars" id="starsContainer">
-            <i class="fa-regular fa-star" data-value="1"></i>
-            <i class="fa-regular fa-star" data-value="2"></i>
-            <i class="fa-regular fa-star" data-value="3"></i>
-            <i class="fa-regular fa-star" data-value="4"></i>
-            <i class="fa-regular fa-star" data-value="5"></i>
-        </div>
+            <!-- Estrelas -->
+            <div class="stars" id="starsContainer">
+                <i class="fa-regular fa-star" data-value="1"></i>
+                <i class="fa-regular fa-star" data-value="2"></i>
+                <i class="fa-regular fa-star" data-value="3"></i>
+                <i class="fa-regular fa-star" data-value="4"></i>
+                <i class="fa-regular fa-star" data-value="5"></i>
+            </div>
 
-        <!-- Comentário -->
-        <textarea id="feedbackMensagem"
-            placeholder="Escreva um comentário (opcional)..."></textarea>
+            <!-- Comentário -->
+            <textarea id="feedbackMensagem" placeholder="Escreva um comentário (opcional)..."></textarea>
 
-        <!-- Botões -->
-        <div class="feedback-actions">
-            <button id="cancelarFeedback" class="btn-cancelar">Sair</button>
-            <button id="enviarFeedback" class="btn-enviar">Enviar</button>
+            <!-- Botões -->
+            <div class="feedback-actions">
+                <button id="cancelarFeedback" class="btn-cancelar">Sair</button>
+                <button id="enviarFeedback" class="btn-enviar">Enviar</button>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- ================= MODAL OBRIGADO ================= -->
+    <div id="obrigadoModal" class="obrigado-modal">
+        <div class="obrigado-modal-content">
+            <h3>Obrigado pelo feedback! 💪</h3>
+            <p>Sua avaliação ajuda seu personal a melhorar ainda mais seus treinos.</p>
+
+            <button id="fecharObrigado" class="btn-fechar-obrigado">
+                Fechar
+            </button>
+        </div>
+    </div>
+
 
 
 

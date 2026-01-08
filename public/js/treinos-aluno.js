@@ -436,8 +436,11 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
             throw new Error('Erro ao enviar feedback');
         }
 
-        alert('Obrigado pelo seu feedback! 💪');
-        document.getElementById('feedbackModal').style.display = 'none';
+// fecha modal de feedback
+document.getElementById('feedbackModal').style.display = 'none';
+
+// abre modal de agradecimento
+document.getElementById('obrigadoModal').style.display = 'flex';
 
     } catch (error) {
         console.error(error);
@@ -445,6 +448,10 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
     }
 });
 
+// Fechar modal de obrigado
+document.getElementById('fecharObrigado').addEventListener('click', () => {
+    document.getElementById('obrigadoModal').style.display = 'none';
+});
 
 /* ============================= */
 /* MODAL VÍDEO */

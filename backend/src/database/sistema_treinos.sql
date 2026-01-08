@@ -76,11 +76,12 @@ CREATE TABLE feedbacks (
     id INT AUTO_INCREMENT PRIMARY KEY,
     aluno_id INT NOT NULL,
     personal_id INT NOT NULL,
-    mensagem TEXT NOT NULL,
+    mensagem TEXT NULL,
     estrelas TINYINT NOT NULL CHECK (estrelas BETWEEN 1 AND 5),
+    treino CHAR(1) NOT NULL, -- A, B, C...
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
     FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
     FOREIGN KEY (personal_id) REFERENCES personals(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);
+
 
