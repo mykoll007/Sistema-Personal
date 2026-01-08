@@ -748,7 +748,7 @@ display: flex;
 .finalizar-btn.finalizado {
     background: linear-gradient(90deg, #2e7d32, #43a047);
     color: #fff;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 
