@@ -1,11 +1,19 @@
 let treinoAtualFeedback = null;
 let estrelasSelecionadas = 0;
 
+function forcarLogout() {
+    localStorage.removeItem('tokenAluno');
+    localStorage.removeItem('nomeAluno');
+    localStorage.removeItem('emailAluno');
+
+    window.location.replace('aluno.html?login=1');
+}
+
 // 🔐 Proteção da página
 const token = localStorage.getItem('tokenAluno');
 
 if (!token) {
-    window.location.replace('aluno.html');
+    window.location.replace('aluno.html?login=1');
 }
 
 const nomeAluno = localStorage.getItem('nomeAluno');
@@ -39,12 +47,10 @@ async function carregarTreinos() {
             }
         });
 
-        if (response.status === 401 || response.status === 403) {
-            localStorage.removeItem('tokenAluno');
-            localStorage.removeItem('nomeAluno');
-            window.location.replace('aluno.html');
-            return;
-        }
+if (response.status === 401 || response.status === 403) {
+    forcarLogout();
+    return;
+}
 
         if (!response.ok) {
             throw new Error('Erro ao buscar treinos');
@@ -281,6 +287,12 @@ async function toggleFinalizarTreino(treinoId, botao) {
             throw new Error('Erro ao atualizar treino');
         }
 
+        if (response.status === 401 || response.status === 403) {
+    forcarLogout();
+    return;
+}
+
+
         const data = await response.json();
 
         if (data.status === 'finalizado') {
@@ -348,6 +360,12 @@ async function verificarTreinoConcluido(letraTreino) {
 
         if (!response.ok) return;
 
+        if (response.status === 401 || response.status === 403) {
+    forcarLogout();
+    return;
+}
+
+
         const data = await response.json();
 
         if (data.podeAvaliar) {
@@ -398,6 +416,12 @@ async function atualizarTreinoBackend(treinoId, campo, valor) {
             }
         );
 
+        if (response.status === 401 || response.status === 403) {
+    forcarLogout();
+    return;
+}
+
+
         if (!response.ok) {
             throw new Error('Erro ao atualizar treino');
         }
@@ -438,6 +462,12 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
         erro.style.display = 'block';
         return;
     }
+
+    if (response.status === 401 || response.status === 403) {
+    forcarLogout();
+    return;
+}
+
 
 
     const mensagem = document.getElementById('feedbackMensagem').value;
@@ -485,6 +515,7 @@ document.getElementById('fecharObrigado').addEventListener('click', () => {
 /* ============================= */
 
 function abrirModalVideo(videoUrl, titulo) {
+    
     const modal = document.getElementById('videoModal');
     const video = document.getElementById('videoModalPlayer');
     const title = document.getElementById('videoModalTitulo');

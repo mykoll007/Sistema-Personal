@@ -214,4 +214,16 @@ loginForm.addEventListener('submit', async (e) => {
     }
 });
 
+/* ===================== */
+/* Abre modal se veio sem token */
+/* ===================== */
+
+window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get('login') === '1') {
+        abrirModal();
+        showToast("Sessão expirada", "Faça login para continuar");
+    }
+});
 
