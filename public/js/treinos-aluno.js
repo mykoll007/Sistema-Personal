@@ -30,6 +30,32 @@ logoutBtn.addEventListener('click', () => {
     window.location.replace('aluno.html');
 });
 
+window.addEventListener('offline', () => {
+    alert('Você ficou sem conexão com a internet 📡');
+});
+
+window.addEventListener('online', () => {
+    console.log('Conexão restabelecida');
+});
+
+
+//Tratando erros
+function tratarErroFetch(error) {
+    if (!navigator.onLine) {
+        alert('Você está sem conexão com a internet 📡');
+    } 
+    else if (error instanceof TypeError) {
+        alert('Você está sem conexão com a internet 📡');
+    } 
+    else if (error.message) {
+        alert(error.message);
+    } 
+    else {
+        alert('Ocorreu um erro inesperado.');
+    }
+}
+
+
 /* ============================= */
 /* Buscar treinos do backend */
 /* ============================= */
@@ -71,7 +97,7 @@ if (response.status === 401 || response.status === 403) {
 
     } catch (error) {
         console.error(error);
-        alert('Erro ao carregar treinos');
+         tratarErroFetch(error);
     } finally {
         // 🔄 Sempre esconde o loader
         loader.style.display = 'none';
@@ -318,7 +344,7 @@ async function toggleFinalizarTreino(treinoId, botao) {
 
     } catch (error) {
         console.error(error);
-        alert('Erro ao atualizar treino');
+        tratarErroFetch(error);
     }
 }
 
@@ -428,6 +454,7 @@ async function atualizarTreinoBackend(treinoId, campo, valor) {
 
     } catch (error) {
         console.error('Erro ao salvar alteração:', error);
+        tratarErroFetch(error);
     }
 }
 
@@ -482,7 +509,6 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
             }
         );
 
-        // 🔐 PROTEÇÃO DE SESSÃO — AGORA NO LUGAR CERTO
         if (response.status === 401 || response.status === 403) {
             forcarLogout();
             return;
@@ -500,7 +526,7 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
 
     } catch (error) {
         console.error(error);
-        alert('Erro ao enviar feedback');
+        tratarErroFetch(error);
     }
 });
 
