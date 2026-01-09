@@ -81,12 +81,15 @@ async function authFetch(url, options = {}) {
 // -----------------------------------
 function formatarData(dataStr) {
     if (!dataStr) return '';
+
     const date = new Date(dataStr);
-    const dia = String(date.getDate()).padStart(2, '0');
-    const mes = String(date.getMonth() + 1).padStart(2, '0');
-    const ano = date.getFullYear();
+    const dia = String(date.getUTCDate()).padStart(2, '0');
+    const mes = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const ano = date.getUTCFullYear();
+
     return `${dia}/${mes}/${ano}`;
 }
+
 
 // -----------------------------------
 // MOSTRAR TOAST
