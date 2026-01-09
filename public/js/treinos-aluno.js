@@ -463,13 +463,6 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
         return;
     }
 
-    if (response.status === 401 || response.status === 403) {
-    forcarLogout();
-    return;
-}
-
-
-
     const mensagem = document.getElementById('feedbackMensagem').value;
 
     try {
@@ -489,6 +482,12 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
             }
         );
 
+        // 🔐 PROTEÇÃO DE SESSÃO — AGORA NO LUGAR CERTO
+        if (response.status === 401 || response.status === 403) {
+            forcarLogout();
+            return;
+        }
+
         if (!response.ok) {
             throw new Error('Erro ao enviar feedback');
         }
@@ -504,6 +503,7 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
         alert('Erro ao enviar feedback');
     }
 });
+
 
 // Fechar modal de obrigado
 document.getElementById('fecharObrigado').addEventListener('click', () => {
