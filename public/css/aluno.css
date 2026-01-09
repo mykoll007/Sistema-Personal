@@ -1389,6 +1389,10 @@ display: flex;
 
 @media (min-width: 707px) {
 
+        .carousel-btn i {
+        font-size: 14px;
+    }
+
     .treino-body-inner {
         flex-direction: column; /* categorias uma embaixo da outra */
         align-items: stretch;
