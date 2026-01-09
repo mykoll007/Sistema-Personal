@@ -43,9 +43,9 @@
     display: none;
     z-index: 3000; /* abaixo do menu */
 }
-.modal-backdrop {
+/* .modal-backdrop {
     z-index: 2999 !important;
-}
+} */
 
 #modalTreinos, #modalConfigTreinos, #modalExcluirAluno, #modalEditarAluno, #logoutModal{
     z-index: 3000;
