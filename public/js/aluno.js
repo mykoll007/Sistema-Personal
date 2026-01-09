@@ -25,6 +25,19 @@ setInterval(() => {
     updateCarouselHero();
 }, 2500);
 
+const prevHero = document.querySelector('.prev-hero');
+const nextHero = document.querySelector('.next-hero');
+
+prevHero.addEventListener('click', () => {
+    indexHero = (indexHero - 1 + itemsHero.length) % itemsHero.length;
+    updateCarouselHero();
+});
+
+nextHero.addEventListener('click', () => {
+    indexHero = (indexHero + 1) % itemsHero.length;
+    updateCarouselHero();
+})
+
 /* ===================== */
 /* Modal Login */
 const loginBtn = document.querySelector('.login-btn');
