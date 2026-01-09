@@ -12,31 +12,53 @@ hamburger.addEventListener('click', () => {
 /* ===================== */
 /* Hero Carousel */
 const trackHero = document.querySelector('.carousel-track-hero');
-const itemsHero = Array.from(trackHero.children);
+const itemsHero = document.querySelectorAll('.carousel-item-hero');
+const prevHero = document.querySelector('.prev-hero');
+const nextHero = document.querySelector('.next-hero');
+
 let indexHero = 0;
+let autoPlayInterval;
+let autoPlayTimeout;
 
 function updateCarouselHero() {
     trackHero.style.transform = `translateX(${-indexHero * 100}%)`;
 }
 
-// Autoplay a cada 2 segundos
-setInterval(() => {
-    indexHero = (indexHero + 1) % itemsHero.length;
-    updateCarouselHero();
-}, 2500);
+/* ===== AUTOPLAY ===== */
+function startAutoplay() {
+    autoPlayInterval = setInterval(() => {
+        indexHero = (indexHero + 1) % itemsHero.length;
+        updateCarouselHero();
+    }, 2500);
+}
 
-const prevHero = document.querySelector('.prev-hero');
-const nextHero = document.querySelector('.next-hero');
+function stopAutoplayTemporario() {
+    clearInterval(autoPlayInterval);
 
+    // reinicia o cooldown
+    clearTimeout(autoPlayTimeout);
+
+    autoPlayTimeout = setTimeout(() => {
+        startAutoplay();
+    }, 3000); // ⏳ 3 segundos sem interação
+}
+
+/* ===== SETAS ===== */
 prevHero.addEventListener('click', () => {
     indexHero = (indexHero - 1 + itemsHero.length) % itemsHero.length;
     updateCarouselHero();
+    stopAutoplayTemporario();
 });
 
 nextHero.addEventListener('click', () => {
     indexHero = (indexHero + 1) % itemsHero.length;
     updateCarouselHero();
-})
+    stopAutoplayTemporario();
+});
+
+/* ===== INICIA ===== */
+startAutoplay();
+
 
 /* ===================== */
 /* Modal Login */
