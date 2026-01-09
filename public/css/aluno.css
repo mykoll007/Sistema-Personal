@@ -1267,6 +1267,42 @@ display: flex;
     position: absolute;
 }
 
+    .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.4);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    transition: 0.2s;
+}
+
+.carousel-btn:hover {
+    background: rgba(0,0,0,0.7);
+}
+
+/* esquerda */
+.prev-hero {
+    left: 8px;
+}
+
+/* direita */
+.next-hero {
+    right: 8px;
+}
+
+.carousel-btn i {
+    font-size: 14px;
+}
+
 
 
 @keyframes spin {
@@ -1318,41 +1354,6 @@ display: flex;
         min-width: 100%;
         padding: 0px 16px;
     }
-    .carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0,0,0,0.4);
-    border: none;
-    color: #fff;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 5;
-    transition: 0.2s;
-}
-
-.carousel-btn:hover {
-    background: rgba(0,0,0,0.7);
-}
-
-/* esquerda */
-.prev-hero {
-    left: 8px;
-}
-
-/* direita */
-.next-hero {
-    right: 8px;
-}
-
-.carousel-btn i {
-    font-size: 14px;
-}
     .carousel-controls {
         display: flex;
         justify-content: center;
