@@ -253,54 +253,58 @@ function renderTreinos() {
     const categoriasMap = {};
 
     exercicios.forEach(e => {
-        if (!categoriasMap[e.categoria_nome]) {
-            categoriasMap[e.categoria_nome] = [];
-        }
+        if (!categoriasMap[e.categoria_nome]) categoriasMap[e.categoria_nome] = [];
         categoriasMap[e.categoria_nome].push(e);
     });
 
     for (const nomeCategoria in categoriasMap) {
-        const collapseId = "collapse_" + nomeCategoria.replace(/\s+/g, "_");
+        const items = categoriasMap[nomeCategoria];
+        const safeId = nomeCategoria.replace(/\s+/g, "_").replace(/[^\w]/g, "");
+        const collapseId = "collapse_" + safeId;
 
         const card = document.createElement("div");
-        card.className = "card mb-4";
+        card.className = "card mb-4 cat-card";
 
         card.innerHTML = `
-            <div class="card-header" style="cursor:pointer"
-                 onclick="toggleCategoria('${collapseId}')">
-                <h5 class="m-0 font-weight-bold text-primary">${nomeCategoria}</h5>
+            <div class="cat-header" onclick="toggleCategoria('${collapseId}')">
+                <h5>${nomeCategoria}</h5>
+                <span class="badge-count">${items.length} treino(s)</span>
             </div>
 
-            <div id="${collapseId}" class="card-body">
-                ${categoriasMap[nomeCategoria].map(e => `
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 style="cursor:pointer; color:#4e73df"
-                                onclick="abrirVideo(${e.id})">
-                                ▶ ${e.nome}
-                            </h5>
+            <div id="${collapseId}" class="cat-body" style="display:none;">
+                <div class="ex-grid">
+                    ${items.map(e => `
+                        <div class="ex-card">
+                            <div class="ex-top">
+                                <h6 class="ex-title" onclick="abrirVideo(${e.id})" title="Abrir vídeo">
+                                    <span class="ex-play"><i class="fas fa-play"></i></span>
+                                    <span>${e.nome}</span>
+                                </h6>
 
-                            <div>
-                                <i class="fas fa-edit text-warning mr-3"
-                                   style="cursor:pointer"
-                                   onclick='editarTreino(${JSON.stringify(e)})'></i>
+                                <div class="ex-actions">
+                                    <button class="icon-btn edit" title="Editar"
+                                        onclick='editarTreino(${JSON.stringify(e)})'>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
 
-                                <i class="fas fa-trash text-danger"
-                                   style="cursor:pointer"
-                                   onclick="excluirTreino(${e.id})"></i>
+                                    <button class="icon-btn trash" title="Excluir"
+                                        onclick="excluirTreino(${e.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
 
-                        <p>${e.descricao || ""}</p>
-                        <hr>
-                    </div>
-                `).join("")}
+                            <p class="ex-desc">${(e.descricao || "").trim() || "Sem descrição."}</p>
+                        </div>
+                    `).join("")}
+                </div>
             </div>
         `;
 
         area.appendChild(card);
     }
 }
+
 
 /* ============================================================
    EDITAR / EXCLUIR
@@ -334,9 +338,11 @@ function excluirTreino(id) {
    UTIL
 ============================================================ */
 function toggleCategoria(id) {
-    const el = document.getElementById(id);
-    el.style.display = el.style.display === "none" ? "block" : "none";
+  const el = document.getElementById(id);
+  const hidden = window.getComputedStyle(el).display === "none";
+  el.style.display = hidden ? "block" : "none";
 }
+
 $('#toastMessage').toast({ autohide: true, delay: 2000 });
 
 function mostrarToast(t, m, tipo) {

@@ -4,7 +4,7 @@
 }
 
 #listaCategoriasTreinos {
-    max-width: 1000px;
+    max-width: 1400px;
     /* largura máxima */
     margin: 0 auto;
     /* centraliza */
@@ -52,3 +52,137 @@
     cursor: pointer;
     z-index: 1000; 
 }
+/* ===== Layout geral ===== */
+.treinos-wrap{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+/* ===== Card da categoria ===== */
+.cat-card{
+  border: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+}
+
+.cat-header{
+  background: linear-gradient(135deg, #4e73df, #224abe);
+  color: #fff;
+  padding: 14px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cat-header h5{
+  margin: 0;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.cat-header .badge-count{
+  background: rgba(255,255,255,.2);
+  border: 1px solid rgba(255,255,255,.25);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.cat-body{
+  padding: 16px;
+  background: #fff;
+}
+
+/* ===== Grid de exercícios ===== */
+.ex-grid{
+  display: grid;
+  grid-template-columns: repeat( auto-fit, minmax(260px, 1fr) );
+  gap: 14px;
+}
+
+/* ===== Card do exercício ===== */
+.ex-card{
+  border: 1px solid #eef0f6;
+  border-radius: 14px;
+  padding: 14px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(0,0,0,.06);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.ex-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(0,0,0,.10);
+}
+
+.ex-top{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ex-title{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #2e2f39;
+  cursor: pointer;
+}
+
+.ex-play{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(78,115,223,.12);
+  color: #4e73df;
+  flex: 0 0 auto;
+}
+
+.ex-desc{
+  margin: 10px 0 0 0;
+  font-size: 13px;
+  color: #6c757d;
+  line-height: 1.4;
+  min-height: 36px;
+}
+
+/* ===== Ações ===== */
+.ex-actions{
+  display: flex;
+  gap: 10px;
+}
+
+.icon-btn{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid #eef0f6;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background .15s ease, transform .15s ease;
+}
+
+.icon-btn:hover{
+  background: #f6f7fb;
+  transform: translateY(-1px);
+}
+
+.icon-btn.edit i{ color: #f6c23e; }
+.icon-btn.trash i{ color: #e74a3b; }
+
+/* opcional: animação de abrir/fechar */
+.collapse-smooth{
+  display: none;
+}
+
