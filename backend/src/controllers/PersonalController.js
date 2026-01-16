@@ -293,7 +293,7 @@ class PersonalController {
         try {
             const alunos = await database('alunos')
                 .where({ personal_id: personalId })
-                .select('id', 'email', 'nome', 'foco', 'idade', 'data_matricula', 'criado_em');
+                .select('id', 'email', 'nome', 'foco', 'idade', 'data_matricula', 'criado_em', 'foto_antes_url', 'foto_depois_url');
 
             return response.status(200).json(alunos);
         } catch (error) {
@@ -302,53 +302,59 @@ class PersonalController {
         }
     }
 
-    async editarAluno(request, response) {
-        const { id } = request.params; // ID do aluno
-        const personalId = request.personalId; // vem do token
-        const { nome, email, foco, idade, data_matricula } = request.body;
+async editarAluno(request, response) {
+  const { id } = request.params;
+  const personalId = request.personalId;
+  const { nome, email, foco, idade, data_matricula, foto_antes_url, foto_depois_url } = request.body;
 
-        if (!personalId) {
-            return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
-        }
+  if (!personalId) {
+    return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
+  }
 
-        try {
-            // Verificar se o aluno pertence ao personal
-            const aluno = await database('alunos')
-                .where({ id, personal_id: personalId })
-                .first();
+  try {
+    const aluno = await database("alunos")
+      .where({ id, personal_id: personalId })
+      .first();
 
-            if (!aluno) {
-                return response.status(403).json({ message: "Este aluno não pertence ao seu perfil." });
-            }
-
-            // Verifica se o novo email já está em uso por outro aluno
-            if (email && email !== aluno.email) {
-                const emailExistente = await database('alunos')
-                    .where({ email })
-                    .andWhereNot('id', id)
-                    .first();
-                if (emailExistente) {
-                    return response.status(400).json({ message: "Este email já está em uso por outro aluno." });
-                }
-            }
-
-            await database('alunos')
-                .where({ id })
-                .update({
-                    nome: nome || aluno.nome,
-                    email: email || aluno.email,
-                    foco: foco || aluno.foco,
-                    idade: idade || aluno.idade,
-                    data_matricula: data_matricula || aluno.data_matricula
-                });
-
-            return response.status(200).json({ message: "Aluno atualizado com sucesso!" });
-
-        } catch (error) {
-            console.error("Erro ao editar aluno:", error);
-            return response.status(500).json({ message: "Erro ao atualizar aluno." });
-        }
+    if (!aluno) {
+      return response.status(403).json({ message: "Este aluno não pertence ao seu perfil." });
     }
+
+    if (email && email !== aluno.email) {
+      const emailExistente = await database("alunos")
+        .where({ email })
+        .andWhereNot("id", id)
+        .first();
+
+      if (emailExistente) {
+        return response.status(400).json({ message: "Este email já está em uso por outro aluno." });
+      }
+    }
+
+    const updateData = {
+      nome: nome ?? aluno.nome,
+      email: email ?? aluno.email,
+      foco: foco ?? aluno.foco,
+      idade: idade ?? aluno.idade,
+      data_matricula: data_matricula ?? aluno.data_matricula
+    };
+
+    // ✅ só atualiza se veio no body
+    if (foto_antes_url !== undefined) updateData.foto_antes_url = foto_antes_url;
+    if (foto_depois_url !== undefined) updateData.foto_depois_url = foto_depois_url;
+
+    await database("alunos")
+      .where({ id })
+      .update(updateData);
+
+    return response.status(200).json({ message: "Aluno atualizado com sucesso!" });
+
+  } catch (error) {
+    console.error("Erro ao editar aluno:", error);
+    return response.status(500).json({ message: "Erro ao atualizar aluno." });
+  }
+}
+
 
     // 📌 Excluir aluno
     async excluirAluno(request, response) {

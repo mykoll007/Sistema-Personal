@@ -291,7 +291,7 @@
 
     <!-- Modal Editar Aluno -->
     <div class="modal fade" id="modalEditarAluno" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -324,6 +324,35 @@
                             <label>Data da Matrícula</label>
                             <input type="date" id="editData" class="form-control">
                         </div>
+
+                        <!-- ====== ANTES / DEPOIS (UPLOAD) ====== -->
+                        <hr class="my-3">
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label><strong>Foto Antes</strong></label>
+                                <input type="file" id="fotoAntesFile" class="form-control" accept="image/*">
+                                <small class="text-muted">Você pode trocar quando quiser.</small>
+
+                                <div class="mt-2">
+                                    <img id="previewFotoAntes" src="" alt="Prévia antes"
+                                        style="display:none; width:100%; max-height:220px; object-fit:cover; border-radius:12px; border:1px solid #eee;">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label><strong>Foto Depois</strong></label>
+                                <input type="file" id="fotoDepoisFile" class="form-control" accept="image/*">
+                                <small class="text-muted">Você pode trocar quando quiser.</small>
+
+                                <div class="mt-2">
+                                    <img id="previewFotoDepois" src="" alt="Prévia depois"
+                                        style="display:none; width:100%; max-height:220px; object-fit:cover; border-radius:12px; border:1px solid #eee;">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ====== /ANTES / DEPOIS ====== -->
+
                     </form>
                 </div>
 
@@ -478,9 +507,6 @@
                     </div>
                 </div>
 
-
-
-
                 <div class="modal-body">
 
                     <!-- Loader -->
@@ -505,8 +531,6 @@
         </div>
     </div>
 
-
-
     <!-- Toast Notificação -->
     <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1102;">
         <div id="toastMessage" class="toast" data-delay="2000">
@@ -518,8 +542,6 @@
             <div class="toast-body" id="toastBody"></div>
         </div>
     </div>
-
-
 
     <!-- jQuery (sempre primeiro) -->
     <script src="vendor/jquery/jquery.min.js"></script>
@@ -538,9 +560,9 @@
     <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
     <!-- Seus eventos e handlers (precisa ser o último) -->
     <script src="js/index.js"></script>
-
 
 </body>
 

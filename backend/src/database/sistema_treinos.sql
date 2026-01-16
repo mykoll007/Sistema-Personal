@@ -26,9 +26,14 @@ CREATE TABLE alunos (
     foco VARCHAR(120) NOT NULL,
     idade INT NOT NULL,
     data_matricula DATE NOT NULL,
+
+    foto_antes_url VARCHAR(255) NULL,
+    foto_depois_url VARCHAR(255) NULL,
+
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (personal_id) REFERENCES personals(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Tabela de categorias
 CREATE TABLE categorias (
