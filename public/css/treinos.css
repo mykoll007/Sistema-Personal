@@ -186,3 +186,61 @@
   display: none;
 }
 
+/* seta do accordion */
+.cat-header .chev{
+  transition: transform .18s ease;
+  opacity: .95;
+}
+.cat-header.open .chev{
+  transform: rotate(180deg);
+}
+
+/* animação suave usando max-height */
+.cat-body{
+  overflow: hidden;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  transition: max-height .25s ease, padding .25s ease;
+}
+
+.cat-body.open{
+  max-height: 2000px; /* suficiente pra maioria */
+  padding: 16px;
+}
+.ex-desc{
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.treinos-toolbar{
+  max-width: 1400px;
+  margin: 0 auto 14px auto;
+  padding: 0 10px;
+  display: flex;
+}
+
+.search-box{
+  width: 360px;              /* não ocupa toda a tela */
+  max-width: 100%;
+}
+
+.search-box .input-group-text{
+  border-radius: 12px 0 0 12px;
+  background: #fff;
+  border: 1px solid #eef0f6;
+}
+
+.search-box .form-control{
+  border-radius: 0 12px 12px 0;
+  border: 1px solid #eef0f6;
+  box-shadow: 0 8px 18px rgba(0,0,0,.06);
+}
+
+@media (max-width: 576px){
+  .treinos-toolbar{ justify-content: stretch; }
+  .search-box{ width: 100%; }
+}
+
+
