@@ -703,8 +703,9 @@ $("#btnCriarAluno").on("click", criarAluno);
 $("#btnSalvarAluno").on("click", editarAluno);
 $("#btnConfirmarExcluir").on("click", excluirAluno);
 
-$("#btnConfirmLogout")?.addEventListener("click", async function () {
+$("#btnConfirmLogout").on("click", async function () {
   setLoadingBotaoLogout(true);
+
   try {
     sessionStorage.clear();
     window.location.href = "login.html";
@@ -715,6 +716,7 @@ $("#btnConfirmLogout")?.addEventListener("click", async function () {
     setLoadingBotaoLogout(false);
   }
 });
+
 
 $('#dataTable tbody').on('click', '.btn-editar', function () {
   const id = $(this).data('id');
