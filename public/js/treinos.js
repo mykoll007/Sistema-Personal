@@ -435,17 +435,19 @@ function setLoadingBotao(id, loading) {
 function setLoadingTreinos(loading) {
   const loader = document.getElementById("treinosLoader");
   const lista = document.getElementById("listaCategoriasTreinos");
-
-  if (!loader || !lista) return;
+  const busca = document.getElementById("toolbarBusca");
 
   if (loading) {
     loader.style.display = "block";
     lista.style.display = "none";
+    if (busca) busca.style.display = "none"; // esconde a busca enquanto carrega
   } else {
     loader.style.display = "none";
     lista.style.display = "block";
+    if (busca) busca.style.display = "flex"; // mostra a busca quando terminou
   }
 }
+
 
 /* ============================================================
    BOTÕES
