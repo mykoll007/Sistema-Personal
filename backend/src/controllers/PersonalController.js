@@ -981,7 +981,9 @@ async editarAluno(request, response) {
         }
         
     }
-    // 📌 Listar feedbacks do personal logado
+
+    
+// 📌 Listar feedbacks do personal logado 
 async listarFeedbacks(request, response) {
   const personal_id = request.personalId;
 
@@ -992,7 +994,15 @@ async listarFeedbacks(request, response) {
   try {
     const feedbacks = await database('feedbacks as f')
       .join('alunos as a', 'f.aluno_id', 'a.id')
+
+      // pega nome_treino do aluno para aquela letra (A/B/C...)
+      .leftJoin('aluno_treinos as at', function () {
+        this.on('at.aluno_id', '=', 'f.aluno_id')
+            .andOn('at.treino', '=', 'f.treino');
+      })
+
       .where('f.personal_id', personal_id)
+
       .select(
         'f.id',
         'f.mensagem',
@@ -1003,6 +1013,22 @@ async listarFeedbacks(request, response) {
         'a.nome as aluno_nome',
         'a.email as aluno_email'
       )
+
+      // como tem várias linhas em aluno_treinos (por exercício),
+      // agregamos para 1 nome_treino por feedback
+      .max({ nome_treino: 'at.nome_treino' })
+
+      .groupBy(
+        'f.id',
+        'f.mensagem',
+        'f.estrelas',
+        'f.treino',
+        'f.criado_em',
+        'a.id',
+        'a.nome',
+        'a.email'
+      )
+
       .orderBy('f.criado_em', 'desc');
 
     return response.status(200).json(feedbacks);
@@ -1011,6 +1037,7 @@ async listarFeedbacks(request, response) {
     return response.status(500).json({ message: "Erro ao buscar feedbacks." });
   }
 }
+
 
 
 }
