@@ -981,7 +981,37 @@ async editarAluno(request, response) {
         }
         
     }
-    
+    // 📌 Listar feedbacks do personal logado
+async listarFeedbacks(request, response) {
+  const personal_id = request.personalId;
+
+  if (!personal_id) {
+    return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
+  }
+
+  try {
+    const feedbacks = await database('feedbacks as f')
+      .join('alunos as a', 'f.aluno_id', 'a.id')
+      .where('f.personal_id', personal_id)
+      .select(
+        'f.id',
+        'f.mensagem',
+        'f.estrelas',
+        'f.treino',
+        'f.criado_em',
+        'a.id as aluno_id',
+        'a.nome as aluno_nome',
+        'a.email as aluno_email'
+      )
+      .orderBy('f.criado_em', 'desc');
+
+    return response.status(200).json(feedbacks);
+  } catch (error) {
+    console.error("Erro ao listar feedbacks:", error);
+    return response.status(500).json({ message: "Erro ao buscar feedbacks." });
+  }
+}
+
 
 }
 

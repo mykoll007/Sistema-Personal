@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Alunos</title>
+    <title>Feedbacks</title>
 
     <!-- Custom fonts for this template -->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -64,7 +64,7 @@
 
 
             <!-- Nav Item - Alunos -->
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="index.html">
                     <i class="fas fa-users"></i>
                     <span>Alunos</span></a>
@@ -78,7 +78,7 @@
             </li>
 
             <!-- Nav Item - Feedbacks -->
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" href="feedbacks.html">
                     <i class="fas fa-star"></i>
                     <span>Feedbacks</span></a>
@@ -135,49 +135,37 @@
                 </nav>
                 <!-- End of Topbar -->
 
-                <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                    <!-- DataTales Example -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary">Alunos do Thon</h6>
+                    <h1 class="h3 mb-4 text-gray-800">Feedbacks</h1>
 
-                            <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalCriarAluno">
-                                <i class="fas fa-user-plus"></i> Adicionar Aluno
-                            </button>
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Lista de Feedbacks</h6>
                         </div>
 
                         <div class="card-body">
-                            <!-- LOADER -->
-                            <div id="loaderTabelaAlunos" class="text-center">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="sr-only">Carregando...</span>
-                                </div>
-                                <p class="text-muted mt-2">Carregando alunos...</p>
-                            </div>
-
-                            <div class="table-responsive" id="tabelaAlunosWrapper" style="display:none;">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="tabelaFeedbacks" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            <th>Nome</th>
-                                            <th>Foco</th>
-                                            <th>Idade</th>
-                                            <th>Data da Matrícula</th>
-                                            <th style="min-width: 100px;">Ações</th>
+                                            <th>Aluno</th>
+                                            <th>Treino</th>
+                                            <th>Estrelas</th>
+                                            <th>Mensagem</th>
+                                            <th>Data</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="listaAlunos">
-                                    </tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
-
                     </div>
 
                 </div>
-                <!-- /.container-fluid -->
+
+
+                <!-- Begin Page Content -->
 
             </div>
             <!-- End of Main Content -->
@@ -569,7 +557,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
     <!-- Seus eventos e handlers (precisa ser o último) -->
-    <script src="js/index.js"></script>
+    <script src="js/feedbacks.js"></script>
 
 </body>
 

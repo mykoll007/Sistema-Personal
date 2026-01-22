@@ -28,6 +28,8 @@ router.post('/personal/alunos/treino', verificarPersonal, PersonalController.adi
 router.get('/personal/alunos/:id/treinos', verificarPersonal, PersonalController.listarTreinosDoAluno);
 router.delete('/personal/alunos/treino/:aluno_id/:exercicio_id', verificarPersonal, PersonalController.deletarTreinoDoAluno);
 router.post('/personal/alunos/treinos/salvar', verificarPersonal, PersonalController.salvarTreinosDoAluno);
+router.get('/personal/feedbacks', verificarPersonal, PersonalController.listarFeedbacks);
+
 
 
 
