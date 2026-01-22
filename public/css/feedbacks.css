@@ -1,30 +1,93 @@
 /* ============================================================
-   FEEDBACKS PAGE
+   FEEDBACKS PAGE - Estilo moderno (similar treinos.css)
 ============================================================ */
-.feedbacks-page {
-  padding-bottom: 25px;
+
+/* Menu do perfil (igual treinos.css) */
+#menuPerfil {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  background: #fff;
+  border: 1px solid #eef0f6;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.10);
+  display: none;
+  z-index: 1050;
+  min-width: 170px;
+  overflow: hidden;
 }
 
+#menuPerfil a {
+  display: block;
+  padding: 10px 14px;
+  color: #5a5c69;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+#menuPerfil a:hover {
+  background-color: #f8f9fc;
+}
+
+.menu-divider {
+  height: 1px;
+  background-color: #eef0f6;
+  margin: 4px 0;
+}
+
+#btnPerfil { cursor: pointer; z-index: 1000; }
+#fotoTopbar { cursor: pointer; }
+
+/* ============================================================
+   Layout geral
+============================================================ */
+.feedbacks-page {
+  padding-bottom: 20px;
+}
+
+/* Header: título à esquerda + toolbar à direita (como dashboard) */
 .feedbacks-header {
+  max-width: 1400px;
+  margin: 0 auto 14px auto;
+  padding: 0 10px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 16px;
 }
 
-.feedbacks-controls {
+/* Toolbar igual treinos */
+.feedbacks-toolbar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-.feedbacks-controls .form-control {
+/* Search box igual treinos.css */
+.search-box {
+  width: 360px;
+  max-width: 100%;
+}
+
+.search-box .input-group-text {
+  border-radius: 12px 0 0 12px;
+  background: #fff;
+  border: 1px solid #eef0f6;
+}
+
+.search-box .form-control {
+  border-radius: 0 12px 12px 0;
+  border: 1px solid #eef0f6;
+  box-shadow: 0 8px 18px rgba(0,0,0,.06);
+}
+
+/* Select com cara moderna */
+.feedbacks-select {
   width: 220px;
-}
-
-#inputBuscaFeedback {
-  width: 240px;
+  border-radius: 12px;
+  border: 1px solid #eef0f6;
+  box-shadow: 0 8px 18px rgba(0,0,0,.06);
 }
 
 /* Loader */
@@ -35,19 +98,34 @@
 }
 
 /* ============================================================
-   CARD (Aluno)
+   Cards (Aluno) - Moderno
 ============================================================ */
+#listaCardsFeedbacks {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
 .feedback-card {
-  height: 100%;
   border: 0;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+  transition: transform .15s ease, box-shadow .15s ease;
+  height: 100%;
+}
+
+.feedback-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(0,0,0,.12);
 }
 
 .feedback-card .card-body {
-  padding: 18px;
+  padding: 16px;
 }
 
+/* topo do card */
 .feedback-card-top {
   display: flex;
   align-items: flex-start;
@@ -57,81 +135,135 @@
 
 .feedback-card-title {
   margin: 0;
-  font-weight: 800;
-  color: #2e2f37;
+  font-weight: 900;
+  font-size: 16px;
+  color: #2e2f39;
   line-height: 1.15;
 }
 
 .feedback-card-subtitle {
-  color: #7a7f8b;
-  font-size: 12px;
   margin-top: 4px;
+  font-size: 12px;
+  color: #6c757d;
   word-break: break-word;
 }
 
+/* bloco média */
 .feedback-card-score {
   text-align: right;
-  min-width: 70px;
+  flex: 0 0 auto;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(78,115,223,.10);
+  border: 1px solid rgba(78,115,223,.16);
 }
 
 .feedback-card-score .label {
   font-size: 11px;
-  color: #8b8f99;
+  color: #4e73df;
+  font-weight: 700;
   margin-bottom: 2px;
 }
 
 .feedback-card-score .value {
   font-size: 18px;
   font-weight: 900;
+  color: #224abe;
   line-height: 1;
-  color: #111827;
 }
 
+/* meta */
 .feedback-card-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 14px;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 12px;
 }
 
 .feedback-meta-item {
-  color: #6b7280;
+  color: #6c757d;
   font-size: 12px;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
+/* último comentário */
 .feedback-last {
   margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f8f9fc;
+  border: 1px solid #eef0f6;
 }
 
 .feedback-last .label {
   font-size: 12px;
-  color: #7a7f8b;
+  color: #6c757d;
+  font-weight: 700;
   margin-bottom: 6px;
 }
 
 .feedback-last .text {
-  color: #3b3f48;
   font-size: 13px;
-  line-height: 1.35;
-  min-height: 42px;
+  color: #2e2f39;
+  line-height: 1.4;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 44px;
+}
+.text-muted {
+    color: white !important;
 }
 
-.feedback-card .btn {
-  border-radius: 10px;
+/* botão do card */
+.btn-ver-feedbacks {
+  border-radius: 12px !important;
+  border: 1px solid #eef0f6 !important;
+  background: #fff !important;
+  font-weight: 800;
+  transition: transform .15s ease, background .15s ease;
+}
+
+.btn-ver-feedbacks:hover {
+  background: #f6f7fb !important;
+  color: black;
+  transform: translateY(-1px);
 }
 
 /* ============================================================
-   MODAL LISTA DE FEEDBACKS
+   Modal - visual moderno
 ============================================================ */
-.modal-title-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+#modalFeedbacksAluno .modal-content {
+  border: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0,0,0,.18);
+}
+
+#modalFeedbacksAluno .modal-header {
+  border: 0;
+  padding: 14px 16px;
+  color: #fff;
+  background: linear-gradient(135deg, #4e73df, #224abe);
+}
+
+#modalFeedbacksAluno .modal-title {
+  font-weight: 900;
+}
+
+#modalFeedbacksAluno .close {
+  color: #fff;
+  opacity: .9;
+}
+
+#modalFeedbacksAluno .close:hover {
+  opacity: 1;
 }
 
 .feedbacks-modal-resumo {
@@ -140,10 +272,11 @@
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
+
   padding: 12px;
-  border-radius: 12px;
-  background: #f8fafc;
-  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  background: #f8f9fc;
+  border: 1px solid #eef0f6;
   margin-bottom: 12px;
 }
 
@@ -151,8 +284,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #4b5563;
+  color: #5a5c69;
   font-size: 13px;
+  font-weight: 600;
 }
 
 .feedbacks-modal-lista {
@@ -162,10 +296,11 @@
 }
 
 .feedback-item {
-  border: 1px solid #eef2f7;
-  background: #ffffff;
-  border-radius: 12px;
+  border: 1px solid #eef0f6;
+  background: #fff;
+  border-radius: 14px;
   padding: 12px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.06);
 }
 
 .feedback-item-top {
@@ -186,53 +321,96 @@
 .badge-treino {
   border-radius: 999px;
   padding: 6px 10px;
-  font-weight: 700;
+  font-weight: 900;
   font-size: 12px;
+  background: rgba(78,115,223,.12) !important;
+  color: #4e73df !important;
+  border: 1px solid rgba(78,115,223,.18);
 }
 
 .feedback-stars {
   font-size: 18px;
   letter-spacing: 1px;
+  color: #f6c23e;
 }
 
 .feedback-date {
-  color: #6b7280;
+  color: #858796;
   font-size: 12px;
+  font-weight: 600;
 }
 
 .feedback-msg {
   margin-top: 10px;
-  color: #374151;
+  color: #2e2f39;
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .feedback-empty {
-  padding: 12px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 14px;
   border: 1px dashed #e5e7eb;
-  color: #6b7280;
+  background: #fff;
+  color: #6c757d;
   text-align: center;
+  font-weight: 600;
 }
 
 /* ============================================================
-   RESPONSIVO - <= 660px
+   Responsivo - <= 891px
 ============================================================ */
-@media (max-width: 660px) {
+@media (max-width: 891px) {
   .feedbacks-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
 
-  .feedbacks-controls {
+  .feedbacks-toolbar {
     width: 100%;
     flex-direction: column;
     align-items: stretch;
   }
 
-  .feedbacks-controls .form-control,
-  #inputBuscaFeedback {
-    width: 100%;
+  .search-box { width: 100%; }
+  .feedbacks-select { width: 100%; }
+}
+
+/* ============================================================
+   Responsivo - >= 1600px
+============================================================ */
+@media (min-width: 1600px) {
+
+  /* libera largura total (mantém um padding bonito) */
+  .feedbacks-header,
+  #listaCardsFeedbacks {
+    max-width: none;
+    margin: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin-bottom: 21px;
+  }
+
+  /* transforma o row em um flex container alinhado à esquerda */
+  #listaCardsFeedbacks.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* tudo começa à esquerda */
+    align-items: stretch;
+    gap: 18px; /* espaço entre cards */
+  }
+
+  /* remove as margens do bootstrap e controla no gap */
+  #listaCardsFeedbacks.row > [class*="col-"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: 0 0 auto;
+  }
+
+  /* largura fixa por card (ajusta aqui se quiser mais/menos colunas) */
+  #listaCardsFeedbacks.row > .col-12.col-md-6.col-lg-4 {
+    width: 360px;      /* card “tamanho padrão” */
+    max-width: 360px;
   }
 }

@@ -98,6 +98,8 @@
         </ul>
         <!-- End of Sidebar -->
 
+
+
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
@@ -136,62 +138,74 @@
                 </nav>
                 <!-- End of Topbar -->
 
-<div class="container-fluid feedbacks-page">
+                <div class="container-fluid feedbacks-page">
 
-  <div class="feedbacks-header">
-    <h1 class="h3 text-gray-800 m-0">Feedbacks</h1>
+                    <div class="feedbacks-header">
+                        <h1 class="h3 text-gray-800 m-0">Feedbacks</h1>
 
-    <div class="feedbacks-controls">
-      <input id="inputBuscaFeedback" type="text" class="form-control form-control-sm"
-        placeholder="Buscar aluno..." />
+                        <div class="feedbacks-toolbar">
+                            <div class="search-box input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                </div>
+                                <input id="inputBuscaFeedback" type="text" class="form-control"
+                                    placeholder="Buscar aluno..." />
+                            </div>
 
-      <select id="selectOrdenacao" class="form-control form-control-sm">
-        <option value="recentes">Mais recentes</option>
-        <option value="melhor">Melhor avaliação</option>
-        <option value="pior">Pior avaliação</option>
-        <option value="maisFeedbacks">Mais feedbacks</option>
-      </select>
-    </div>
-  </div>
+                            <div class="order-box input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-sort"></i></span>
+                                </div>
+                                <select id="selectOrdenacao" class="form-control">
+                                    <option value="recentes">Mais recentes</option>
+                                    <option value="melhor">Melhor avaliação</option>
+                                    <option value="pior">Pior avaliação</option>
+                                    <option value="maisFeedbacks">Mais feedbacks</option>
+                                </select>
+                            </div>
 
-  <!-- Loader -->
-  <div id="loaderFeedbacks" class="feedbacks-loader">
-    <div class="spinner-border" role="status"></div>
-    <p class="text-muted mt-2">Carregando feedbacks...</p>
-  </div>
+                        </div>
+                    </div>
 
-  <!-- Cards -->
-  <div id="listaCardsFeedbacks" class="row"></div>
 
-</div>
+                    <!-- Loader -->
+                    <div id="loaderFeedbacks" class="feedbacks-loader">
+                        <div class="spinner-border" role="status"></div>
+                        <p class="text-muted mt-2">Carregando feedbacks...</p>
+                    </div>
 
-<!-- Modal Feedbacks do Aluno -->
-<div class="modal fade" id="modalFeedbacksAluno" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg">
-    <div class="modal-content">
+                    <!-- Cards -->
+                    <div id="listaCardsFeedbacks" class="row"></div>
 
-      <div class="modal-header">
-        <div class="modal-title-wrap">
-          <h5 class="modal-title m-0" id="modalFeedbacksTitulo">Feedbacks do aluno</h5>
-          <small class="text-muted" id="modalFeedbacksSubtitulo"></small>
-        </div>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
+                </div>
 
-      <div class="modal-body">
-        <div id="modalFeedbacksResumo" class="feedbacks-modal-resumo"></div>
-        <div id="modalFeedbacksLista" class="feedbacks-modal-lista"></div>
-      </div>
+                <!-- Modal Feedbacks do Aluno -->
+                <div class="modal fade" id="modalFeedbacksAluno" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                        <div class="modal-content">
 
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-      </div>
+                            <div class="modal-header">
+                                <div class="modal-title-wrap">
+                                    <h5 class="modal-title m-0" id="modalFeedbacksTitulo">Feedbacks do aluno</h5>
+                                    <small class="text-muted" id="modalFeedbacksSubtitulo"></small>
+                                </div>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
 
-    </div>
-  </div>
-</div>
+                            <div class="modal-body">
+                                <div id="modalFeedbacksResumo" class="feedbacks-modal-resumo"></div>
+                                <div id="modalFeedbacksLista" class="feedbacks-modal-lista"></div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
 
 
 
