@@ -29,7 +29,7 @@ function startAutoplay() {
     autoPlayInterval = setInterval(() => {
         indexHero = (indexHero + 1) % itemsHero.length;
         updateCarouselHero();
-    }, 2500);
+    }, 4000);
 }
 
 function stopAutoplayTemporario() {
