@@ -62,7 +62,7 @@ async function carregarTreinos() {
   const loader = document.getElementById('loader-treinos');
   const container = document.getElementById('treinos-container');
 
-  loader.style.display = 'block';
+  loader.style.display = 'flex';
   container.style.display = 'none';
 
   try {
@@ -275,7 +275,10 @@ function renderizarTreinos(dados) {
   });
 
 
-      card.appendChild(lista);
+      const viewport = document.createElement('div');
+viewport.classList.add('carousel-viewport');
+viewport.appendChild(lista);
+card.appendChild(viewport);
 
       const inner = body.querySelector('.treino-body-inner');
       inner.appendChild(card);

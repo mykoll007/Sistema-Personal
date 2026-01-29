@@ -2,124 +2,236 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área do Aluno </title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/aluno.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Área do Aluno | Bioenergia Thon</title>
+  <meta name="description" content="Bioenergia Thon - Área do aluno para treinos, protocolos e suporte" />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/aluno-teste.css" />
 </head>
 
 <body>
 
-    <header id="header">
-        <div class="header-left">
-            <div class="logo"><a href="aluno.html" style="text-decoration: none; color: #1a237e;"><img
-                        src="img/logo-thon.png" alt="logo do Thon"></a></div>
-            <div class="social-icons">
-                <a href="https://wa.me/5511985377270" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                <a href="https://www.instagram.com/thon_cerqueiira/" target="_blank"><i
-                        class="fab fa-instagram"></i></a>
-            </div>
-        </div>
-        <div class="hamburger" id="hamburger">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-        <nav id="nav-menu">
-            <a href="#sobre">Sobre</a>
-            <a href="#" data-protegido="treinos" id="linkTreinos">Treinos</a>
-            <a href="#" data-protegido="perfil" id="linkPerfil">Perfil</a>
-            <button class="login-btn">Login</button>
-        </nav>
-    </header>
+    <!-- Efeitos (por trás do conteúdo) -->
+<canvas id="lightning-canvas" aria-hidden="true"></canvas>
+<div class="embers" aria-hidden="true"></div>
 
-    <section class="hero">
-        <div class="hero-text">
-            <h1>Construa Seu Treino Perfeito</h1>
-            <p>Acesse seus treinos, vídeos explicativos e suporte direto com o Professor para
-                atingir seus objetivos de forma segura e eficiente.</p>
-            <a href="#" data-protegido="treinos">Meus Treinos</a>
+  <!-- Header -->
+  <header id="header">
+    <div class="header-container">
+      <div class="header-left">
+        <a href="aluno.html" class="logo" aria-label="Bioenergia Thon - Página inicial">
+          <i class="fas fa-bolt logo-icon" aria-hidden="true"></i>
+          <span class="logo-text">Bio<span class="logo-highlight">energia</span></span>
+          <span class="logo-divider" aria-hidden="true">•</span>
+          <span class="logo-brand">Thon</span>
+        </a>
+
+        <div class="social-icons">
+          <a href="https://wa.me/5511985377270" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+            <i class="fab fa-whatsapp" aria-hidden="true"></i>
+          </a>
+          <a href="https://www.instagram.com/thon_cerqueiira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <i class="fab fa-instagram" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Mantido no formato que seu JS espera -->
+      <div class="hamburger" id="hamburger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-menu">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+
+      <!-- Mantido ID/nav para seu JS -->
+      <nav id="nav-menu" aria-label="Menu principal">
+        <a href="#sobre">Sobre</a>
+        <a href="#" data-protegido="treinos" id="linkTreinos">Treinos</a>
+        <a href="#" data-protegido="perfil" id="linkPerfil">Perfil</a>
+        <button class="login-btn">Login</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+
+  <main>
+    <!-- Dashboard (estilo StormFit) -->
+    <section class="dashboard">
+      <div class="dashboard-header">
+        <div class="greeting">
+          <h1>Olá, <span class="user-name">Aluno</span></h1>
+          <p class="subtitle">Bioenergia pronta para ativação.</p>
         </div>
 
-        <div class="hero-image">
-            <div class="carousel-hero">
-                <button class="carousel-btn prev-hero">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="carousel-track-hero">
-                    <div class="carousel-item-hero"><img src="img/thon-antes.jpeg" alt="Treino 1"></div>
-                    <div class="carousel-item-hero"><img src="img/thon-depois.jpeg" alt="Treino 2"></div>
-                </div>
-                <button class="carousel-btn next-hero">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
+        <div class="mode-badge">
+          <i class="fas fa-bolt" aria-hidden="true"></i>
+          <span>Bioenergia: ATIVA</span>
         </div>
+      </div>
+
+      <!-- Featured Card - Treino do Dia -->
+      <div class="featured-card">
+        <div class="featured-content">
+          <div class="featured-icon" aria-hidden="true">
+            <i class="fas fa-fire"></i>
+          </div>
+
+          <div class="featured-info">
+            <span class="featured-label">Ativação do Dia</span>
+            <h2>Hora de energizar o corpo</h2>
+            <p>Seu treino está pronto. Acesse agora e mantenha a evolução constante.</p>
+          </div>
+        </div>
+
+        <a href="#" class="featured-cta" data-protegido="treinos">
+          <span>Ativar Treino</span>
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <!-- ✅ AQUI: Carrossel abaixo do card do treino do dia (estrutura compatível com seu JS) -->
+      <div class="carousel-section" aria-label="Carrossel">
+        <div class="carousel-hero">
+          <button class="carousel-btn prev-hero" type="button" aria-label="Imagem anterior">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+          </button>
+
+          <div class="carousel-viewport">
+            <div class="carousel-track-hero">
+              <!-- Você vai substituir tudo aqui pelo carrossel que você mandar -->
+              <div class="carousel-item-hero">
+                <img src="img/thon-antes.jpeg" alt="Imagem 1" />
+              </div>
+              <div class="carousel-item-hero">
+                <img src="img/thon-depois.jpeg" alt="Imagem 2" />
+              </div>
+            </div>
+          </div>
+
+          <button class="carousel-btn next-hero" type="button" aria-label="Próxima imagem">
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Ações rápidas (estilo StormFit) -->
+      <div class="quick-actions">
+        <a href="#" class="action-card" data-protegido="treinos">
+          <div class="action-icon" aria-hidden="true">
+            <i class="fas fa-dumbbell"></i>
+          </div>
+          <div class="action-text">
+            <h3>Meus Treinos</h3>
+            <p>Acesse seus treinos e protocolos</p>
+          </div>
+          <span class="action-arrow" aria-hidden="true">
+            <i class="fas fa-chevron-right"></i>
+          </span>
+        </a>
+
+        <a href="#" class="action-card" data-protegido="perfil">
+          <div class="action-icon" aria-hidden="true">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <div class="action-text">
+            <h3>Meu Perfil</h3>
+            <p>Dados, evolução e informações</p>
+          </div>
+          <span class="action-arrow" aria-hidden="true">
+            <i class="fas fa-chevron-right"></i>
+          </span>
+        </a>
+
+        <a href="https://wa.me/5511985377270" target="_blank" rel="noopener noreferrer" class="action-card">
+          <div class="action-icon" aria-hidden="true">
+            <i class="fab fa-whatsapp"></i>
+          </div>
+          <div class="action-text">
+            <h3>Falar com Professor</h3>
+            <p>Suporte direto e rápido</p>
+          </div>
+          <span class="action-arrow" aria-hidden="true">
+            <i class="fas fa-chevron-right"></i>
+          </span>
+        </a>
+      </div>
     </section>
 
-    <section id="sobre">
-        <h2>EDUCAÇÃO FÍSICA</h2>
-        <div id="align-img"><img src="img/logo-thon.png" alt="logo do thon"></div>
-        <p>A Educação Física é a área que estuda o movimento do corpo humano, promovendo saúde, bem-estar e qualidade de
-            vida. Por meio de atividades como esportes, jogos, danças e exercícios físicos, contribui para o
-            desenvolvimento físico, mental e social das pessoas. No ambiente escolar, ajuda na formação integral do
-            aluno, incentivando hábitos saudáveis, disciplina, cooperação e respeito.</p>
-        <div class="cards">
-            <div class="card">
-                <i class="fas fa-dumbbell"></i>
-                <h3>Treinos</h3>
-                <a href="#" data-protegido="treinos">Acessar Treinos</a>
-            </div>
-            <div class="card">
-                <i class="fas fa-phone"></i>
-                <h3>Contato</h3>
-                <p>📞 (11) 98537-7270</p>
-                <p>📧 raickcerqueira7@gmail.com</p>
-                <div id="align-ancora">
-                    <a href="https://wa.me/5511985377270" id="ancora-wpp" target="_blank">
-                        <i class="fab fa-whatsapp" id="icone-wppMain"></i> WhatsApp
-                    </a>
-                </div>
-            </div>
-
+    <!-- Sobre -->
+    <section id="sobre" class="about-section">
+      <div class="about-container">
+        <div class="about-header">
+          <i class="fas fa-bolt about-icon" aria-hidden="true"></i>
+          <h2>EDUCAÇÃO FÍSICA</h2>
         </div>
+
+        <p class="about-text">
+          A Educação Física é a área que estuda o movimento do corpo humano, promovendo saúde, bem-estar e qualidade de vida.
+          Por meio de atividades como esportes, jogos, danças e exercícios físicos, contribui para o desenvolvimento físico,
+          mental e social das pessoas. No ambiente escolar, ajuda na formação integral do aluno, incentivando hábitos saudáveis,
+          disciplina, cooperação e respeito.
+        </p>
+
+        <div class="about-features">
+          <div class="feature">
+            <i class="fas fa-dumbbell" aria-hidden="true"></i>
+            <span>Treinos e exercícios</span>
+          </div>
+          <div class="feature">
+            <i class="fas fa-heart-pulse" aria-hidden="true"></i>
+            <span>Saúde e bem-estar</span>
+          </div>
+          <div class="feature">
+            <i class="fas fa-people-group" aria-hidden="true"></i>
+            <span>Social e disciplina</span>
+          </div>
+        </div>
+      </div>
     </section>
+  </main>
 
-    <footer>
-        &copy; 2025 Thon Cerqueira. Todos os direitos reservados.
-    </footer>
-
-    <!-- Modal Login -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Login do Aluno</h2>
-            <p>Use o login e senha fornecidos pelo Thon para acessar seus treinos.</p>
-            <form id="loginForm">
-                <input type="text" placeholder="Usuário" id="username" required>
-                <input type="password" placeholder="Senha" id="password" required>
-                <button type="submit" id="loginSubmit">
-                    <span class="btn-text">Entrar</span>
-                    <span class="btn-loader"></span>
-                </button>
-            </form>
-        </div>
+  <footer>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <i class="fas fa-bolt" aria-hidden="true"></i>
+        <span>Bioenergia • Thon</span>
+      </div>
+      <p>&copy; 2025 Thon Cerqueira. Todos os direitos reservados.</p>
     </div>
+  </footer>
 
-    <!-- Toast Notificação -->
-    <div id="toastMessage" class="toast">
-        <div class="toast-header">
-            <strong id="toastTitle">Sistema</strong>
-        </div>
-        <div class="toast-body" id="toastBody"></div>
+  <!-- Modal Login (mantido no formato que seu JS usa) -->
+  <div id="loginModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <span class="close" aria-label="Fechar">&times;</span>
+      <h2>Login do Aluno</h2>
+      <p>Use o login e senha fornecidos pelo Thon para acessar seus treinos.</p>
+
+      <form id="loginForm">
+        <input type="text" placeholder="Usuário" id="username" required />
+        <input type="password" placeholder="Senha" id="password" required />
+        <button type="submit" id="loginSubmit">
+          <span class="btn-text">Entrar</span>
+          <span class="btn-loader" aria-hidden="true"></span>
+        </button>
+      </form>
     </div>
+  </div>
 
+  <!-- Toast (mantido no formato que seu JS usa) -->
+  <div id="toastMessage" class="toast" aria-live="polite">
+    <div class="toast-header">
+      <strong id="toastTitle">Sistema</strong>
+    </div>
+    <div class="toast-body" id="toastBody"></div>
+  </div>
 
-    <script src="js/aluno.js"></script>
-
-
+  <!-- Seu JS (lógica mantida) -->
+  <script src="js/aluno.js"></script>
 </body>
 
 </html>

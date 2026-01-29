@@ -1,117 +1,135 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meus Treinos</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/aluno.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meus Treinos | Bioenergia Thon</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Base (header/menu/tema) -->
+  <link rel="stylesheet" href="css/aluno-teste.css" />
+  <!-- Página de treinos -->
+  <link rel="stylesheet" href="css/treinos-aluno.css" />
 </head>
 
 <body>
+  <!-- Header (igual ao aluno.html Bioenergia) -->
+  <header id="header">
+    <div class="header-container">
+      <div class="header-left">
+        <a href="aluno.html" class="logo" aria-label="Bioenergia Thon - Página inicial">
+          <i class="fas fa-bolt logo-icon" aria-hidden="true"></i>
+          <span class="logo-text">Bio<span class="logo-highlight">energia</span></span>
+          <span class="logo-divider" aria-hidden="true">•</span>
+          <span class="logo-brand">Thon</span>
+        </a>
 
-    <!-- Header igual ao da página principal -->
-    <header id="header">
-        <div class="header-left">
-            <div class="logo"><a href="aluno.html" style="text-decoration: none; color: #1a237e;"><img
-                        src="img/logo-thon.png" alt="logo do Thon"></a></div>
-            <div class="social-icons">
-                <a href="https://wa.me/5511985377270" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                <a href="https://www.instagram.com/Thon_Cerqueiira/" target="_blank"><i
-                        class="fab fa-instagram"></i></a>
-            </div>
+        <div class="social-icons">
+          <a href="https://wa.me/5511985377270" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+            <i class="fab fa-whatsapp" aria-hidden="true"></i>
+          </a>
+          <a href="https://www.instagram.com/thon_cerqueiira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <i class="fab fa-instagram" aria-hidden="true"></i>
+          </a>
         </div>
-        <div class="hamburger" id="hamburger">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-        <nav id="nav-menu">
-            <a href="aluno.html#sobre">Sobre</a>
-            <a href="treinos-aluno.html">Treinos</a>
-            <a href="perfil-aluno.html">Perfil</a>
-            <button class="login-btn" id="logoutBtn">Logout</button>
+      </div>
 
-        </nav>
-    </header>
+      <!-- Hamburger (mesmo formato que seu aluno.js espera) -->
+      <div class="hamburger" id="hamburger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-menu">
+        <div></div><div></div><div></div>
+      </div>
 
+      <!-- Nav (mantém IDs/classes) -->
+      <nav id="nav-menu" aria-label="Menu principal">
+        <a href="aluno.html#sobre">Sobre</a>
+        <a href="treinos-aluno.html">Treinos</a>
+        <a href="perfil-aluno.html">Perfil</a>
+        <button class="login-btn" id="logoutBtn">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Overlay do menu (usado pelo aluno.js) -->
+  <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+
+  <main>
     <!-- Seção de treinos -->
     <section id="treinos" class="treinos-section">
-        <h2 class="treinos-aluno-title">
-            Treinos de <span id="nomeAluno"></span>
-        </h2>
+      <div class="treinos-header">
+        <h1 class="treinos-aluno-title">
+          Treinos de <span id="nomeAluno"></span>
+        </h1>
+        <p class="subtitle">Selecione um treino e acompanhe suas métricas.</p>
+      </div>
 
-        <!-- 🔄 Loader -->
-        <div id="loader-treinos" class="loader"></div>
+      <!-- Loader -->
+      <div id="loader-treinos" class="loader" aria-live="polite" aria-busy="true">
+        <div class="loader-spinner" aria-hidden="true"></div>
+        <span>Carregando treinos...</span>
+      </div>
 
-        <div id="treinos-container">
-            <!-- Os treinos serão inseridos aqui via JS -->
-        </div>
+      <div id="treinos-container">
+        <!-- Os treinos entram via JS -->
+      </div>
     </section>
+  </main>
 
-
-    <footer id="ft-treinos-aluno">
-        &copy; 2025 Thon Cerqueira. Todos os direitos reservados.
-    </footer>
-
-    <!-- ================= MODAL VÍDEO ================= -->
-    <div id="videoModal" class="video-modal">
-        <div class="video-modal-content">
-            <span class="video-modal-close" onclick="fecharModalVideo()">&times;</span>
-            <h3 id="videoModalTitulo"></h3>
-
-            <video id="videoModalPlayer" controls></video>
-        </div>
+  <footer id="ft-treinos-aluno">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <i class="fas fa-bolt" aria-hidden="true"></i>
+        <span>Bioenergia • Thon</span>
+      </div>
+      <p>&copy; 2025 Thon Cerqueira. Todos os direitos reservados.</p>
     </div>
+  </footer>
 
-    <!-- ================= MODAL FEEDBACK ================= -->
-    <div id="feedbackModal" class="feedback-modal">
-        <div class="feedback-modal-content">
-            <h3>Avalie seu treino ⭐</h3>
-
-            <!-- Estrelas -->
-            <div class="stars" id="starsContainer">
-                <i class="fa-regular fa-star" data-value="1"></i>
-                <i class="fa-regular fa-star" data-value="2"></i>
-                <i class="fa-regular fa-star" data-value="3"></i>
-                <i class="fa-regular fa-star" data-value="4"></i>
-                <i class="fa-regular fa-star" data-value="5"></i>
-            </div>
-
-
-            <p id="erroEstrelas" class="erro-estrelas"></p>
-
-
-            <!-- Comentário -->
-            <textarea id="feedbackMensagem" placeholder="Escreva um comentário (opcional)..."></textarea>
-
-            <!-- Botões -->
-            <div class="feedback-actions">
-                <button id="cancelarFeedback" class="btn-cancelar">Sair</button>
-                <button id="enviarFeedback" class="btn-enviar">Enviar</button>
-            </div>
-        </div>
+  <!-- ================= MODAL VÍDEO ================= -->
+  <div id="videoModal" class="video-modal">
+    <div class="video-modal-content">
+      <span class="video-modal-close" onclick="fecharModalVideo()">&times;</span>
+      <h3 id="videoModalTitulo"></h3>
+      <video id="videoModalPlayer" controls></video>
     </div>
+  </div>
 
-    <!-- ================= MODAL OBRIGADO ================= -->
-    <div id="obrigadoModal" class="obrigado-modal">
-        <div class="obrigado-modal-content">
-            <h3>Obrigado pelo feedback! 💪</h3>
-            <p>Sua avaliação ajuda seu personal a melhorar ainda mais seus treinos.</p>
+  <!-- ================= MODAL FEEDBACK ================= -->
+  <div id="feedbackModal" class="feedback-modal">
+    <div class="feedback-modal-content">
+      <h3>Avalie seu treino ⭐</h3>
 
-            <button id="fecharObrigado" class="btn-fechar-obrigado">
-                Fechar
-            </button>
-        </div>
+      <div class="stars" id="starsContainer">
+        <i class="fa-regular fa-star" data-value="1"></i>
+        <i class="fa-regular fa-star" data-value="2"></i>
+        <i class="fa-regular fa-star" data-value="3"></i>
+        <i class="fa-regular fa-star" data-value="4"></i>
+        <i class="fa-regular fa-star" data-value="5"></i>
+      </div>
+
+      <p id="erroEstrelas" class="erro-estrelas"></p>
+
+      <textarea id="feedbackMensagem" placeholder="Escreva um comentário (opcional)..."></textarea>
+
+      <div class="feedback-actions">
+        <button id="cancelarFeedback" class="btn-cancelar">Sair</button>
+        <button id="enviarFeedback" class="btn-enviar">Enviar</button>
+      </div>
     </div>
+  </div>
 
+  <!-- ================= MODAL OBRIGADO ================= -->
+  <div id="obrigadoModal" class="obrigado-modal">
+    <div class="obrigado-modal-content">
+      <h3>Obrigado pelo feedback! 💪</h3>
+      <p>Sua avaliação ajuda seu professor a melhorar ainda mais seus treinos.</p>
+      <button id="fecharObrigado" class="btn-fechar-obrigado">Fechar</button>
+    </div>
+  </div>
 
-
-
-    <script src="js/aluno.js"></script>
-    <script src="js/treinos-aluno.js"></script>
+  <!-- Scripts -->
+  <script src="js/aluno.js"></script>
+  <script src="js/treinos-aluno.js"></script>
 </body>
-
 </html>

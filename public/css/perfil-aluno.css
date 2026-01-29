@@ -1,271 +1,465 @@
-/* Reset e fontes */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'DM Sans', sans-serif;
+/* ========================================
+   Bioenergia Thon - Perfil do Aluno (Dark Modern)
+   NAV igual aluno.html + conteúdo some no mobile ao abrir menu
+   ======================================== */
+
+:root{
+  --bg-dark:#070A0F;
+  --bg-mid:#0B120A;
+  --card: rgba(16, 20, 14, 0.78);
+
+  --primary:#A3E635;   /* verde-lima */
+  --primary-2:#22C55E; /* verde */
+  --accent:#FACC15;    /* amarelo */
+
+  --text:#F8FAFC;
+  --muted:#94A3B8;
+
+  --border: rgba(163, 230, 53, 0.18);
+  --glow: rgba(250, 204, 21, 0.35);
+
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 6px 28px rgba(0,0,0,.38);
+  --shadow-glow: 0 0 26px var(--glow);
+
+  --t: .28s ease;
+  --container: 1200px;
 }
 
-body {
-    background-color: #ffffff;
-    color: #212121;
+/* Reset */
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family:"DM Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
 }
 
-/* Header */
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 34px 30px;
-    padding-bottom: 45px;
-    background-color: #ffffff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    font-family: 'DM Sans', sans-serif;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    left: 0;
-    transition: top 0.4s ease;
-    z-index: 1000;
-    height: 58px;
+/* =========================
+   Header (igual aluno.html)
+   ========================= */
+#header{
+  position: fixed;
+  top:0; left:0; right:0;
+  z-index: 2000;
+  background: rgba(7, 10, 15, .92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+.header-container{
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 1rem;
 }
 
-.logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #1a237e;
-}
-.logo img{
-    width: 39px;
-    margin-top: 7px;
-}
-.social-icons{
-        padding-top: 9px;
-}
-.social-icons a {
-    color: #1a237e;
-    font-size: 27px;
-    margin-left: 10px;
-    transition: color 0.3s;
+.header-left{
+  display:flex;
+  align-items:center;
+  gap: 1rem;
+  min-width: 0;
 }
 
-.social-icons a:hover {
-    color: #f4c542;
-}
-#nav-menu{
-        padding-top:10px;
-}
-nav {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-nav a {
-    color: #1a237e;
-    text-decoration: none !important;
-    font-weight: 500;
-    transition: color 0.3s;
-        font-family: DM Sans, sans-serif;
+.logo{
+  display:inline-flex;
+  align-items:center;
+  gap:.55rem;
+  text-decoration:none;
+  color: var(--text);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
-nav a:hover {
-    color: #f4c542;
+.logo-icon{
+  color: var(--accent);
+  filter: drop-shadow(0 0 10px rgba(250,204,21,.35));
+  font-size: 1.35rem;
 }
 
-.logout-btn {
-    padding: 6px 15px;
-    background-color: #1a237e;
-    border: none;
-    border-radius: 5px;
-    color: #fff;
-    font-weight: bold;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+.logo-highlight{ color: var(--primary); }
+.logo-divider{ opacity:.55; }
+.logo-brand{ color: var(--text); opacity:.92; font-weight:700; }
 
-.logout-btn:hover {
-    background-color: #ff7043;
+.social-icons{ display:flex; gap:.6rem; }
+.social-icons a{
+  width: 36px;
+  height: 36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  text-decoration:none;
+  transition: transform var(--t), border-color var(--t), color var(--t);
+}
+.social-icons a:hover{
+  transform: translateY(-2px);
+  border-color: rgba(250,204,21,.45);
+  color: var(--accent);
 }
 
 /* Hamburger */
-.hamburger {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-    gap: 5px;
+.hamburger{
+  width:42px;
+  height:42px;
+  display:inline-flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+  padding:10px;
+  cursor:pointer;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background: rgba(16,20,14,.35);
+}
+.hamburger div{
+  height:2px;
+  width:100%;
+  background: var(--text);
+  border-radius:999px;
+  transition: transform var(--t), opacity var(--t);
+}
+.hamburger.active div:nth-child(1){ transform: translateY(8px) rotate(45deg); }
+.hamburger.active div:nth-child(2){ opacity:0; }
+.hamburger.active div:nth-child(3){ transform: translateY(-8px) rotate(-45deg); }
+
+/* =========================
+   NAV
+   ========================= */
+
+/* Nav mobile fullscreen abaixo do header */
+#nav-menu{
+  position: fixed;
+  left:0; right:0;
+  top: 74px;        /* não cobre o header */
+  bottom:0;
+  z-index: 1900;
+
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap: 1.1rem;
+
+  padding: 1.35rem 1.25rem 2rem;
+  background: rgba(0,0,0,.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-.hamburger div {
-    width: 25px;
-    height: 3px;
-    background-color: #1a237e;
-    transition: all 0.3s ease;
+#nav-menu.open{ display:flex; }
+
+#nav-menu a{
+  color: var(--text);
+  text-decoration:none;
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: .6rem 1rem;
+  border-radius: 10px;
+  transition: color var(--t), background var(--t), border-color var(--t);
+}
+#nav-menu a:hover{
+  color: var(--accent);
+  background: rgba(250,204,21,.08);
+}
+#nav-menu .active-link{
+  color: var(--accent);
+  background: rgba(250,204,21,.10);
+  border: 1px solid rgba(250,204,21,.22);
 }
 
-.hamburger.active div:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
+/* Logout botão no menu */
+.logout-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: .85rem 1.25rem;
+  min-width: 180px;
+  border:none;
+  border-radius: var(--radius);
+  cursor:pointer;
+  font-weight: 1000;
+  font-size: 1rem;
+  color: #061007;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  box-shadow: var(--shadow-glow);
+  transition: transform var(--t), box-shadow var(--t);
+}
+.logout-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 0 34px rgba(250,204,21,.42);
 }
 
-.hamburger.active div:nth-child(2) {
-    opacity: 0;
+/* Overlay do conteúdo (não cobre header) */
+.menu-overlay{
+  position: fixed;
+  left:0; right:0;
+  top: 74px;
+  bottom:0;
+  background: rgba(0,0,0,.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 1800;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
 }
 
-.hamburger.active div:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
+/* ✅ Se tiver body.menu-open (igual outros), funciona também */
+body.menu-open{ overflow:hidden; }
+body.menu-open .menu-overlay{
+  opacity: 1;
+  pointer-events:auto;
 }
 
-/* Container perfil */
-.container {
-    margin-top: 78px !important;
+/* ✅ Como seu JS do perfil NÃO adiciona body.menu-open,
+   a gente também ativa overlay quando o nav estiver aberto */
+#nav-menu.open ~ .menu-overlay{
+  opacity: 1;
+  pointer-events: auto;
 }
 
-.card {
-    margin-top: 23px;
-    position: relative;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 20px;
-    padding: 30px 20px;
-    text-align: center;
-    box-shadow: 0 8px 30px rgba(26, 35, 126, 0.15);
-    transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.3s ease;
+/* =========================
+   Desktop nav
+   ========================= */
+@media (min-width: 840px){
+  .hamburger{ display:none; }
+
+  #nav-menu{
+    position: static;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    background:none;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    padding:0;
+    gap: 1.1rem;
+  }
+
+  #nav-menu a{
+    font-size: .95rem;
+    padding: .45rem .6rem;
+  }
+
+  .logout-btn{
+    min-width:auto;
+    padding: .75rem 1.15rem;
+  }
+
+  .menu-overlay{ display:none; }
+}
+
+/* =========================
+   Main
+   ========================= */
+.perfil-main{
+  padding-top: 92px; /* espaço do header */
+  min-height: calc(100vh - 92px);
+  position: relative;
+  z-index: 1;
+}
+
+.perfil-wrap{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 2.5rem;
+  display:flex;
+  justify-content:center;
+}
+
+.perfil-card{
+  width: 100%;
+  max-width: 520px;
+  background: linear-gradient(135deg, var(--card), rgba(163,230,53,.06));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow:hidden;
+}
+
+.perfil-top{
+  padding: 1.75rem 1.5rem 1rem;
+  text-align:center;
+}
+
+.perfil-avatar{
+  width: 74px;
+  height: 74px;
+  margin: 0 auto .9rem;
+  border-radius: 999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: #061007;
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  box-shadow: 0 0 26px rgba(250,204,21,.28);
+  font-size: 1.6rem;
+}
+
+.perfil-title{
+  font-size: 1.55rem;
+  font-weight: 1000;
+  letter-spacing: -0.01em;
+  margin-bottom: .25rem;
+}
+
+.perfil-subtitle{
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+.perfil-form{
+  padding: 1.25rem 1.5rem 1.5rem;
+  display:flex;
+  flex-direction:column;
+  gap: 1rem;
+}
+
+.field label{
+  display:block;
+  font-weight: 900;
+  font-size: .9rem;
+  color: var(--text);
+  margin-bottom: .45rem;
+}
+
+.input{
+  display:flex;
+  align-items:center;
+  gap: .75rem;
+  background: rgba(16,20,14,.55);
+  border: 1px solid rgba(163,230,53,.18);
+  border-radius: 12px;
+  padding: .9rem 1rem;
+}
+
+.input i{
+  color: var(--accent);
+  opacity: .95;
+}
+
+.input input{
+  width:100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.input input:disabled{
+  opacity: .95;
+  -webkit-text-fill-color: var(--text);
+}
+
+.btn-sair{
+  margin-top: .25rem;
+  width:100%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap: .65rem;
+  padding: 1rem 1rem;
+  border-radius: var(--radius);
+  text-decoration:none;
+  font-weight: 1000;
+  color: #061007;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  box-shadow: var(--shadow-glow);
+  transition: transform var(--t), box-shadow var(--t);
+}
+
+.btn-sair:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 0 34px rgba(250,204,21,.42);
+}
+
+.perfil-foot{
+  padding: 0 1.5rem 1.5rem;
+  display:flex;
+  justify-content:center;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap: .55rem;
+  padding: .55rem 1rem;
+  border-radius: 999px;
+  width: fit-content;
+  color: var(--accent);
+  border: 1px solid rgba(250,204,21,.45);
+  background: linear-gradient(135deg, rgba(163,230,53,.14), rgba(250,204,21,.12));
+  font-weight: 900;
+  font-size: .9rem;
+}
+
+/* =========================
+   Footer
+   ========================= */
+.perfil-footer{
+  padding: 2rem 1.25rem;
+  background: rgba(11,18,10,.98);
+  border-top: 1px solid var(--border);
+}
+
+.footer-content{
+  max-width: var(--container);
+  margin: 0 auto;
+  text-align:center;
+  color: var(--muted);
+}
+
+.footer-logo{
+  display:inline-flex;
+  align-items:center;
+  gap:.6rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: .4rem;
+}
+.footer-logo i{ color: var(--accent); }
+
+/* =========================
+   ✅ SUMIR CONTEÚDO NO MOBILE QUANDO MENU ABRIR
+   (sem depender do body.menu-open)
+   ========================= */
+@media (max-width: 839px){
+
+  /* trava scroll do fundo quando o menu estiver aberto (via :has se suportar) */
+  body:has(#nav-menu.open){
     overflow: hidden;
+    touch-action: none;
+  }
+
+  /* esconde conteúdo quando nav abrir */
+  body:has(#nav-menu.open) .perfil-main,
+  body:has(#nav-menu.open) .perfil-footer{
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* fallback se você decidir adicionar body.menu-open em outro momento */
+  body.menu-open .perfil-main,
+  body.menu-open .perfil-footer{
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
-.card img {
-    border-radius: 50%;
-    margin-bottom: 15px;
-}
-
-.card h3 {
-    color: #1a237e !important;
-    margin-bottom: 20px;
-}
-
-.card .form-group label {
-    font-weight: 600;
-    color: #1a237e;
-    display: block;
-    margin-bottom: 5px;
-}
-
-.card .form-control {
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid #1a237e;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 1rem;
-    color: #212121;
-}
-
-.card .form-control:disabled {
-    background-color: #e9ecef;
-
-}
-
-/* Botão Sair */
-.btn-danger {
-    background-color: #e53935;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    padding: 10px 0;
-    transition: background 0.3s;
-    width: 100%;
-}
-
-.btn-danger:hover {
-    background-color: #f44336;
-}
-
-/* Modal Logout */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 3000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    justify-content: center;
-    align-items: center;
-}
-
-.modal.show {
-    display: flex;
-}
-
-.modal-content {
-    background-color: #ffffff;
-    border-radius: 20px;
-    padding: 30px;
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    position: relative;
-}
-
-.modal-content h5 {
-    color: #1a237e;
-    margin-bottom: 15px;
-}
-
-.modal-content .close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    cursor: pointer;
-    color: #1a237e;
-}
-
-.modal-content .close:hover {
-    color: #ff7043;
-}
-
-/* Responsividade */
-@media screen and (max-width: 768px){
-    .hamburger { display: flex; }
-    nav { 
-        flex-direction: column; 
-        position: absolute;
-        top: 100%;
-        right: 0;
-        width: 100%;
-        background: #fff;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-    }
-    nav.open { max-height: 300px; }
-    nav a { width: 100%; padding: 2px 20px; }
-    .header-left { gap: 10px; }
-    .logout-btn{
-        padding: 12px 20px;
-        width: 100%;
-    }
-}
-
-/* Responsividade menor */
-@media screen and (max-width: 450px){
-    .card{
-        padding: 15px;
-    }
-    .modal-content{
-        margin: 8% 5%;
-    }
-}
+/* ⚠️ Caso o navegador não suporte :has, ainda funciona se você
+   colocar no HTML o overlay depois do nav-menu (como nos outros),
+   e (opcionalmente) adicionar body.menu-open no JS futuramente. */

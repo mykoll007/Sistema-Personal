@@ -1,0 +1,576 @@
+/* ========================================
+   Bioenergia Thon - Treinos (Dark Modern)
+   Compatível com treinos-aluno.js (IDs/classes mantidos)
+   ======================================== */
+
+/* Página */
+.treinos-section{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  min-height: calc(100vh - 180px);
+}
+
+.treinos-header{
+  text-align: center;
+  margin-bottom: 1.6rem;
+}
+
+.treinos-aluno-title{
+  font-size: 1.75rem;
+  font-weight: 1000;
+  letter-spacing: -0.02em;
+}
+
+#nomeAluno{
+  color: var(--primary);
+}
+
+.treinos-header .subtitle{
+  margin-top: .45rem;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+/* Loader */
+.loader{
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .9rem;
+  padding: 1.5rem 1.25rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.loader-spinner{
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(163,230,53,.16);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========================================
+   Accordion Treino
+   ======================================== */
+.treino-accordion{
+  background: rgba(16, 20, 14, 0.70);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 1rem;
+}
+
+.treino-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  padding: 1.15rem 1.25rem;
+  cursor: pointer;
+
+  transition: background var(--t), border-color var(--t);
+}
+
+.treino-header:hover{
+  background: rgba(250,204,21,.06);
+}
+
+.treino-header.ativo{
+  background: rgba(250,204,21,.10);
+  border-bottom: 1px solid rgba(163,230,53,.14);
+}
+
+.treino-header h3{
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.treino-header i{
+  color: var(--muted);
+  transition: transform var(--t), color var(--t);
+}
+
+.treino-header.ativo i{
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+
+/* Body do accordion */
+.treino-body{
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .38s ease;
+}
+
+.treino-body.aberto{
+  max-height: 4000px;
+}
+
+.treino-body-inner{
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ========================================
+   Card de categoria
+   ======================================== */
+.treino-card{
+  background: rgba(7,10,15,.55);
+  border: 1px solid rgba(163,230,53,.14);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.categoria-titulo{
+  font-size: .95rem;
+  font-weight: 900;
+  color: var(--accent);
+  margin-bottom: .85rem;
+
+  padding-bottom: .75rem;
+  border-bottom: 1px solid rgba(163,230,53,.14);
+}
+
+/* ========================================
+   Controles do carrossel (mobile)
+   (seu JS usa .carousel-prev/.carousel-next/.carousel-indicator)
+   ======================================== */
+.carousel-controls{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .9rem;
+  margin-bottom: .9rem;
+}
+
+.carousel-prev,
+.carousel-next{
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(163,230,53,.18);
+  background: rgba(16,20,14,.55);
+  color: var(--muted);
+  cursor: pointer;
+  transition: transform var(--t), border-color var(--t), color var(--t);
+}
+
+.carousel-prev:hover,
+.carousel-next:hover{
+  transform: translateY(-1px);
+  border-color: rgba(250,204,21,.55);
+  color: var(--accent);
+}
+
+.carousel-indicator{
+  font-size: .9rem;
+  color: var(--muted);
+}
+
+/* ========================================
+   Exercício
+   ======================================== */
+.exercicios-list{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  transition: transform .3s ease;
+  will-change: transform;
+}
+
+.exercicio-item{
+  width: 100%;
+  background: rgba(11,18,10,.78);
+  border: 1px solid rgba(163,230,53,.16);
+  border-radius: var(--radius);
+  padding: 1.05rem;
+  height: 100%;
+}
+
+.exercicio-item:hover{
+  border-color: rgba(250,204,21,.30);
+}
+
+.exercicio-header{
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: .35rem;
+}
+
+.altere-icon{
+  color: rgba(250,204,21,.85);
+  filter: drop-shadow(0 0 10px rgba(250,204,21,.15));
+}
+
+.exercicio-item strong{
+  display: block;
+  font-size: 1rem;
+  font-weight: 900;
+  margin-bottom: .85rem;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+/* Métricas */
+.exercicio-metricas{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .75rem;
+  margin-bottom: .9rem;
+}
+
+.metrica-box{
+  background: rgba(16,20,14,.55);
+  border: 1px solid rgba(163,230,53,.16);
+  border-radius: 10px;
+  padding: .75rem;
+  text-align: center;
+}
+
+.metrica-label{
+  display: block;
+  font-size: .72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin-bottom: .45rem;
+}
+
+.metrica-controls{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+}
+
+.metrica-controls span{
+  font-size: 1.05rem;
+  font-weight: 1000;
+  color: var(--text);
+  min-width: 30px;
+}
+
+.metrica-controls small{
+  font-size: .78rem;
+  color: var(--muted);
+  margin-left: -4px;
+}
+
+/* Botões + e - */
+.btn-menos,
+.btn-mais{
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(163,230,53,.16);
+  background: rgba(7,10,15,.55);
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform var(--t), border-color var(--t), color var(--t), background var(--t);
+}
+
+.btn-menos:hover,
+.btn-mais:hover{
+  border-color: rgba(250,204,21,.55);
+  color: var(--accent);
+  transform: translateY(-1px);
+  background: rgba(250,204,21,.06);
+}
+
+/* Descrições */
+.descricao-label{
+  font-size: .88rem;
+  color: var(--muted);
+  line-height: 1.55;
+  padding: .75rem;
+  border-radius: 10px;
+  margin-bottom: .8rem;
+  background: rgba(250,204,21,.06);
+  border: 1px solid rgba(250,204,21,.10);
+}
+
+.descricao-label strong{
+  color: var(--text);
+}
+
+/* Ações */
+.acoes-exercicio{
+  display: flex;
+  gap: .75rem;
+  margin-top: .5rem;
+}
+
+.video-btn{
+  padding: .7rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(163,230,53,.18);
+  background: rgba(16,20,14,.55);
+  color: var(--text);
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform var(--t), border-color var(--t), color var(--t);
+}
+
+.video-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(250,204,21,.55);
+  color: var(--accent);
+}
+
+.finalizar-btn{
+  flex: 1;
+  padding: .7rem 1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 1000;
+  color: #061007;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  box-shadow: var(--shadow-glow);
+  transition: transform var(--t), filter var(--t);
+}
+
+.finalizar-btn:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.finalizar-btn.finalizado{
+  background: linear-gradient(135deg, var(--primary-2), #16a34a);
+  color: #061007;
+}
+
+/* ========================================
+   Modais (vídeo/feedback/obrigado)
+   (mantém seus IDs/classes)
+   ======================================== */
+.video-modal,
+.feedback-modal,
+.obrigado-modal{
+  position: fixed;
+  inset: 0;
+  z-index: 2600;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(0,0,0,.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* vídeo */
+.video-modal-content{
+  width: 100%;
+  max-width: 860px;
+  background: rgba(10,15,10,.98);
+  border: 1px solid rgba(250,204,21,.22);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  position: relative;
+}
+
+.video-modal-close{
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  background: rgba(16,20,14,.55);
+  border: 1px solid rgba(163,230,53,.16);
+  color: var(--text);
+  font-size: 1.5rem;
+  z-index: 2;
+}
+
+.video-modal-content h3{
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(163,230,53,.14);
+  font-weight: 900;
+  font-size: 1rem;
+}
+
+.video-modal-content video{
+  width: 100%;
+  max-height: 70vh;
+  background: #000;
+  display: block;
+}
+
+/* feedback / obrigado */
+.feedback-modal-content,
+.obrigado-modal-content{
+  width: 100%;
+  max-width: 420px;
+  background: rgba(10,15,10,.98);
+  border: 1px solid rgba(250,204,21,.22);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.4rem;
+  text-align: center;
+}
+
+.feedback-modal-content h3,
+.obrigado-modal-content h3{
+  font-size: 1.2rem;
+  font-weight: 1000;
+  margin-bottom: .55rem;
+}
+
+.stars{
+  display: flex;
+  justify-content: center;
+  gap: .55rem;
+  margin: .75rem 0 .65rem;
+}
+
+.stars i{
+  font-size: 2rem;
+  cursor: pointer;
+  color: #fbbf24;
+  transition: transform var(--t);
+}
+
+.stars i:hover{
+  transform: scale(1.08);
+}
+
+.erro-estrelas{
+  color: #ef4444;
+  font-weight: 700;
+  display: none;
+  margin-bottom: .6rem;
+}
+
+#feedbackMensagem{
+  width: 100%;
+  min-height: 110px;
+  resize: none;
+  padding: .9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(163,230,53,.16);
+  background: rgba(16,20,14,.55);
+  color: var(--text);
+  outline: none;
+  margin-bottom: 1rem;
+}
+
+#feedbackMensagem:focus{
+  border-color: rgba(250,204,21,.55);
+  box-shadow: 0 0 0 3px rgba(250,204,21,.12);
+}
+
+.feedback-actions{
+  display: flex;
+  gap: .75rem;
+}
+
+.btn-cancelar{
+  flex: 1;
+  padding: .85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(163,230,53,.16);
+  background: rgba(16,20,14,.55);
+  color: var(--muted);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.btn-enviar,
+.btn-fechar-obrigado{
+  flex: 1;
+  padding: .85rem 1rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 1000;
+  color: #061007;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-fechar-obrigado{
+  width: 100%;
+  margin-top: .85rem;
+}
+
+/* ========================================
+   Responsivo
+   ======================================== */
+@media (min-width: 640px){
+  .treinos-aluno-title{ font-size: 2rem; }
+}
+
+@media (min-width: 768px){
+  .treinos-section{ padding: 3rem 2rem; }
+}
+
+/* Mobile: carrossel de exercícios (seu JS ativa até 706px) */
+@media (max-width: 706px){
+  .exercicios-list{
+    width: 100%;
+  }
+}
+
+/* Mobile muito pequeno: layout mais limpo */
+@media (max-width: 465px){
+  .exercicio-metricas{ grid-template-columns: 1fr; }
+  .acoes-exercicio{ flex-direction: column; }
+  .video-btn, .finalizar-btn{ width: 100%; justify-content: center; }
+}
+
+/* ===========================
+   CARROSSEL: 1 EXERCÍCIO POR VEZ (MOBILE + DESKTOP)
+   compatível com translateX(-index * 100%)
+   =========================== */
+
+/* viewport corta o que sai da tela */
+.treino-card .carousel-viewport{
+  overflow: hidden;
+  width: 100%;
+}
+
+/* trilho vira faixa única */
+.treino-card .exercicios-list{
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  gap: 0;                 /* sem gap pra não quebrar o 100% */
+  transition: transform .3s ease; /* suave */
+  will-change: transform;
+}
+
+/* cada exercício ocupa exatamente 100% da viewport */
+.treino-card .exercicio-item{
+  flex: 0 0 100%;
+  min-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* controles ficam SEMPRE visíveis (inclusive desktop) */
+.treino-card .carousel-controls{
+  display: flex;
+}
