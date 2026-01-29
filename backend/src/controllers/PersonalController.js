@@ -813,6 +813,7 @@ async editarAluno(request, response) {
                     'at.repeticoes',
                     'at.peso',
                     'at.intervalo_seg',
+                    'at.descricao',
                     'at.ordem',
                     'e.nome as exercicio_nome',
                     'e.categoria_id'
@@ -948,6 +949,7 @@ async editarAluno(request, response) {
                             repeticoes: t.repeticoes,
                             peso: t.peso,
                             intervalo_seg: t.intervalo_seg,
+                            descricao: t.descricao || null,
                             ordem: t.ordem
                         });
 
@@ -963,6 +965,7 @@ async editarAluno(request, response) {
                             repeticoes: t.repeticoes,
                             peso: t.peso,
                             intervalo_seg: t.intervalo_seg,
+                            descricao: t.descricao || null,
                             ordem: t.ordem
                         });
 

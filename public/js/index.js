@@ -545,6 +545,16 @@ function renderizarConfigTreinos() {
               <label>Intervalo (seg)</label>
               <input type="number" class="form-control input-intervalo" data-id="${t.exercicio_id}" value="${t.intervalo_seg}">
             </div>
+            <div class="form-group col-12">
+              <label>Descrição</label>
+              <textarea
+                class="form-control input-descricao"
+                rows="2"
+                data-id="${t.exercicio_id}"
+                placeholder="Observações, técnica, execução..."
+              >${t.descricao ?? ""}</textarea>
+            </div>
+
           </div>
         </div>
       </div>
@@ -634,6 +644,7 @@ function salvarValoresInputsVisiveis() {
     treinoObj.repeticoes = Number($(this).find(".input-repeticoes").val()) || 0;
     treinoObj.peso = Number($(this).find(".input-peso").val()) || 0;
     treinoObj.intervalo_seg = Number($(this).find(".input-intervalo").val()) || 0;
+    treinoObj.descricao = $(this).find(".input-descricao").val().trim();
     treinoObj.treino = $(this).find(".input-treino").val();
   });
 }
