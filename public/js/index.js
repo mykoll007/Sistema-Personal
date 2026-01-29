@@ -871,7 +871,8 @@ $("#btnSalvarTreinos").on("click", async function () {
             repeticoes: treinoAntigo?.repeticoes || 0,
             peso: treinoAntigo?.peso || 0,
             intervalo_seg: treinoAntigo?.intervalo_seg || 0,
-            ordem: treinoAntigo?.ordem || 0
+            ordem: treinoAntigo?.ordem || 0,
+            descricao: treinoAntigo?.descricao || ""
           });
         }
       }
