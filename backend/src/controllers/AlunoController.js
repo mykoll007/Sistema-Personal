@@ -80,13 +80,20 @@ class AlunoController {
                     'aluno_treinos.repeticoes',
                     'aluno_treinos.peso',
                     'aluno_treinos.intervalo_seg',
-                    'exercicios.descricao',
+
+                    // ✅ NOVA (personalizada do aluno)
+                    'aluno_treinos.descricao as descricao_personalizada',
+
+                    // ✅ ANTIGA (descrição do exercício)
+                    'exercicios.descricao as descricao_exercicio',
+
                     'aluno_treinos.status',
                     'aluno_treinos.finalizado_em'
                 )
                 .where('aluno_treinos.aluno_id', alunoId)
                 .orderBy('aluno_treinos.treino')
                 .orderBy('aluno_treinos.ordem');
+
 
             return res.json(rows);
 
@@ -147,126 +154,126 @@ class AlunoController {
     // Aluno atualizar os treinos
     // =========================
 
-   async atualizarCargaTreino(req, res) {
-    const alunoId = req.alunoId;
-    const { treinoId } = req.params;
-    const { campo, valor } = req.body;
+    async atualizarCargaTreino(req, res) {
+        const alunoId = req.alunoId;
+        const { treinoId } = req.params;
+        const { campo, valor } = req.body;
 
-    const camposPermitidos = ['series', 'repeticoes', 'peso', 'intervalo_seg'];
+        const camposPermitidos = ['series', 'repeticoes', 'peso', 'intervalo_seg'];
 
-    if (!camposPermitidos.includes(campo)) {
-        return res.status(400).json({ message: 'Campo inválido' });
+        if (!camposPermitidos.includes(campo)) {
+            return res.status(400).json({ message: 'Campo inválido' });
+        }
+
+        try {
+            const linhasAfetadas = await database('aluno_treinos')
+                .where({
+                    id: treinoId,
+                    aluno_id: alunoId
+                })
+                .update({
+                    [campo]: valor
+                });
+
+            if (linhasAfetadas === 0) {
+                return res.status(404).json({
+                    message: 'Treino não encontrado ou não pertence ao aluno'
+                });
+            }
+
+            return res.json({ success: true });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Erro ao atualizar treino' });
+        }
     }
 
-    try {
-        const linhasAfetadas = await database('aluno_treinos')
-            .where({
-                id: treinoId,
-                aluno_id: alunoId
-            })
-            .update({
-                [campo]: valor
-            });
+    // =========================
+    // Enviar feedback do aluno
+    // =========================
+    async enviarFeedback(req, res) {
+        const alunoId = req.alunoId;
+        const { estrelas, mensagem, treino } = req.body;
 
-        if (linhasAfetadas === 0) {
-            return res.status(404).json({
-                message: 'Treino não encontrado ou não pertence ao aluno'
+        if (!estrelas || !treino) {
+            return res.status(400).json({
+                message: 'Estrelas e treino são obrigatórios'
             });
         }
 
-        return res.json({ success: true });
+        try {
+            // 🔎 Descobre o personal responsável
+            const aluno = await database('alunos')
+                .select('personal_id')
+                .where('id', alunoId)
+                .first();
 
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Erro ao atualizar treino' });
-    }
-}
+            if (!aluno) {
+                return res.status(404).json({ message: 'Aluno não encontrado' });
+            }
 
-// =========================
-// Enviar feedback do aluno
-// =========================
-async enviarFeedback(req, res) {
-    const alunoId = req.alunoId;
-    const { estrelas, mensagem, treino } = req.body;
+            // 📅 evita duplicidade no mesmo dia
+            const hoje = new Date().toISOString().slice(0, 10);
 
-    if (!estrelas || !treino) {
-        return res.status(400).json({
-            message: 'Estrelas e treino são obrigatórios'
-        });
-    }
+            const jaExiste = await database('feedbacks')
+                .where({
+                    aluno_id: alunoId,
+                    treino: treino
+                })
+                .where('criado_em', '>=', `${hoje} 00:00:00`)
+                .first();
 
-    try {
-        // 🔎 Descobre o personal responsável
-        const aluno = await database('alunos')
-            .select('personal_id')
-            .where('id', alunoId)
-            .first();
+            if (jaExiste) {
+                return res.status(409).json({
+                    message: 'Feedback já enviado para esse treino hoje'
+                });
+            }
 
-        if (!aluno) {
-            return res.status(404).json({ message: 'Aluno não encontrado' });
+            // 💾 Salvar feedback
+            await database('feedbacks').insert({
+                aluno_id: alunoId,
+                personal_id: aluno.personal_id,
+                estrelas,
+                mensagem: mensagem || null,
+                treino
+            });
+
+            return res.status(201).json({ success: true });
+
+        } catch (error) {
+            console.error('Erro ao salvar feedback:', error);
+            return res.status(500).json({ message: 'Erro ao salvar feedback' });
         }
+    }
 
-        // 📅 evita duplicidade no mesmo dia
+    // =========================
+    // Verifica se ja foi avaliado no dia
+    // =========================
+    async podeAvaliar(req, res) {
+        const alunoId = req.alunoId;
+        const { treino } = req.params;
+
         const hoje = new Date().toISOString().slice(0, 10);
 
-        const jaExiste = await database('feedbacks')
-            .where({
-                aluno_id: alunoId,
-                treino: treino
-            })
-            .where('criado_em', '>=', `${hoje} 00:00:00`)
-            .first();
+        try {
+            const jaExiste = await database('feedbacks')
+                .where({
+                    aluno_id: alunoId,
+                    treino: treino
+                })
+                .where('criado_em', '>=', `${hoje} 00:00:00`)
+                .first();
 
-        if (jaExiste) {
-            return res.status(409).json({
-                message: 'Feedback já enviado para esse treino hoje'
+            return res.json({
+                podeAvaliar: !jaExiste
             });
+
+        } catch (error) {
+            console.error('Erro ao verificar feedback:', error);
+            return res.status(500).json({ message: 'Erro ao verificar feedback' });
         }
-
-        // 💾 Salvar feedback
-        await database('feedbacks').insert({
-            aluno_id: alunoId,
-            personal_id: aluno.personal_id,
-            estrelas,
-            mensagem: mensagem || null,
-            treino
-        });
-
-        return res.status(201).json({ success: true });
-
-    } catch (error) {
-        console.error('Erro ao salvar feedback:', error);
-        return res.status(500).json({ message: 'Erro ao salvar feedback' });
     }
-}
-
-// =========================
-// Verifica se ja foi avaliado no dia
-// =========================
-async podeAvaliar(req, res) {
-    const alunoId = req.alunoId;
-    const { treino } = req.params;
-
-    const hoje = new Date().toISOString().slice(0, 10);
-
-    try {
-        const jaExiste = await database('feedbacks')
-            .where({
-                aluno_id: alunoId,
-                treino: treino
-            })
-            .where('criado_em', '>=', `${hoje} 00:00:00`)
-            .first();
-
-        return res.json({
-            podeAvaliar: !jaExiste
-        });
-
-    } catch (error) {
-        console.error('Erro ao verificar feedback:', error);
-        return res.status(500).json({ message: 'Erro ao verificar feedback' });
-    }
-}
 
 
 
