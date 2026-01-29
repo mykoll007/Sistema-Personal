@@ -185,84 +185,95 @@ function renderizarTreinos(dados) {
       const lista = document.createElement('div');
       lista.classList.add('exercicios-list');
 
-      porTreino[letraTreino][categoria]
-        .sort((a, b) => (a.ordem || 999) - (b.ordem || 999))
-        .forEach(ex => {
-          const item = document.createElement('div');
-          item.classList.add('exercicio-item');
+     porTreino[letraTreino][categoria]
+  .sort((a, b) => (a.ordem || 999) - (b.ordem || 999))
+  .forEach(ex => {
+    const item = document.createElement('div');
+    item.classList.add('exercicio-item');
 
-          // ✅ PRIMEIRO personalizada (aluno_treinos), senão cai na descrição do exercício
-          const desc = (ex.descricao_personalizada?.trim() || ex.descricao_exercicio?.trim() || '');
+    const obsPersonal = (ex.descricao_personalizada?.trim() || '');
+    const descExercicio = (ex.descricao_exercicio?.trim() || '');
 
-          item.innerHTML = `
-            <div class="exercicio-header">
-              <i class="fa-solid fa-dumbbell altere-icon" title="Exercício de força"></i>
-            </div>
+    item.innerHTML = `
+      <div class="exercicio-header">
+        <i class="fa-solid fa-dumbbell altere-icon" title="Exercício de força"></i>
+      </div>
 
-            <strong>${ex.exercicio}</strong>
+      <strong>${ex.exercicio}</strong>
 
-            <div class="exercicio-metricas">
+      <div class="exercicio-metricas">
 
-              <div class="metrica-box">
-                <span class="metrica-label">Séries</span>
-                <div class="metrica-controls">
-                  <button class="btn-menos" onclick="alterarValor(${ex.id}, 'series', -1)">−</button>
-                  <span id="series-${ex.id}">${ex.series}</span>
-                  <button class="btn-mais" onclick="alterarValor(${ex.id}, 'series', 1)">+</button>
-                </div>
-              </div>
+        <div class="metrica-box">
+          <span class="metrica-label">Séries</span>
+          <div class="metrica-controls">
+            <button class="btn-menos" onclick="alterarValor(${ex.id}, 'series', -1)">−</button>
+            <span id="series-${ex.id}">${ex.series}</span>
+            <button class="btn-mais" onclick="alterarValor(${ex.id}, 'series', 1)">+</button>
+          </div>
+        </div>
 
-              <div class="metrica-box">
-                <span class="metrica-label">Reps</span>
-                <div class="metrica-controls">
-                  <button class="btn-menos" onclick="alterarValor(${ex.id}, 'repeticoes', -1)">−</button>
-                  <span id="repeticoes-${ex.id}">${ex.repeticoes}</span>
-                  <button class="btn-mais" onclick="alterarValor(${ex.id}, 'repeticoes', 1)">+</button>
-                </div>
-              </div>
+        <div class="metrica-box">
+          <span class="metrica-label">Reps</span>
+          <div class="metrica-controls">
+            <button class="btn-menos" onclick="alterarValor(${ex.id}, 'repeticoes', -1)">−</button>
+            <span id="repeticoes-${ex.id}">${ex.repeticoes}</span>
+            <button class="btn-mais" onclick="alterarValor(${ex.id}, 'repeticoes', 1)">+</button>
+          </div>
+        </div>
 
-              <div class="metrica-box">
-                <span class="metrica-label">Peso (kg)</span>
-                <div class="metrica-controls">
-                  <button class="btn-menos" onclick="alterarValor(${ex.id}, 'peso', -1)">−</button>
-                  <span id="peso-${ex.id}">${ex.peso}</span>
-                  <button class="btn-mais" onclick="alterarValor(${ex.id}, 'peso', 1)">+</button>
-                </div>
-              </div>
+        <div class="metrica-box">
+          <span class="metrica-label">Peso (kg)</span>
+          <div class="metrica-controls">
+            <button class="btn-menos" onclick="alterarValor(${ex.id}, 'peso', -1)">−</button>
+            <span id="peso-${ex.id}">${ex.peso}</span>
+            <button class="btn-mais" onclick="alterarValor(${ex.id}, 'peso', 1)">+</button>
+          </div>
+        </div>
 
-              <div class="metrica-box">
-                <span class="metrica-label">Intervalo</span>
-                <div class="metrica-controls">
-                  <button class="btn-menos" onclick="alterarValor(${ex.id}, 'intervalo_seg', -5)">−</button>
-                  <span id="intervalo_seg-${ex.id}">${ex.intervalo_seg}</span>
-                  <small>s</small>
-                  <button class="btn-mais" onclick="alterarValor(${ex.id}, 'intervalo_seg', 5)">+</button>
-                </div>
-              </div>
+        <div class="metrica-box">
+          <span class="metrica-label">Intervalo</span>
+          <div class="metrica-controls">
+            <button class="btn-menos" onclick="alterarValor(${ex.id}, 'intervalo_seg', -5)">−</button>
+            <span id="intervalo_seg-${ex.id}">${ex.intervalo_seg}</span>
+            <small>s</small>
+            <button class="btn-mais" onclick="alterarValor(${ex.id}, 'intervalo_seg', 5)">+</button>
+          </div>
+        </div>
 
-            </div>
+      </div>
 
-            ${desc ? `<p class="descricao-label">Descrição: ${desc}</p>` : ''}
+      ${obsPersonal ? `
+        <p class="descricao-label descricao-personal">
+          <strong>Obs do personal:</strong> ${obsPersonal}
+        </p>
+      ` : ''}
 
-            <div class="acoes-exercicio">
+      ${descExercicio ? `
+        <p class="descricao-label descricao-exercicio">
+          <strong>Descrição do exercício:</strong> ${descExercicio}
+        </p>
+      ` : ''}
 
-              ${ex.video_url ? `
-                <button class="video-btn"
-                  onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
-                  Vídeo
-                </button>
-              ` : ''}
+      <div class="acoes-exercicio">
 
-              <button class="finalizar-btn ${ex.status === 'finalizado' ? 'finalizado' : ''}"
-                onclick="toggleFinalizarTreino(${ex.id}, this)">
-                ${ex.status === 'finalizado' ? '✅ Finalizado' : 'Finalizar'}
-              </button>
+        ${ex.video_url ? `
+          <button class="video-btn"
+            onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
+            Vídeo
+          </button>
+        ` : ''}
 
-            </div>
-          `;
+        <button class="finalizar-btn ${ex.status === 'finalizado' ? 'finalizado' : ''}"
+          onclick="toggleFinalizarTreino(${ex.id}, this)">
+          ${ex.status === 'finalizado' ? '✅ Finalizado' : 'Finalizar'}
+        </button>
 
-          lista.appendChild(item);
-        });
+      </div>
+    `;
+
+    lista.appendChild(item);
+  });
+
 
       card.appendChild(lista);
 
