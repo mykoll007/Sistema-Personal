@@ -15,6 +15,8 @@ let nomesTreinos = {};
 let fotoAntesUrlTemp = null;
 let fotoDepoisUrlTemp = null;
 
+const LETRAS_TREINO = ["A", "B", "C", "D", "E"];
+
 /* ============================================================
    TOKEN / AUTH
 ============================================================ */
@@ -58,7 +60,7 @@ async function retryFetch(url, options = {}, retries = 3) {
     } catch (err) {
       if (i === retries - 1) throw err;
       const delay = 500 * Math.pow(2, i);
-      await new Promise(r => setTimeout(r, delay));
+      await new Promise((r) => setTimeout(r, delay));
     }
   }
 }
@@ -126,7 +128,8 @@ async function uploadImagemCloudinary(file) {
   );
 
   const dataCloud = await resCloud.json();
-  if (!resCloud.ok) throw new Error(dataCloud.error?.message || "Erro ao enviar imagem");
+  if (!resCloud.ok)
+    throw new Error(dataCloud.error?.message || "Erro ao enviar imagem");
 
   return dataCloud.secure_url;
 }
@@ -150,7 +153,9 @@ async function carregarPersonalLogado(forceReload = false) {
     if (!personal) throw new Error("Dados do personal não encontrados.");
 
     const fotoFinal = personal.foto_url
-      ? (personal.foto_url.startsWith("http") ? personal.foto_url : `${API_URL}${personal.foto_url}`)
+      ? personal.foto_url.startsWith("http")
+        ? personal.foto_url
+        : `${API_URL}${personal.foto_url}`
       : "img/undraw_profile.svg";
 
     document.getElementById("nomePersonal").textContent = personal.nome;
@@ -158,7 +163,6 @@ async function carregarPersonalLogado(forceReload = false) {
 
     cachePersonal = personal;
     return personal;
-
   } catch (err) {
     console.error(err);
     mostrarToast("Erro", err.message, "danger");
@@ -172,7 +176,7 @@ async function carregarPersonalLogado(forceReload = false) {
 function renderAlunos() {
   if (dataTable) {
     dataTable.clear();
-    alunos.forEach(a => {
+    alunos.forEach((a) => {
       dataTable.row.add([
         a.nome,
         a.foco,
@@ -186,13 +190,13 @@ function renderAlunos() {
          </a>
          <a href="javascript:void(0)" class="btn btn-danger btn-circle btn-sm btn-excluir" data-id="${a.id}" data-nome="${a.nome}">
             <i class="fas fa-trash"></i>
-         </a>`
+         </a>`,
       ]);
     });
     dataTable.draw();
   } else {
     dataTable = $("#dataTable").DataTable({
-      data: alunos.map(a => [
+      data: alunos.map((a) => [
         a.nome,
         a.foco,
         a.idade,
@@ -205,14 +209,14 @@ function renderAlunos() {
          </a>
          <a href="javascript:void(0)" class="btn btn-danger btn-circle btn-sm btn-excluir" data-id="${a.id}" data-nome="${a.nome}">
             <i class="fas fa-trash"></i>
-         </a>`
+         </a>`,
       ]),
       columns: [
         { title: "Nome" },
         { title: "Foco" },
         { title: "Idade" },
         { title: "Data da Matrícula" },
-        { title: "Ações", orderable: false, searchable: false }
+        { title: "Ações", orderable: false, searchable: false },
       ],
       pageLength: 10,
       lengthChange: true,
@@ -229,8 +233,8 @@ function renderAlunos() {
         infoEmpty: "Mostrando 0 a 0 de 0 cadastros",
         infoFiltered: "(filtrado de _MAX_ registros no total)",
         zeroRecords: "Nenhum cadastro encontrado",
-        emptyTable: "Nenhum dado disponível na tabela"
-      }
+        emptyTable: "Nenhum dado disponível na tabela",
+      },
     });
   }
 }
@@ -252,7 +256,6 @@ async function carregarAlunos() {
     alunos = await res.json();
     renderAlunos();
     tabelaWrapper.style.display = "block";
-
   } catch (err) {
     console.error(err);
     mostrarToast("Erro", err.message, "danger");
@@ -273,7 +276,15 @@ async function criarAluno() {
   const idade = $("#novaIdade").val();
   const data_matricula = $("#novaData").val();
 
-  if (!email || !senha || !confirmarSenha || !nome || !foco || !idade || !data_matricula) {
+  if (
+    !email ||
+    !senha ||
+    !confirmarSenha ||
+    !nome ||
+    !foco ||
+    !idade ||
+    !data_matricula
+  ) {
     mostrarToast("Erro", "Preencha todos os campos!", "danger");
     return;
   }
@@ -284,7 +295,15 @@ async function criarAluno() {
     const res = await authFetch(`${API_URL}/personal/alunos`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, senha, confirmarSenha, nome, foco, idade, data_matricula })
+      body: JSON.stringify({
+        email,
+        senha,
+        confirmarSenha,
+        nome,
+        foco,
+        idade,
+        data_matricula,
+      }),
     });
 
     const data = await res.json();
@@ -314,8 +333,10 @@ async function editarAluno() {
   const data_matricula = $("#editData").val();
 
   try {
-    const fileAntes = document.getElementById("fotoAntesFile")?.files?.[0] || null;
-    const fileDepois = document.getElementById("fotoDepoisFile")?.files?.[0] || null;
+    const fileAntes =
+      document.getElementById("fotoAntesFile")?.files?.[0] || null;
+    const fileDepois =
+      document.getElementById("fotoDepoisFile")?.files?.[0] || null;
 
     if (fileAntes) fotoAntesUrlTemp = await uploadImagemCloudinary(fileAntes);
     if (fileDepois) fotoDepoisUrlTemp = await uploadImagemCloudinary(fileDepois);
@@ -324,11 +345,14 @@ async function editarAluno() {
     if (fotoAntesUrlTemp) payload.foto_antes_url = fotoAntesUrlTemp;
     if (fotoDepoisUrlTemp) payload.foto_depois_url = fotoDepoisUrlTemp;
 
-    const res = await authFetch(`${API_URL}/personal/alunos/${alunoSelecionado.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    const res = await authFetch(
+      `${API_URL}/personal/alunos/${alunoSelecionado.id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Erro ao editar aluno");
@@ -338,7 +362,6 @@ async function editarAluno() {
 
     alunoSelecionado = null;
     await carregarAlunos();
-
   } catch (err) {
     console.error(err);
     mostrarToast("Erro", err.message, "danger");
@@ -353,9 +376,12 @@ async function excluirAluno() {
   setLoadingBotaoExcluir(true);
 
   try {
-    const res = await authFetch(`${API_URL}/personal/alunos/${alunoSelecionado.id}`, {
-      method: "DELETE"
-    });
+    const res = await authFetch(
+      `${API_URL}/personal/alunos/${alunoSelecionado.id}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Erro ao excluir aluno");
@@ -365,7 +391,6 @@ async function excluirAluno() {
 
     alunoSelecionado = null;
     carregarAlunos();
-
   } catch (err) {
     console.error(err);
     mostrarToast("Erro", err.message, "danger");
@@ -385,10 +410,6 @@ $("#btnSalvarNomeTreinos").on("click", function () {
     nomesTreinos[treino] = $(this).val().trim();
   });
 
-  treinosSelecionados.forEach(t => {
-    t.nome_treino = nomesTreinos[t.treino] || null;
-  });
-
   $("#modalNomearTreinos").modal("hide");
   salvarTreinosNoBackend();
 });
@@ -398,7 +419,6 @@ $(document).on("click", "#btnSalvarConfigTreinos", function () {
 
   salvarValoresInputsVisiveis();
   atualizarOrdemTreinos();
-  treinosSelecionados = normalizarOrdemPorCategoria(treinosSelecionados);
 
   setLoadingBotaoSalvarConfig(false);
   $("#modalNomearTreinos").modal("show");
@@ -417,17 +437,40 @@ $("#modalNomearTreinos").on("shown.bs.modal", function () {
   preencherModalNomeTreinos();
 });
 
+function expandirTreinosParaBackend(lista) {
+  const saida = [];
+  lista.forEach((item) => {
+    const letras = item.treinos?.length ? item.treinos : [];
+    letras.forEach((letra) => {
+      saida.push({
+        exercicio_id: item.exercicio_id,
+        treino: letra,
+        nome_treino: (nomesTreinos && nomesTreinos[letra]) ? nomesTreinos[letra] : null,
+        series: item.series,
+        repeticoes: item.repeticoes,
+        peso: item.peso,
+        intervalo_seg: item.intervalo_seg,
+        descricao: item.descricao || null,
+        ordem: item.ordem,
+      });
+    });
+  });
+  return saida;
+}
+
 async function salvarTreinosNoBackend() {
   setLoadingBotaoSalvarConfig(true);
 
   try {
+    const treinosExpandido = expandirTreinosParaBackend(treinosSelecionados);
+
     const res = await authFetch(`${API_URL}/personal/alunos/treinos/salvar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         aluno_id: alunoParaTreino.id,
-        treinos: treinosSelecionados
-      })
+        treinos: treinosExpandido,
+      }),
     });
 
     const data = await res.json();
@@ -435,7 +478,6 @@ async function salvarTreinosNoBackend() {
 
     mostrarToast("Sucesso", "Treinos atualizados com sucesso!", "success");
     $("#modalConfigTreinos").modal("hide");
-
   } catch (err) {
     console.error(err);
     mostrarToast("Erro", err.message, "danger");
@@ -453,9 +495,14 @@ async function carregarCategoriasExerciciosComNomes() {
     const categorias = await res.json();
 
     for (const cat of categorias) {
-      const resEx = await authFetch(`${API_URL}/personal/exercicios/categoria/${cat.id}`);
+      const resEx = await authFetch(
+        `${API_URL}/personal/exercicios/categoria/${cat.id}`
+      );
       const exercicios = await resEx.json();
-      cat.exercicios = exercicios.map(ex => ({ ...ex, categoria_nome: cat.nome }));
+      cat.exercicios = exercicios.map((ex) => ({
+        ...ex,
+        categoria_nome: cat.nome,
+      }));
     }
 
     return categorias;
@@ -473,8 +520,9 @@ async function carregarTreinosDoAluno(alunoId) {
 
     const treinos = await res.json();
 
+    // carrega nomes por letra (pode vir repetido por exercício)
     nomesTreinos = {};
-    treinos.forEach(t => {
+    treinos.forEach((t) => {
       if (t.treino && t.nome_treino) nomesTreinos[t.treino] = t.nome_treino;
     });
 
@@ -488,11 +536,28 @@ async function carregarTreinosDoAluno(alunoId) {
 
 /* ============================================================
    CONFIG TREINOS (render/drag/filtro)
-   (mantive suas funções SEM alterar lógica)
 ============================================================ */
+function renderTreinoChecks(exercicioId, treinosMarcados = []) {
+  return LETRAS_TREINO.map(
+    (l) => `
+    <div class="form-check form-check-inline">
+      <input class="form-check-input input-treinos"
+             type="checkbox"
+             data-id="${exercicioId}"
+             value="${l}"
+             ${treinosMarcados.includes(l) ? "checked" : ""}>
+      <label class="form-check-label">${l}</label>
+    </div>
+  `
+  ).join("");
+}
+
 function renderizarConfigTreinos() {
   treinosSelecionados.sort((a, b) => {
-    if (a.treino !== b.treino) return a.treino.localeCompare(b.treino);
+    const tA = (a.treinos?.[0] || "").toString();
+    const tB = (b.treinos?.[0] || "").toString();
+    if (tA !== tB) return tA.localeCompare(tB);
+
     const ordemA = Number(a.ordem) || 999;
     const ordemB = Number(b.ordem) || 999;
     return ordemA - ordemB;
@@ -500,9 +565,11 @@ function renderizarConfigTreinos() {
 
   let html = "";
 
-  treinosSelecionados.forEach(t => {
+  treinosSelecionados.forEach((t) => {
+    const treinosTxt = (t.treinos || []).join(", ") || "-";
+
     html += `
-      <div class="card mb-3 card-treino" data-id="${t.exercicio_id}" data-treino="${t.treino}">
+      <div class="card mb-3 card-treino" data-id="${t.exercicio_id}">
         <div class="card-header d-flex justify-content-between align-items-center font-weight-bold header-treino" style="cursor:pointer;">
           <div>
             <i class="fas fa-grip-vertical mr-2 text-muted drag-handle"></i>
@@ -510,20 +577,17 @@ function renderizarConfigTreinos() {
             ${t.exercicio_nome}
             <span class="text-muted">(${t.categoria_nome})</span>
           </div>
-          <span class="badge badge-primary badge-treino" data-id="${t.exercicio_id}">Treino ${t.treino}</span>
+          <span class="badge badge-primary badge-treino" data-id="${t.exercicio_id}">Treino ${treinosTxt}</span>
         </div>
 
         <div class="card-body body-treino">
           <div class="form-row d-flex flex-wrap">
-            <div class="form-group col-6 col-sm-4 col-md-2">
-              <label>Treino</label>
-              <select class="form-control input-treino" data-id="${t.exercicio_id}">
-                <option value="A" ${t.treino === "A" ? "selected" : ""}>A</option>
-                <option value="B" ${t.treino === "B" ? "selected" : ""}>B</option>
-                <option value="C" ${t.treino === "C" ? "selected" : ""}>C</option>
-                <option value="D" ${t.treino === "D" ? "selected" : ""}>D</option>
-                <option value="E" ${t.treino === "E" ? "selected" : ""}>E</option>
-              </select>
+
+            <div class="form-group col-12 col-md-4">
+              <label>Treinos</label>
+              <div>
+                ${renderTreinoChecks(t.exercicio_id, t.treinos || [])}
+              </div>
             </div>
 
             <div class="form-group col-6 col-sm-4 col-md-2">
@@ -545,6 +609,7 @@ function renderizarConfigTreinos() {
               <label>Intervalo (seg)</label>
               <input type="number" class="form-control input-intervalo" data-id="${t.exercicio_id}" value="${t.intervalo_seg}">
             </div>
+
             <div class="form-group col-12">
               <label>Descrição</label>
               <textarea
@@ -567,13 +632,17 @@ function renderizarConfigTreinos() {
 
 function renderizarPorFiltroTreino(treinoFiltro) {
   let lista = [...treinosSelecionados];
-  if (treinoFiltro !== "todos") lista = lista.filter(t => t.treino === treinoFiltro);
+  if (treinoFiltro !== "todos") {
+    lista = lista.filter((t) => (t.treinos || []).includes(treinoFiltro));
+  }
 
   let html = "";
 
-  lista.forEach(t => {
+  lista.forEach((t) => {
+    const treinosTxt = (t.treinos || []).join(", ") || "-";
+
     html += `
-      <div class="card mb-3 card-treino" data-id="${t.exercicio_id}" data-treino="${t.treino}">
+      <div class="card mb-3 card-treino" data-id="${t.exercicio_id}">
         <div class="card-header d-flex justify-content-between align-items-center font-weight-bold header-treino">
           <div>
             <i class="fas fa-grip-vertical mr-2 text-muted drag-handle"></i>
@@ -581,16 +650,17 @@ function renderizarPorFiltroTreino(treinoFiltro) {
             ${t.exercicio_nome}
             <span class="text-muted">(${t.categoria_nome})</span>
           </div>
-          <span class="badge badge-primary badge-treino" data-id="${t.exercicio_id}">Treino ${t.treino}</span>
+          <span class="badge badge-primary badge-treino" data-id="${t.exercicio_id}">Treino ${treinosTxt}</span>
         </div>
 
         <div class="card-body body-treino">
           <div class="form-row d-flex flex-wrap">
-            <div class="form-group col-6 col-sm-4 col-md-2">
-              <label>Treino</label>
-              <select class="form-control input-treino" data-id="${t.exercicio_id}">
-                ${["A","B","C","D","E"].map(l => `<option value="${l}" ${t.treino === l ? "selected" : ""}>${l}</option>`).join("")}
-              </select>
+
+            <div class="form-group col-12 col-md-4">
+              <label>Treinos</label>
+              <div>
+                ${renderTreinoChecks(t.exercicio_id, t.treinos || [])}
+              </div>
             </div>
 
             <div class="form-group col-6 col-sm-4 col-md-2">
@@ -609,9 +679,20 @@ function renderizarPorFiltroTreino(treinoFiltro) {
             </div>
 
             <div class="form-group col-6 col-sm-4 col-md-2">
-              <label>Intervalo</label>
+              <label>Intervalo (seg)</label>
               <input type="number" class="form-control input-intervalo" data-id="${t.exercicio_id}" value="${t.intervalo_seg}">
             </div>
+
+            <div class="form-group col-12">
+              <label>Descrição</label>
+              <textarea
+                class="form-control input-descricao"
+                rows="2"
+                data-id="${t.exercicio_id}"
+                placeholder="Observações, técnica, execução..."
+              >${t.descricao ?? ""}</textarea>
+            </div>
+
           </div>
         </div>
       </div>
@@ -629,7 +710,7 @@ function atualizarOrdemTreinos() {
     ordemPorId[id] = index + 1;
   });
 
-  treinosSelecionados.forEach(t => {
+  treinosSelecionados.forEach((t) => {
     if (ordemPorId[t.exercicio_id] != null) t.ordem = ordemPorId[t.exercicio_id];
   });
 }
@@ -637,15 +718,23 @@ function atualizarOrdemTreinos() {
 function salvarValoresInputsVisiveis() {
   $("#listaConfigsTreinos .card-treino").each(function () {
     const exercicioId = Number($(this).data("id"));
-    const treinoObj = treinosSelecionados.find(t => t.exercicio_id === exercicioId);
+    const treinoObj = treinosSelecionados.find((t) => t.exercicio_id === exercicioId);
     if (!treinoObj) return;
+
+    const treinosMarcados = $(this)
+      .find(".input-treinos:checked")
+      .map(function () {
+        return $(this).val();
+      })
+      .get();
+
+    treinoObj.treinos = treinosMarcados;
 
     treinoObj.series = Number($(this).find(".input-series").val()) || 0;
     treinoObj.repeticoes = Number($(this).find(".input-repeticoes").val()) || 0;
     treinoObj.peso = Number($(this).find(".input-peso").val()) || 0;
     treinoObj.intervalo_seg = Number($(this).find(".input-intervalo").val()) || 0;
     treinoObj.descricao = $(this).find(".input-descricao").val().trim();
-    treinoObj.treino = $(this).find(".input-treino").val();
   });
 }
 
@@ -671,40 +760,8 @@ function ativarDragOrdem() {
     chosenClass: "drag-chosen",
     onEnd() {
       atualizarOrdemTreinos();
-    }
+    },
   });
-}
-
-function normalizarOrdemPorCategoria(treinos) {
-  const resultado = [];
-  const porTreino = {};
-
-  treinos.forEach(t => {
-    if (!porTreino[t.treino]) porTreino[t.treino] = [];
-    porTreino[t.treino].push(t);
-  });
-
-  Object.keys(porTreino).sort().forEach(treinoLetra => {
-    const lista = porTreino[treinoLetra];
-    lista.sort((a, b) => (a.ordem || 999) - (b.ordem || 999));
-
-    const categoriasMap = new Map();
-    lista.forEach(item => {
-      const cat = item.categoria_nome || "Outros";
-      if (!categoriasMap.has(cat)) categoriasMap.set(cat, []);
-      categoriasMap.get(cat).push(item);
-    });
-
-    let ordemGlobal = 1;
-    categoriasMap.forEach(listaCategoria => {
-      listaCategoria.forEach(item => {
-        item.ordem = ordemGlobal++;
-        resultado.push(item);
-      });
-    });
-  });
-
-  return resultado;
 }
 
 /* ============================================================
@@ -728,25 +785,26 @@ $("#btnConfirmLogout").on("click", async function () {
   }
 });
 
-
-$('#dataTable tbody').on('click', '.btn-editar', function () {
-  const id = $(this).data('id');
-  alunoSelecionado = alunos.find(a => a.id === id);
+$("#dataTable tbody").on("click", ".btn-editar", function () {
+  const id = $(this).data("id");
+  alunoSelecionado = alunos.find((a) => a.id === id);
   if (!alunoSelecionado) return;
 
   $("#editEmail").val(alunoSelecionado.email);
   $("#editNome").val(alunoSelecionado.nome);
   $("#editFoco").val(alunoSelecionado.foco);
   $("#editIdade").val(alunoSelecionado.idade);
-  $("#editData").val(alunoSelecionado.data_matricula ? alunoSelecionado.data_matricula.split('T')[0] : '');
+  $("#editData").val(
+    alunoSelecionado.data_matricula
+      ? alunoSelecionado.data_matricula.split("T")[0]
+      : ""
+  );
 
-  // limpa temporários e inputs
   fotoAntesUrlTemp = null;
   fotoDepoisUrlTemp = null;
   $("#fotoAntesFile").val("");
   $("#fotoDepoisFile").val("");
 
-  // previews existentes (se o backend retornar)
   if (alunoSelecionado.foto_antes_url) {
     $("#previewFotoAntes").attr("src", alunoSelecionado.foto_antes_url).show();
   } else {
@@ -762,28 +820,28 @@ $('#dataTable tbody').on('click', '.btn-editar', function () {
   $("#modalEditarAluno").modal("show");
 });
 
-$('#dataTable tbody').on('click', '.btn-excluir', function () {
-  const id = $(this).data('id');
-  const nome = $(this).data('nome');
-  alunoSelecionado = alunos.find(a => a.id === id);
+$("#dataTable tbody").on("click", ".btn-excluir", function () {
+  const id = $(this).data("id");
+  const nome = $(this).data("nome");
+  alunoSelecionado = alunos.find((a) => a.id === id);
   $("#nomeAlunoExcluir").text(nome);
   $("#modalExcluirAluno").modal("show");
 });
 
-/* ---------- Modal treinos ---------- */
-$('#dataTable tbody').on('click', '.btn-treino', function () {
+/* ---------- Modal treinos (selecionar exercícios) ---------- */
+$("#dataTable tbody").on("click", ".btn-treino", function () {
   treinosSelecionados = [];
   $("#listaCategorias").empty();
   $("#listaConfigsTreinos").empty();
 
-  const nome = $(this).data('nome');
-  alunoParaTreino = alunos.find(a => a.nome === nome);
+  const nome = $(this).data("nome");
+  alunoParaTreino = alunos.find((a) => a.nome === nome);
   if (!alunoParaTreino) return;
 
   $("#nomeAlunoTreino").text(alunoParaTreino.nome);
   $("#modalTreinos").modal("show");
 
-  $("#modalTreinos").one('shown.bs.modal', async function () {
+  $("#modalTreinos").one("shown.bs.modal", async function () {
     $("#loaderTreinosVincular").removeClass("d-none");
     $("#listaCategorias").addClass("d-none");
 
@@ -791,17 +849,21 @@ $('#dataTable tbody').on('click', '.btn-treino', function () {
       categorias = await carregarCategoriasExerciciosComNomes();
       const treinosVinculados = await carregarTreinosDoAluno(alunoParaTreino.id);
 
-      $("#modalTreinos").data('treinosVinculados', treinosVinculados);
-      const idsVinculados = treinosVinculados.map(t => Number(t.exercicio_id));
+      $("#modalTreinos").data("treinosVinculados", treinosVinculados);
 
-      let html = '';
+      // ids vinculados (por exercício)
+      const idsVinculados = new Set(
+        treinosVinculados.map((t) => Number(t.exercicio_id))
+      );
+
+      let html = "";
 
       for (const cat of categorias) {
         if (!cat.exercicios?.length) continue;
 
-        let exHtml = '';
+        let exHtml = "";
         for (const ex of cat.exercicios) {
-          const checked = idsVinculados.includes(Number(ex.id)) ? 'checked' : '';
+          const checked = idsVinculados.has(Number(ex.id)) ? "checked" : "";
           exHtml += `
             <div class="form-check">
               <input class="form-check-input exercicio-checkbox" type="checkbox"
@@ -830,7 +892,6 @@ $('#dataTable tbody').on('click', '.btn-treino', function () {
       }
 
       $("#listaCategorias").html(html);
-
     } catch (err) {
       console.error(err);
       mostrarToast("Erro", "Erro ao carregar treinos", "danger");
@@ -846,49 +907,50 @@ $("#btnSalvarTreinos").on("click", async function () {
   setLoadingBotaoConfigurar(true);
 
   try {
-    const treinosVinculados = $("#modalTreinos").data('treinosVinculados') || [];
-    const idsVinculados = treinosVinculados.map(t => t.exercicio_id);
+    const treinosVinculados = $("#modalTreinos").data("treinosVinculados") || [];
 
     treinosSelecionados = [];
-    const idsSelecionados = $(".exercicio-checkbox:checked").map(function () {
-      return Number($(this).val());
-    }).get();
 
-    const idsParaAdicionar = idsSelecionados.filter(id => !idsVinculados.includes(id));
-    const idsParaDeletar = idsVinculados.filter(id => !idsSelecionados.includes(id));
+    const idsSelecionados = $(".exercicio-checkbox:checked")
+      .map(function () {
+        return Number($(this).val());
+      })
+      .get();
 
+    // Monte a lista por exercício (agrupando as letras já existentes)
     for (const cat of categorias) {
       for (const ex of cat.exercicios) {
-        if (idsSelecionados.includes(ex.id)) {
-          const treinoAntigo = treinosVinculados.find(t => t.exercicio_id === ex.id);
+        if (!idsSelecionados.includes(ex.id)) continue;
 
-          treinosSelecionados.push({
-            exercicio_id: ex.id,
-            treino: treinoAntigo?.treino || 'A',
-            exercicio_nome: ex.nome,
-            categoria_nome: ex.categoria_nome,
-            series: treinoAntigo?.series || 0,
-            repeticoes: treinoAntigo?.repeticoes || 0,
-            peso: treinoAntigo?.peso || 0,
-            intervalo_seg: treinoAntigo?.intervalo_seg || 0,
-            ordem: treinoAntigo?.ordem || 0,
-            descricao: treinoAntigo?.descricao || ""
-          });
-        }
+        const doEx = treinosVinculados.filter(
+          (t) => Number(t.exercicio_id) === Number(ex.id)
+        );
+
+        const treinosLetras = doEx.length ? doEx.map((t) => t.treino) : ["A"];
+        const base = doEx[0]; // usa configs da primeira linha (se existirem)
+
+        treinosSelecionados.push({
+          exercicio_id: ex.id,
+          treinos: treinosLetras,
+          exercicio_nome: ex.nome,
+          categoria_nome: ex.categoria_nome,
+          series: base?.series || 0,
+          repeticoes: base?.repeticoes || 0,
+          peso: base?.peso || 0,
+          intervalo_seg: base?.intervalo_seg || 0,
+          ordem: base?.ordem || 0,
+          descricao: base?.descricao || "",
+        });
       }
     }
 
     $("#modalTreinos").modal("hide");
     $("#modalConfigTreinos").modal("show");
 
-    $("#modalConfigTreinos").data('idsParaAdicionar', idsParaAdicionar);
-    $("#modalConfigTreinos").data('idsParaDeletar', idsParaDeletar);
-
     $("#modalConfigTreinos").one("shown.bs.modal", () => {
       renderizarConfigTreinos();
       setLoadingBotaoConfigurar(false);
     });
-
   } catch (err) {
     console.error(err);
     mostrarToast("Erro", "Erro ao configurar treinos", "danger");
@@ -902,26 +964,29 @@ $(document).on("click", ".filtro-treino", function (e) {
   salvarValoresInputsVisiveis();
 
   const treinoSelecionado = $(this).data("treino");
-  treinosSelecionados = normalizarOrdemPorCategoria(treinosSelecionados);
   renderizarPorFiltroTreino(treinoSelecionado);
 });
 
-$(document).on("change", ".input-treino", function () {
-  const exercicioId = $(this).data("id");
-  const novoTreino = $(this).val();
+// quando marca/desmarca checkboxes A-E
+$(document).on("change", ".input-treinos", function () {
+  const exercicioId = Number($(this).data("id"));
+  const card = $(`.card-treino[data-id="${exercicioId}"]`);
 
-  const card = $(`.card-treino[data-id="${exercicioId}"], .card-treino:has(.input-treino[data-id="${exercicioId}"])`);
-  card.attr("data-treino", novoTreino);
+  const treinosMarcados = card
+    .find(".input-treinos:checked")
+    .map(function () {
+      return $(this).val();
+    })
+    .get();
 
-  const badge = $(`.badge-treino[data-id="${exercicioId}"]`);
-  badge.text(`Treino ${novoTreino}`);
+  const treinoObj = treinosSelecionados.find((t) => t.exercicio_id === exercicioId);
+  if (treinoObj) treinoObj.treinos = treinosMarcados;
 
-  const treinoObj = treinosSelecionados.find(t => t.exercicio_id === exercicioId);
-  if (treinoObj) treinoObj.treino = novoTreino;
+  card.find(".badge-treino").text(`Treino ${treinosMarcados.join(", ") || "-"}`);
 });
 
 $(document).on("click", ".header-treino", function (e) {
-  if ($(e.target).is("select, option, .badge, .badge *")) return;
+  if ($(e.target).is("input, label, .badge, .badge *")) return;
 
   const card = $(this).closest(".card");
   const body = card.find(".body-treino");
@@ -1075,7 +1140,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fotoTopbar?.addEventListener("click", (e) => {
     e.stopPropagation();
-    menuPerfil.style.display = menuPerfil.style.display === "block" ? "none" : "block";
+    menuPerfil.style.display =
+      menuPerfil.style.display === "block" ? "none" : "block";
   });
 
   document.addEventListener("click", () => {

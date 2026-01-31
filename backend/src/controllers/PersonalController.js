@@ -880,110 +880,142 @@ async editarAluno(request, response) {
     }
 
 
-    async salvarTreinosDoAluno(req, res) {
-        const { aluno_id, treinos } = req.body;
-        const personal_id = req.personalId;
+async salvarTreinosDoAluno(req, res) {
+  const { aluno_id, treinos } = req.body;
+  const personal_id = req.personalId;
 
+  if (!aluno_id) {
+    return res.status(400).json({ message: "Aluno obrigatório." });
+  }
 
-        if (!aluno_id) {
-            return res.status(400).json({ message: "Aluno obrigatório." });
-        }
+  if (!Array.isArray(treinos)) {
+    return res.status(400).json({ message: "Treinos deve ser um array." });
+  }
 
-        try {
-            // 1️⃣ Buscar treinos atuais (considerando treino)
-            const treinosAtuais = await database('aluno_treinos as at')
-                .join('alunos as a', 'at.aluno_id', 'a.id')
-                .where('at.aluno_id', aluno_id)
-                .andWhere('a.personal_id', personal_id)
-                .select('at.exercicio_id', 'at.treino');
+  try {
+    // ✅ garante que o aluno pertence ao personal
+    const aluno = await database("alunos")
+      .where({ id: aluno_id, personal_id })
+      .first();
 
-            const atuais = treinosAtuais.map(t => ({
-                exercicio_id: t.exercicio_id,
-                treino: t.treino
-            }));
-
-            const novos = treinos.map(t => ({
-                exercicio_id: t.exercicio_id,
-                treino: t.treino
-            }));
-
-            // 2️⃣ Deletar treinos removidos
-            const paraDeletar = atuais.filter(a =>
-                !novos.some(n =>
-                    n.exercicio_id === a.exercicio_id &&
-                    n.treino === a.treino
-                )
-            );
-
-            if (paraDeletar.length > 0) {
-                for (const t of paraDeletar) {
-                    await database('aluno_treinos')
-                        .where({
-                            aluno_id,
-                            exercicio_id: t.exercicio_id,
-                            treino: t.treino
-                        })
-                        .del();
-                }
-
-            }
-
-            // 3️⃣ Inserir ou atualizar
-            for (const t of treinos) {
-                const existe = atuais.some(a =>
-                    a.exercicio_id === t.exercicio_id &&
-                    a.treino === t.treino
-                );
-
-                if (existe) {
-                    // 🔄 Atualiza
-                    await database('aluno_treinos')
-                        .where({
-                            aluno_id,
-                            exercicio_id: t.exercicio_id,
-                            treino: t.treino
-                        })
-                        .update({
-                            nome_treino: t.nome_treino || null,
-                            series: t.series,
-                            repeticoes: t.repeticoes,
-                            peso: t.peso,
-                            intervalo_seg: t.intervalo_seg,
-                            descricao: t.descricao || null,
-                            ordem: t.ordem
-                        });
-
-                } else {
-                    // ➕ Insere
-                    await database('aluno_treinos')
-                        .insert({
-                            aluno_id,
-                            exercicio_id: t.exercicio_id,
-                            treino: t.treino,
-                            nome_treino: t.nome_treino || null,
-                            series: t.series,
-                            repeticoes: t.repeticoes,
-                            peso: t.peso,
-                            intervalo_seg: t.intervalo_seg,
-                            descricao: t.descricao || null,
-                            ordem: t.ordem
-                        });
-
-                }
-            }
-
-            return res.status(200).json({
-                message: "Treinos salvos com sucesso!"
-            });
-
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({
-                message: "Erro ao salvar treinos do aluno."
-            });
-        }
-        
+    if (!aluno) {
+      return res.status(403).json({ message: "Este aluno não pertence ao seu perfil." });
     }
+
+    // ✅ Normaliza payload:
+    // - se vier expandido: [{exercicio_id, treino:"A", ...}]
+    // - se vier agrupado: [{exercicio_id, treinos:["A","C"], ...}]
+    const normalizados = [];
+    for (const t of treinos) {
+      const exercicio_id = Number(t.exercicio_id);
+
+      // aceita treino único ou array
+      const letras =
+        Array.isArray(t.treinos) ? t.treinos :
+        (t.treino ? [t.treino] : []);
+
+      for (const letra of letras) {
+        if (!letra) continue;
+
+        normalizados.push({
+          exercicio_id,
+          treino: String(letra).trim().toUpperCase(),
+          nome_treino: t.nome_treino ?? null,
+          series: Number(t.series) || 0,
+          repeticoes: Number(t.repeticoes) || 0,
+          peso: Number(t.peso) || 0,
+          intervalo_seg: Number(t.intervalo_seg) || 0,
+          descricao: t.descricao ?? null,
+          ordem: Number(t.ordem) || 0
+        });
+      }
+    }
+
+    // se nada veio, significa: remover tudo do aluno
+    // (opcional: você pode bloquear isso, se quiser)
+    await database.transaction(async (trx) => {
+      // 1) Buscar treinos atuais (por letra)
+      const treinosAtuais = await trx("aluno_treinos as at")
+        .join("alunos as a", "at.aluno_id", "a.id")
+        .where("at.aluno_id", aluno_id)
+        .andWhere("a.personal_id", personal_id)
+        .select("at.exercicio_id", "at.treino");
+
+      const atuais = treinosAtuais.map((t) => ({
+        exercicio_id: Number(t.exercicio_id),
+        treino: String(t.treino)
+      }));
+
+      const novos = normalizados.map((t) => ({
+        exercicio_id: Number(t.exercicio_id),
+        treino: String(t.treino)
+      }));
+
+      // 2) Deletar o que saiu
+      const paraDeletar = atuais.filter((a) =>
+        !novos.some((n) => n.exercicio_id === a.exercicio_id && n.treino === a.treino)
+      );
+
+      for (const t of paraDeletar) {
+        await trx("aluno_treinos")
+          .where({
+            aluno_id,
+            exercicio_id: t.exercicio_id,
+            treino: t.treino
+          })
+          .del();
+      }
+
+      // 3) Inserir/Atualizar os novos
+      //    - se existir, update
+      //    - se não existir, insert
+      for (const t of normalizados) {
+        const existe = atuais.some((a) =>
+          a.exercicio_id === t.exercicio_id && a.treino === t.treino
+        );
+
+        if (existe) {
+          await trx("aluno_treinos")
+            .where({
+              aluno_id,
+              exercicio_id: t.exercicio_id,
+              treino: t.treino
+            })
+            .update({
+              nome_treino: t.nome_treino || null,
+              series: t.series,
+              repeticoes: t.repeticoes,
+              peso: t.peso,
+              intervalo_seg: t.intervalo_seg,
+              descricao: t.descricao || null,
+              ordem: t.ordem
+            });
+        } else {
+          await trx("aluno_treinos")
+            .insert({
+              aluno_id,
+              exercicio_id: t.exercicio_id,
+              treino: t.treino,
+              nome_treino: t.nome_treino || null,
+              series: t.series,
+              repeticoes: t.repeticoes,
+              peso: t.peso,
+              intervalo_seg: t.intervalo_seg,
+              descricao: t.descricao || null,
+              ordem: t.ordem
+            });
+        }
+      }
+    });
+
+    return res.status(200).json({ message: "Treinos salvos com sucesso!" });
+
+  } catch (error) {
+    console.error("Erro ao salvar treinos do aluno:", error);
+    return res.status(500).json({ message: "Erro ao salvar treinos do aluno." });
+  }
+}
+
 
     
 // 📌 Listar feedbacks do personal logado 
