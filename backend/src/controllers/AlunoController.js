@@ -7,45 +7,46 @@ class AlunoController {
     // =========================
     // Autenticar aluno
     // =========================
-    async autenticarAluno(req, res) {
-        const { email, senha } = req.body;
+async autenticarAluno(req, res) {
+    const { email, senha } = req.body;
 
-        if (!email || !senha) {
-            return res.status(400).json({ message: "Email e senha são obrigatórios." });
-        }
-
-        try {
-            const aluno = await database('alunos')
-                .where({ email })
-                .first();
-
-            if (!aluno) {
-                return res.status(401).json({ message: "Email ou senha incorretos." });
-            }
-
-            const validarSenha = await bcrypt.compare(senha, aluno.senha);
-
-            if (!validarSenha) {
-                return res.status(401).json({ message: "Email ou senha incorretos." });
-            }
-
-            const token = jwt.sign(
-                { aluno_id: aluno.id },
-                process.env.SALT,
-                { expiresIn: '1h' }
-            );
-
-            return res.status(200).json({
-                token,
-                nome: aluno.nome,
-                email: aluno.email
-            });
-
-        } catch (error) {
-            console.error("Erro ao autenticar aluno:", error);
-            return res.status(500).json({ message: "Erro ao tentar autenticar." });
-        }
+    if (!email || !senha) {
+        return res.status(400).json({ message: "Email e senha são obrigatórios." });
     }
+
+    try {
+        const aluno = await database('alunos')
+            .where({ email })
+            .first();
+
+        if (!aluno) {
+            return res.status(401).json({ message: "Email ou senha incorretos." });
+        }
+
+        const validarSenha = await bcrypt.compare(senha, aluno.senha);
+
+        if (!validarSenha) {
+            return res.status(401).json({ message: "Email ou senha incorretos." });
+        }
+
+        const token = jwt.sign(
+            { aluno_id: aluno.id },
+            process.env.SALT,
+            { expiresIn: '1h' }
+        );
+
+        return res.status(200).json({
+            token,
+            nome: aluno.nome,
+            email: aluno.email,
+            data_matricula: aluno.data_matricula
+        });
+
+    } catch (error) {
+        console.error("Erro ao autenticar aluno:", error);
+        return res.status(500).json({ message: "Erro ao tentar autenticar." });
+    }
+}
 
     // =========================
     // Buscar treinos do aluno
