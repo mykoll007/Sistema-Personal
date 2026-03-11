@@ -93,6 +93,24 @@
         </a>
       </div>
 
+      <section class="payment-section" id="paymentSection" style="display: none;">
+  <div class="payment-card">
+    <div class="payment-header">
+      <i class="fas fa-calendar-dollar" aria-hidden="true"></i>
+      <h3>Pagamento</h3>
+    </div>
+
+    <p class="payment-text" id="paymentText">
+      Sua próxima data de pagamento é: --
+    </p>
+
+    <div class="payment-warning" id="paymentWarning" style="display: none;">
+      <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+      <span id="paymentWarningText"></span>
+    </div>
+  </div>
+</section>
+
       <!-- ✅ AQUI: Carrossel abaixo do card do treino do dia (estrutura compatível com seu JS) -->
       <div class="carousel-section" aria-label="Carrossel">
         <div class="carousel-hero">
@@ -193,6 +211,7 @@
       </div>
     </section>
   </main>
+
 
   <footer>
     <div class="footer-content">

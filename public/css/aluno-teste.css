@@ -812,6 +812,52 @@ footer {
   color: var(--muted);
 }
 
+.payment-section {
+  width: min(1100px, 92%);
+  margin: 32px auto 0;
+}
+
+.payment-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.payment-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.payment-header i {
+  font-size: 1.2rem;
+}
+
+.payment-header h3 {
+  margin: 0;
+}
+
+.payment-text {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.payment-warning {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 193, 7, 0.12);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  color: #ffd54f;
+  font-weight: 600;
+}
+
 /* =========================
    FX Layer: Raios + Brasas
    ========================= */

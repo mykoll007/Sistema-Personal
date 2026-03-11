@@ -4,19 +4,19 @@ const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('nav-menu');
 const menuOverlay = document.getElementById('menuOverlay');
 
-function abrirMenu(){
+function abrirMenu() {
   hamburger.classList.add('active');
   navMenu.classList.add('open');
   document.body.classList.add('menu-open');
 }
 
-function fecharMenu(){
+function fecharMenu() {
   hamburger.classList.remove('active');
   navMenu.classList.remove('open');
   document.body.classList.remove('menu-open');
 }
 
-hamburger.addEventListener('click', () => {
+hamburger?.addEventListener('click', () => {
   const aberto = navMenu.classList.contains('open');
   if (aberto) fecharMenu();
   else abrirMenu();
@@ -24,10 +24,9 @@ hamburger.addEventListener('click', () => {
 
 menuOverlay?.addEventListener('click', fecharMenu);
 
-navMenu.querySelectorAll('a').forEach(a => {
+navMenu?.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', fecharMenu);
 });
-
 
 
 /* ===================== */
@@ -49,6 +48,8 @@ function updateCarouselHero() {
 /* ===== AUTOPLAY ===== */
 function startAutoplay() {
   if (!itemsHero || itemsHero.length <= 1) return;
+
+  clearInterval(autoPlayInterval);
   autoPlayInterval = setInterval(() => {
     indexHero = (indexHero + 1) % itemsHero.length;
     updateCarouselHero();
@@ -82,6 +83,7 @@ nextHero?.addEventListener('click', () => {
 /* ===== INICIA ===== */
 startAutoplay();
 
+
 /* ===================== */
 /* Modal Login */
 const loginBtn = document.querySelector('.login-btn');
@@ -97,13 +99,17 @@ function abrirModal() {
 function fecharModal() {
   if (!modal) return;
   modal.classList.remove('show');
-  setTimeout(() => (modal.style.display = 'none'), 300);
+  setTimeout(() => {
+    modal.style.display = 'none';
+  }, 300);
 }
 
 closeModal?.addEventListener('click', fecharModal);
+
 window.addEventListener('click', (e) => {
   if (e.target === modal) fecharModal();
 });
+
 
 /* ===================== */
 /* Toast */
@@ -123,8 +129,9 @@ function showToast(titulo, mensagem, duracao = 2500) {
   }, duracao);
 }
 
+
 /* ===================== */
-/* ✅ ATUALIZA NOME DO ALUNO (igual no StormFit) */
+/* Atualiza nome do aluno */
 function atualizarNomeAluno() {
   const el = document.querySelector('.user-name');
   const nome = localStorage.getItem('nomeAluno');
@@ -132,8 +139,163 @@ function atualizarNomeAluno() {
   if (el) el.textContent = nome || 'Aluno';
 }
 
+
+/* ===================== */
+/* Funções de pagamento */
+function formatarDataBR(data) {
+  if (!(data instanceof Date) || isNaN(data.getTime())) return '--';
+
+  return data.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
+
+function diferencaEmDias(dataFutura, dataAtual) {
+  const umDia = 1000 * 60 * 60 * 24;
+
+  const d1 = new Date(dataFutura);
+  const d2 = new Date(dataAtual);
+
+  d1.setHours(0, 0, 0, 0);
+  d2.setHours(0, 0, 0, 0);
+
+  return Math.ceil((d1 - d2) / umDia);
+}
+
+function getUltimoDiaDoMes(ano, mes) {
+  return new Date(ano, mes + 1, 0).getDate();
+}
+
+function parseDataMatricula(dataMatricula) {
+  if (!dataMatricula) return null;
+
+  const valor = String(dataMatricula).trim();
+
+  if (!valor || valor === 'undefined' || valor === 'null') {
+    return null;
+  }
+
+  // pega só a parte da data, ignorando hora
+  const somenteData = valor.includes('T') ? valor.split('T')[0] : valor;
+
+  const partes = somenteData.split('-');
+  if (partes.length !== 3) return null;
+
+  const ano = Number(partes[0]);
+  const mes = Number(partes[1]) - 1;
+  const dia = Number(partes[2]);
+
+  if (
+    Number.isNaN(ano) ||
+    Number.isNaN(mes) ||
+    Number.isNaN(dia) ||
+    mes < 0 ||
+    mes > 11 ||
+    dia < 1 ||
+    dia > 31
+  ) {
+    return null;
+  }
+
+  return { ano, mes, dia };
+}
+
+function calcularProximaDataPagamento(dataMatricula) {
+  const matricula = parseDataMatricula(dataMatricula);
+  if (!matricula) return null;
+
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  const diaBase = matricula.dia;
+
+  let anoAtual = hoje.getFullYear();
+  let mesAtual = hoje.getMonth();
+
+  let diaMesAtual = Math.min(diaBase, getUltimoDiaDoMes(anoAtual, mesAtual));
+  let proximaData = new Date(anoAtual, mesAtual, diaMesAtual);
+
+  if (proximaData < hoje) {
+    mesAtual += 1;
+
+    if (mesAtual > 11) {
+      mesAtual = 0;
+      anoAtual += 1;
+    }
+
+    const diaProximoMes = Math.min(diaBase, getUltimoDiaDoMes(anoAtual, mesAtual));
+    proximaData = new Date(anoAtual, mesAtual, diaProximoMes);
+  }
+
+  if (isNaN(proximaData.getTime())) return null;
+
+  return proximaData;
+}
+
+let ultimoAvisoPagamento = null;
+
+function atualizarAvisoPagamento() {
+  const token = localStorage.getItem('tokenAluno');
+  const dataMatricula = localStorage.getItem('dataMatriculaAluno');
+
+  const paymentSection = document.getElementById('paymentSection');
+  const paymentText = document.getElementById('paymentText');
+  const paymentWarning = document.getElementById('paymentWarning');
+  const paymentWarningText = document.getElementById('paymentWarningText');
+
+  if (!paymentSection || !paymentText || !paymentWarning || !paymentWarningText) return;
+
+  if (!token || !dataMatricula) {
+    paymentSection.style.display = 'none';
+    paymentWarning.style.display = 'none';
+    return;
+  }
+
+  const hoje = new Date();
+  const proximaData = calcularProximaDataPagamento(dataMatricula);
+
+  if (!proximaData) {
+    paymentSection.style.display = 'none';
+    paymentWarning.style.display = 'none';
+    return;
+  }
+
+  const diasRestantes = diferencaEmDias(proximaData, hoje);
+
+  paymentSection.style.display = 'block';
+  paymentText.textContent = `Sua próxima data de pagamento é: ${formatarDataBR(proximaData)} caso
+  não tenha pago ainda o mês atual.`;
+
+  if (diasRestantes >= 0 && diasRestantes <= 3) {
+    paymentWarning.style.display = 'flex';
+
+    let mensagemAviso = '';
+
+    if (diasRestantes === 0) {
+      mensagemAviso = 'Seu pagamento vence hoje.';
+    } else if (diasRestantes === 1) {
+      mensagemAviso = 'Falta 1 dia para o pagamento.';
+    } else {
+      mensagemAviso = `Faltam ${diasRestantes} dias para o pagamento.`;
+    }
+
+    paymentWarningText.textContent = mensagemAviso;
+
+    const chaveAviso = `${formatarDataBR(proximaData)}-${diasRestantes}`;
+    if (ultimoAvisoPagamento !== chaveAviso) {
+      ultimoAvisoPagamento = chaveAviso;
+      showToast('Aviso de pagamento', mensagemAviso, 4000);
+    }
+  } else {
+    paymentWarning.style.display = 'none';
+  }
+}
+
+
 /* ================================================= */
-/* Links protegidos (menu, botões, cards, qualquer) */
+/* Links protegidos */
 /* ================================================= */
 const linksProtegidos = document.querySelectorAll('[data-protegido]');
 
@@ -161,16 +323,17 @@ linksProtegidos.forEach((link) => {
   });
 });
 
+
 /* ===================== */
 /* Login / Logout */
 function atualizarBotao() {
+  const btnAtual = document.querySelector('.login-btn');
+  if (!btnAtual) return;
+
   const token = localStorage.getItem('tokenAluno');
 
-  // remove listeners antigos
-  loginBtn.replaceWith(loginBtn.cloneNode(true));
-  const novoBtn = document.querySelector('.login-btn');
-
-  if (!novoBtn) return;
+  const novoBtn = btnAtual.cloneNode(true);
+  btnAtual.replaceWith(novoBtn);
 
   if (token) {
     novoBtn.innerText = 'Logout';
@@ -189,15 +352,20 @@ function logoutAluno(e) {
   localStorage.removeItem('tokenAluno');
   localStorage.removeItem('nomeAluno');
   localStorage.removeItem('emailAluno');
+  localStorage.removeItem('dataMatriculaAluno');
+
+  ultimoAvisoPagamento = null;
 
   showToast('Logout', 'Você saiu da conta com sucesso!');
   atualizarBotao();
-  atualizarNomeAluno(); // ✅ volta pra "Aluno"
+  atualizarNomeAluno();
+  atualizarAvisoPagamento();
 }
 
 // Ajusta ao carregar a página
 atualizarBotao();
 atualizarNomeAluno();
+
 
 /* ===================== */
 /* Formulário de login */
@@ -212,7 +380,6 @@ loginForm?.addEventListener('submit', async (e) => {
 
   if (!email || !senha || !submitBtn) return;
 
-  // 🔄 Ativa loading
   submitBtn.classList.add('loading');
   submitBtn.disabled = true;
   email.disabled = true;
@@ -229,18 +396,28 @@ loginForm?.addEventListener('submit', async (e) => {
     });
 
     const data = await response.json();
+    console.log('RESPOSTA LOGIN:', data);
 
     if (response.ok) {
-      // ✅ guarda dados como no StormFit
       localStorage.setItem('tokenAluno', data.token);
       localStorage.setItem('nomeAluno', data.nome);
       localStorage.setItem('emailAluno', data.email);
+
+      if (data.data_matricula) {
+        const dataLimpa = String(data.data_matricula).split('T')[0];
+        localStorage.setItem('dataMatriculaAluno', dataLimpa);
+      } else {
+        localStorage.removeItem('dataMatriculaAluno');
+      }
+
+      ultimoAvisoPagamento = null;
 
       showToast('Bem-vindo!', `Olá ${data.nome}, você entrou com sucesso!`);
       fecharModal();
 
       atualizarBotao();
-      atualizarNomeAluno(); // ✅ troca o nome no "Olá, ..."
+      atualizarNomeAluno();
+      atualizarAvisoPagamento();
 
       loginForm.reset?.();
     } else {
@@ -250,7 +427,6 @@ loginForm?.addEventListener('submit', async (e) => {
     console.error('Erro ao logar:', error);
     showToast('Erro!', 'Não foi possível conectar ao servidor.');
   } finally {
-    // 🔁 Volta estado normal
     submitBtn.classList.remove('loading');
     submitBtn.disabled = false;
     email.disabled = false;
@@ -258,9 +434,9 @@ loginForm?.addEventListener('submit', async (e) => {
   }
 });
 
+
 /* ===================== */
-/* Abre modal se veio sem token */
-/* ===================== */
+/* DOMContentLoaded */
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
 
@@ -269,13 +445,14 @@ window.addEventListener('DOMContentLoaded', () => {
     showToast('Sessão expirada', 'Faça login para continuar');
   }
 
-  // ✅ garante que atualiza nome e botão também aqui
-   atualizarBotao();
+  atualizarBotao();
   atualizarNomeAluno();
+  atualizarAvisoPagamento();
 });
 
+
 /* ===================== */
-/* ⚡ Lightning Canvas Effect (Bioenergia) */
+/* Lightning Canvas Effect */
 function initLightningCanvas() {
   const lightningCanvas = document.getElementById('lightning-canvas');
   if (!lightningCanvas) return;
@@ -290,9 +467,8 @@ function initLightningCanvas() {
   let animationId;
   let lastLightningTime = 0;
 
-  // Ajuste fino aqui:
-  const lightningInterval = 2600; // frequência base
-  const chance = 0.32;            // chance de aparecer a cada intervalo
+  const lightningInterval = 2600;
+  const chance = 0.32;
 
   function resizeCanvas() {
     lightningCanvas.width = window.innerWidth;
@@ -303,7 +479,9 @@ function initLightningCanvas() {
   window.addEventListener('resize', resizeCanvas);
 
   class Lightning {
-    constructor() { this.reset(); }
+    constructor() {
+      this.reset();
+    }
 
     reset() {
       this.x = Math.random() * lightningCanvas.width;
@@ -325,12 +503,15 @@ function initLightningCanvas() {
 
         this.segments.push({ x1: x, y1: y, x2: newX, y2: newY });
 
-        // ramificações
         if (Math.random() < 0.22 && this.segments.length > 2) {
           const branchX = newX + (Math.random() - 0.5) * 100;
           const branchY = newY + Math.random() * 70;
           this.segments.push({
-            x1: newX, y1: newY, x2: branchX, y2: branchY, isBranch: true
+            x1: newX,
+            y1: newY,
+            x2: branchX,
+            y2: branchY,
+            isBranch: true
           });
         }
 
@@ -348,7 +529,6 @@ function initLightningCanvas() {
       this.segments.forEach(seg => {
         const lineWidth = seg.isBranch ? 1 : 2.2;
 
-        // brilho amarelo/verde (Bioenergia)
         ctx.shadowColor = '#FACC15';
         ctx.shadowBlur = 22;
         ctx.strokeStyle = '#FFFFFF';
@@ -399,10 +579,12 @@ function initLightningCanvas() {
 
   window.addEventListener('beforeunload', () => cancelAnimationFrame(animationId));
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) cancelAnimationFrame(animationId);
-    else animate(performance.now());
+    if (document.hidden) {
+      cancelAnimationFrame(animationId);
+    } else {
+      animate(performance.now());
+    }
   });
 }
 
 initLightningCanvas();
-
