@@ -826,6 +826,11 @@ $("#editPeso").val(alunoSelecionado.peso);
       ? alunoSelecionado.data_matricula.split("T")[0]
       : ""
   );
+  $("#editDataVencimento").val(
+  alunoSelecionado.data_vencimento
+    ? alunoSelecionado.data_vencimento.split("T")[0]
+    : ""
+);
 
   fotoAntesUrlTemp = null;
   fotoDepoisUrlTemp = null;

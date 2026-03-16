@@ -858,6 +858,144 @@ footer {
   font-weight: 600;
 }
 
+.payment-methods-section {
+  padding: 0 1.25rem 4rem;
+}
+
+.payment-methods-container {
+  max-width: 1100px;
+  margin: 30px auto;
+  background: rgba(16, 20, 14, 0.55);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+}
+
+.payment-methods-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .75rem;
+}
+
+.payment-methods-header i {
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+
+.payment-methods-header h2 {
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.payment-methods-subtitle {
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+  font-size: 1rem;
+}
+
+.payment-methods-subtitle strong {
+  color: var(--accent);
+}
+
+.payment-methods-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.payment-method-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.2rem;
+  transition: transform var(--t), border-color var(--t);
+}
+
+.payment-method-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(250, 204, 21, 0.35);
+}
+
+.featured-payment {
+  border-color: rgba(250, 204, 21, 0.25);
+  box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.08);
+}
+
+.payment-method-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: .9rem;
+  background: linear-gradient(135deg, rgba(163, 230, 53, .18), rgba(250, 204, 21, .12));
+  color: var(--accent);
+  font-size: 1.25rem;
+}
+
+.payment-method-card h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: .4rem;
+}
+
+.payment-method-description {
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.pix-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(250, 204, 21, 0.18);
+  border-radius: 12px;
+  padding: .9rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.pix-label {
+  display: block;
+  font-size: .8rem;
+  color: var(--muted);
+  margin-bottom: .35rem;
+}
+
+.pix-box strong {
+  color: var(--text);
+  font-size: 1rem;
+  word-break: break-all;
+}
+
+.copy-pix-btn {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: .95rem 1rem;
+  cursor: pointer;
+  font-weight: 800;
+  color: #061007;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  box-shadow: var(--shadow-glow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  transition: transform var(--t), box-shadow var(--t);
+}
+
+.copy-pix-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 34px rgba(250, 204, 21, .42);
+}
+
+@media (min-width: 768px) {
+  .payment-methods-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 /* =========================
    FX Layer: Raios + Brasas
    ========================= */

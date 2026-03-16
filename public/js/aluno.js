@@ -139,6 +139,37 @@ function atualizarNomeAluno() {
   if (el) el.textContent = nome || 'Aluno';
 }
 
+function atualizarFormasPagamento() {
+  const token = localStorage.getItem('tokenAluno');
+  const section = document.getElementById('paymentMethodsSection');
+
+  if (!section) return;
+
+  section.style.display = token ? 'block' : 'none';
+}
+
+function configurarCopiaPix() {
+  const btn = document.getElementById('copyPixBtn');
+  const pixKeyEl = document.getElementById('pixKey');
+
+  if (!btn || !pixKeyEl) return;
+
+  btn.addEventListener('click', async () => {
+    const token = localStorage.getItem('tokenAluno');
+    if (!token) return;
+
+    const chavePix = pixKeyEl.textContent.trim();
+
+    try {
+      await navigator.clipboard.writeText(chavePix);
+      showToast('PIX copiado', 'A chave PIX foi copiada com sucesso!', 3000);
+    } catch (error) {
+      console.error('Erro ao copiar PIX:', error);
+      showToast('Erro', 'Não foi possível copiar a chave PIX.', 3000);
+    }
+  });
+}
+
 
 /* ===================== */
 /* Funções de pagamento */
@@ -150,6 +181,50 @@ function formatarDataBR(data) {
     month: '2-digit',
     year: 'numeric'
   });
+}
+
+function parseDiaVencimento(dataStr) {
+  if (!dataStr) return null;
+
+  const partes = String(dataStr).split("-");
+  if (partes.length !== 3) return null;
+
+  const dia = Number(partes[2]);
+  return Number.isNaN(dia) ? null : dia;
+}
+
+function getUltimoDiaDoMes(ano, mes) {
+  return new Date(ano, mes + 1, 0).getDate();
+}
+
+function calcularProximoVencimento(dataBaseVencimento) {
+  const diaBase = parseDiaVencimento(dataBaseVencimento);
+  if (!diaBase) return null;
+
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  let ano = hoje.getFullYear();
+  let mes = hoje.getMonth();
+
+  let diaDoMesAtual = Math.min(diaBase, getUltimoDiaDoMes(ano, mes));
+  let vencimento = new Date(ano, mes, diaDoMesAtual);
+  vencimento.setHours(0, 0, 0, 0);
+
+  if (vencimento < hoje) {
+    mes += 1;
+
+    if (mes > 11) {
+      mes = 0;
+      ano += 1;
+    }
+
+    const diaDoProximoMes = Math.min(diaBase, getUltimoDiaDoMes(ano, mes));
+    vencimento = new Date(ano, mes, diaDoProximoMes);
+    vencimento.setHours(0, 0, 0, 0);
+  }
+
+  return vencimento;
 }
 
 function diferencaEmDias(dataFutura, dataAtual) {
@@ -164,81 +239,12 @@ function diferencaEmDias(dataFutura, dataAtual) {
   return Math.ceil((d1 - d2) / umDia);
 }
 
-function getUltimoDiaDoMes(ano, mes) {
-  return new Date(ano, mes + 1, 0).getDate();
-}
-
-function parseDataMatricula(dataMatricula) {
-  if (!dataMatricula) return null;
-
-  const valor = String(dataMatricula).trim();
-
-  if (!valor || valor === 'undefined' || valor === 'null') {
-    return null;
-  }
-
-  // pega só a parte da data, ignorando hora
-  const somenteData = valor.includes('T') ? valor.split('T')[0] : valor;
-
-  const partes = somenteData.split('-');
-  if (partes.length !== 3) return null;
-
-  const ano = Number(partes[0]);
-  const mes = Number(partes[1]) - 1;
-  const dia = Number(partes[2]);
-
-  if (
-    Number.isNaN(ano) ||
-    Number.isNaN(mes) ||
-    Number.isNaN(dia) ||
-    mes < 0 ||
-    mes > 11 ||
-    dia < 1 ||
-    dia > 31
-  ) {
-    return null;
-  }
-
-  return { ano, mes, dia };
-}
-
-function calcularProximaDataPagamento(dataMatricula) {
-  const matricula = parseDataMatricula(dataMatricula);
-  if (!matricula) return null;
-
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-
-  const diaBase = matricula.dia;
-
-  let anoAtual = hoje.getFullYear();
-  let mesAtual = hoje.getMonth();
-
-  let diaMesAtual = Math.min(diaBase, getUltimoDiaDoMes(anoAtual, mesAtual));
-  let proximaData = new Date(anoAtual, mesAtual, diaMesAtual);
-
-  if (proximaData < hoje) {
-    mesAtual += 1;
-
-    if (mesAtual > 11) {
-      mesAtual = 0;
-      anoAtual += 1;
-    }
-
-    const diaProximoMes = Math.min(diaBase, getUltimoDiaDoMes(anoAtual, mesAtual));
-    proximaData = new Date(anoAtual, mesAtual, diaProximoMes);
-  }
-
-  if (isNaN(proximaData.getTime())) return null;
-
-  return proximaData;
-}
 
 let ultimoAvisoPagamento = null;
 
 function atualizarAvisoPagamento() {
   const token = localStorage.getItem('tokenAluno');
-  const dataMatricula = localStorage.getItem('dataMatriculaAluno');
+  const dataVencimento = localStorage.getItem('dataVencimentoAluno');
 
   const paymentSection = document.getElementById('paymentSection');
   const paymentText = document.getElementById('paymentText');
@@ -247,16 +253,18 @@ function atualizarAvisoPagamento() {
 
   if (!paymentSection || !paymentText || !paymentWarning || !paymentWarningText) return;
 
-  if (!token || !dataMatricula) {
+  if (!token || !dataVencimento) {
     paymentSection.style.display = 'none';
     paymentWarning.style.display = 'none';
     return;
   }
 
   const hoje = new Date();
-  const proximaData = calcularProximaDataPagamento(dataMatricula);
+  hoje.setHours(0, 0, 0, 0);
 
-  if (!proximaData) {
+  const proximaData = calcularProximoVencimento(dataVencimento);
+
+  if (!proximaData || isNaN(proximaData.getTime())) {
     paymentSection.style.display = 'none';
     paymentWarning.style.display = 'none';
     return;
@@ -265,8 +273,7 @@ function atualizarAvisoPagamento() {
   const diasRestantes = diferencaEmDias(proximaData, hoje);
 
   paymentSection.style.display = 'block';
-  paymentText.textContent = `Sua próxima data de pagamento é: ${formatarDataBR(proximaData)} caso
-  não tenha pago ainda o mês atual.`;
+  paymentText.textContent = `Sua próxima data de pagamento é: ${formatarDataBR(proximaData)}.`;
 
   if (diasRestantes >= 0 && diasRestantes <= 3) {
     paymentWarning.style.display = 'flex';
@@ -293,6 +300,21 @@ function atualizarAvisoPagamento() {
   }
 }
 
+function criarDataLocal(dataStr) {
+  if (!dataStr) return null;
+
+  const partes = String(dataStr).split('-');
+  if (partes.length !== 3) return null;
+
+  const ano = Number(partes[0]);
+  const mes = Number(partes[1]) - 1;
+  const dia = Number(partes[2]);
+
+  const data = new Date(ano, mes, dia);
+  data.setHours(0, 0, 0, 0);
+
+  return isNaN(data.getTime()) ? null : data;
+}
 
 /* ================================================= */
 /* Links protegidos */
@@ -360,6 +382,7 @@ function logoutAluno(e) {
   atualizarBotao();
   atualizarNomeAluno();
   atualizarAvisoPagamento();
+  atualizarFormasPagamento();
 }
 
 // Ajusta ao carregar a página
@@ -396,19 +419,19 @@ loginForm?.addEventListener('submit', async (e) => {
     });
 
     const data = await response.json();
-    console.log('RESPOSTA LOGIN:', data);
+    // console.log('RESPOSTA LOGIN:', data);
 
     if (response.ok) {
       localStorage.setItem('tokenAluno', data.token);
       localStorage.setItem('nomeAluno', data.nome);
       localStorage.setItem('emailAluno', data.email);
 
-if (data.data_vencimento) {
-  const dataLimpa = String(data.data_vencimento).split('T')[0];
-  localStorage.setItem('dataVencimentoAluno', dataLimpa);
-} else {
-  localStorage.removeItem('dataVencimentoAluno');
-}
+      if (data.data_vencimento) {
+        const dataLimpa = String(data.data_vencimento).split('T')[0];
+        localStorage.setItem('dataVencimentoAluno', dataLimpa);
+      } else {
+        localStorage.removeItem('dataVencimentoAluno');
+      }
 
       ultimoAvisoPagamento = null;
 
@@ -418,6 +441,7 @@ if (data.data_vencimento) {
       atualizarBotao();
       atualizarNomeAluno();
       atualizarAvisoPagamento();
+      atualizarFormasPagamento();
 
       loginForm.reset?.();
     } else {
@@ -448,6 +472,8 @@ window.addEventListener('DOMContentLoaded', () => {
   atualizarBotao();
   atualizarNomeAluno();
   atualizarAvisoPagamento();
+  atualizarFormasPagamento();
+  configurarCopiaPix();
 });
 
 
