@@ -352,7 +352,7 @@ function logoutAluno(e) {
   localStorage.removeItem('tokenAluno');
   localStorage.removeItem('nomeAluno');
   localStorage.removeItem('emailAluno');
-  localStorage.removeItem('dataMatriculaAluno');
+  localStorage.removeItem('dataVencimentoAluno');
 
   ultimoAvisoPagamento = null;
 
@@ -403,12 +403,12 @@ loginForm?.addEventListener('submit', async (e) => {
       localStorage.setItem('nomeAluno', data.nome);
       localStorage.setItem('emailAluno', data.email);
 
-      if (data.data_matricula) {
-        const dataLimpa = String(data.data_matricula).split('T')[0];
-        localStorage.setItem('dataMatriculaAluno', dataLimpa);
-      } else {
-        localStorage.removeItem('dataMatriculaAluno');
-      }
+if (data.data_vencimento) {
+  const dataLimpa = String(data.data_vencimento).split('T')[0];
+  localStorage.setItem('dataVencimentoAluno', dataLimpa);
+} else {
+  localStorage.removeItem('dataVencimentoAluno');
+}
 
       ultimoAvisoPagamento = null;
 

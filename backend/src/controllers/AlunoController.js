@@ -39,7 +39,8 @@ async autenticarAluno(req, res) {
             token,
             nome: aluno.nome,
             email: aluno.email,
-            data_matricula: aluno.data_matricula
+            data_matricula: aluno.data_matricula,
+            data_vencimento: aluno.data_vencimento
         });
 
     } catch (error) {
