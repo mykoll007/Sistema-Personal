@@ -274,6 +274,8 @@ async function criarAluno() {
   const nome = $("#novoNome").val();
   const foco = $("#novoFoco").val();
   const idade = $("#novaIdade").val();
+  const altura = $("#novaAltura").val();
+  const peso = $("#novoPeso").val();
   const data_matricula = $("#novaData").val();
 
   if (
@@ -302,6 +304,8 @@ async function criarAluno() {
         nome,
         foco,
         idade,
+        altura,
+        peso,
         data_matricula,
       }),
     });
@@ -330,6 +334,8 @@ async function editarAluno() {
   const nome = $("#editNome").val();
   const foco = $("#editFoco").val();
   const idade = $("#editIdade").val();
+  const altura = $("#editAltura").val();
+  const peso = $("#editPeso").val();
   const data_matricula = $("#editData").val();
 
   try {
@@ -341,7 +347,7 @@ async function editarAluno() {
     if (fileAntes) fotoAntesUrlTemp = await uploadImagemCloudinary(fileAntes);
     if (fileDepois) fotoDepoisUrlTemp = await uploadImagemCloudinary(fileDepois);
 
-    const payload = { email, nome, foco, idade, data_matricula };
+    const payload = { email, nome, foco, idade, altura, peso, data_matricula };
     if (fotoAntesUrlTemp) payload.foto_antes_url = fotoAntesUrlTemp;
     if (fotoDepoisUrlTemp) payload.foto_depois_url = fotoDepoisUrlTemp;
 
@@ -794,6 +800,8 @@ $("#dataTable tbody").on("click", ".btn-editar", function () {
   $("#editNome").val(alunoSelecionado.nome);
   $("#editFoco").val(alunoSelecionado.foco);
   $("#editIdade").val(alunoSelecionado.idade);
+  $("#editAltura").val(alunoSelecionado.altura);
+$("#editPeso").val(alunoSelecionado.peso);
   $("#editData").val(
     alunoSelecionado.data_matricula
       ? alunoSelecionado.data_matricula.split("T")[0]

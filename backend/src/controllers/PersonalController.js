@@ -245,7 +245,7 @@ class PersonalController {
 
     // 📌 ADICIONAR ALUNO (com email + senha)
     async adicionarAluno(request, response) {
-        const { email, senha, confirmarSenha, nome, foco, idade, data_matricula } = request.body;
+        const { email, senha, confirmarSenha, nome, foco, idade, altura, peso, data_matricula } = request.body;
         const personalId = request.personalId; // vem do token
 
         if (!personalId) {
@@ -272,6 +272,8 @@ class PersonalController {
                 nome,
                 foco,
                 idade,
+                altura,
+                peso,
                 data_matricula
             });
 
@@ -293,7 +295,7 @@ class PersonalController {
         try {
             const alunos = await database('alunos')
                 .where({ personal_id: personalId })
-                .select('id', 'email', 'nome', 'foco', 'idade', 'data_matricula', 'criado_em', 'foto_antes_url', 'foto_depois_url');
+                .select('id', 'email', 'nome', 'foco', 'idade', 'altura', 'peso', 'data_matricula', 'criado_em', 'foto_antes_url', 'foto_depois_url');
 
             return response.status(200).json(alunos);
         } catch (error) {
@@ -305,7 +307,7 @@ class PersonalController {
 async editarAluno(request, response) {
   const { id } = request.params;
   const personalId = request.personalId;
-  const { nome, email, foco, idade, data_matricula, foto_antes_url, foto_depois_url } = request.body;
+  const { nome, email, foco, idade, altura, peso, data_matricula, foto_antes_url, foto_depois_url } = request.body;
 
   if (!personalId) {
     return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
@@ -336,6 +338,8 @@ async editarAluno(request, response) {
       email: email ?? aluno.email,
       foco: foco ?? aluno.foco,
       idade: idade ?? aluno.idade,
+      altura: altura ?? aluno.altura,
+      peso: peso ?? aluno.peso,
       data_matricula: data_matricula ?? aluno.data_matricula
     };
 

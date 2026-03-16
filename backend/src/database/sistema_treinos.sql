@@ -30,6 +30,8 @@ CREATE TABLE alunos (
   nome VARCHAR(100) NOT NULL,
   foco VARCHAR(120) NOT NULL,
   idade INT NOT NULL,
+  altura DECIMAL(4,2) NOT NULL, -- Ex: 1.75
+  peso DECIMAL(5,2) NOT NULL,   -- Ex: 70.50
   data_matricula DATE NOT NULL,
 
   foto_antes_url VARCHAR(255) NULL,
