@@ -197,7 +197,7 @@ function getUltimoDiaDoMes(ano, mes) {
   return new Date(ano, mes + 1, 0).getDate();
 }
 
-function calcularProximoVencimento(dataBaseVencimento) {
+function calcularProximoVencimento(dataBaseVencimento, mesAtualPago = false) {
   const diaBase = parseDiaVencimento(dataBaseVencimento);
   if (!diaBase) return null;
 
@@ -208,10 +208,11 @@ function calcularProximoVencimento(dataBaseVencimento) {
   let mes = hoje.getMonth();
 
   let diaDoMesAtual = Math.min(diaBase, getUltimoDiaDoMes(ano, mes));
-  let vencimento = new Date(ano, mes, diaDoMesAtual);
-  vencimento.setHours(0, 0, 0, 0);
+  let vencimentoAtual = new Date(ano, mes, diaDoMesAtual);
+  vencimentoAtual.setHours(0, 0, 0, 0);
 
-  if (vencimento < hoje) {
+  // se o mês atual já foi pago, joga automaticamente para o próximo mês
+  if (mesAtualPago) {
     mes += 1;
 
     if (mes > 11) {
@@ -220,11 +221,14 @@ function calcularProximoVencimento(dataBaseVencimento) {
     }
 
     const diaDoProximoMes = Math.min(diaBase, getUltimoDiaDoMes(ano, mes));
-    vencimento = new Date(ano, mes, diaDoProximoMes);
-    vencimento.setHours(0, 0, 0, 0);
+    const vencimentoProximo = new Date(ano, mes, diaDoProximoMes);
+    vencimentoProximo.setHours(0, 0, 0, 0);
+
+    return vencimentoProximo;
   }
 
-  return vencimento;
+  // se ainda não pagou e o vencimento do mês já passou, continua mostrando o mês atual como referência vencida
+  return vencimentoAtual;
 }
 
 function diferencaEmDias(dataFutura, dataAtual) {
@@ -245,6 +249,7 @@ let ultimoAvisoPagamento = null;
 function atualizarAvisoPagamento() {
   const token = localStorage.getItem('tokenAluno');
   const dataVencimento = localStorage.getItem('dataVencimentoAluno');
+  const pagamentoMesAtual = localStorage.getItem('pagamentoMesAtual') === 'true';
 
   const paymentSection = document.getElementById('paymentSection');
   const paymentText = document.getElementById('paymentText');
@@ -262,7 +267,7 @@ function atualizarAvisoPagamento() {
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
 
-  const proximaData = calcularProximoVencimento(dataVencimento);
+  const proximaData = calcularProximoVencimento(dataVencimento, pagamentoMesAtual);
 
   if (!proximaData || isNaN(proximaData.getTime())) {
     paymentSection.style.display = 'none';
@@ -273,9 +278,11 @@ function atualizarAvisoPagamento() {
   const diasRestantes = diferencaEmDias(proximaData, hoje);
 
   paymentSection.style.display = 'block';
-  paymentText.textContent = `Sua próxima data de pagamento é: ${formatarDataBR(proximaData)}.`;
+  paymentText.textContent = pagamentoMesAtual
+    ? `Seu próximo pagamento será em: ${formatarDataBR(proximaData)}.`
+    : `Sua próxima data de pagamento é: ${formatarDataBR(proximaData)}.`;
 
-  if (diasRestantes >= 0 && diasRestantes <= 3) {
+  if (!pagamentoMesAtual && diasRestantes >= 0 && diasRestantes <= 3) {
     paymentWarning.style.display = 'flex';
 
     let mensagemAviso = '';
@@ -295,6 +302,9 @@ function atualizarAvisoPagamento() {
       ultimoAvisoPagamento = chaveAviso;
       showToast('Aviso de pagamento', mensagemAviso, 4000);
     }
+  } else if (!pagamentoMesAtual && diasRestantes < 0) {
+    paymentWarning.style.display = 'flex';
+    paymentWarningText.textContent = 'Seu pagamento está em atraso.';
   } else {
     paymentWarning.style.display = 'none';
   }
@@ -375,6 +385,7 @@ function logoutAluno(e) {
   localStorage.removeItem('nomeAluno');
   localStorage.removeItem('emailAluno');
   localStorage.removeItem('dataVencimentoAluno');
+  localStorage.removeItem('pagamentoMesAtual');
 
   ultimoAvisoPagamento = null;
 
@@ -432,6 +443,8 @@ loginForm?.addEventListener('submit', async (e) => {
       } else {
         localStorage.removeItem('dataVencimentoAluno');
       }
+
+      localStorage.setItem('pagamentoMesAtual', data.pagamento_mes_atual ? 'true' : 'false');
 
       ultimoAvisoPagamento = null;
 

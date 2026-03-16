@@ -175,28 +175,37 @@ async function carregarPersonalLogado(forceReload = false) {
    TABELA ALUNOS
 ============================================================ */
 function renderAlunos() {
+  const botoesAcoes = (a) => `
+    <a href="javascript:void(0)" class="btn btn-warning btn-circle btn-sm btn-treino" data-nome="${a.nome}">
+        <i class="fas fa-dumbbell"></i>
+    </a>
+
+    <a href="javascript:void(0)" class="btn btn-success btn-circle btn-sm btn-pagamento" data-id="${a.id}" data-nome="${a.nome}">
+        <i class="fas fa-dollar-sign"></i>
+    </a>
+
+    <a href="javascript:void(0)" class="btn btn-primary btn-circle btn-sm btn-editar" data-id="${a.id}">
+        <i class="fas fa-edit"></i>
+    </a>
+
+    <a href="javascript:void(0)" class="btn btn-danger btn-circle btn-sm btn-excluir" data-id="${a.id}" data-nome="${a.nome}">
+        <i class="fas fa-trash"></i>
+    </a>
+  `;
+
   if (dataTable) {
     dataTable.clear();
+
     alunos.forEach((a) => {
       dataTable.row.add([
         a.nome,
         a.foco,
         a.idade,
         formatarData(a.data_matricula),
-        `<a href="javascript:void(0)" class="btn btn-warning btn-circle btn-sm btn-treino" data-nome="${a.nome}">
-            <i class="fas fa-dumbbell"></i>
-         </a>
-          <a href="javascript:void(0)" class="btn btn-success btn-circle btn-sm btn-pagamento" data-id="${a.id}" data-nome="${a.nome}">
-            <i class="fas fa-dollar-sign"></i>
-         </a>
-         <a href="javascript:void(0)" class="btn btn-primary btn-circle btn-sm btn-editar" data-id="${a.id}">
-            <i class="fas fa-edit"></i>
-         </a>
-         <a href="javascript:void(0)" class="btn btn-danger btn-circle btn-sm btn-excluir" data-id="${a.id}" data-nome="${a.nome}">
-            <i class="fas fa-trash"></i>
-         </a>`,
+        botoesAcoes(a),
       ]);
     });
+
     dataTable.draw();
   } else {
     dataTable = $("#dataTable").DataTable({
@@ -205,16 +214,9 @@ function renderAlunos() {
         a.foco,
         a.idade,
         formatarData(a.data_matricula),
-        `<a href="javascript:void(0)" class="btn btn-warning btn-circle btn-sm btn-treino" data-nome="${a.nome}">
-            <i class="fas fa-dumbbell"></i>
-         </a>
-         <a href="javascript:void(0)" class="btn btn-primary btn-circle btn-sm btn-editar" data-id="${a.id}">
-            <i class="fas fa-edit"></i>
-         </a>
-         <a href="javascript:void(0)" class="btn btn-danger btn-circle btn-sm btn-excluir" data-id="${a.id}" data-nome="${a.nome}">
-            <i class="fas fa-trash"></i>
-         </a>`,
+        botoesAcoes(a),
       ]),
+
       columns: [
         { title: "Nome" },
         { title: "Foco" },
@@ -222,12 +224,14 @@ function renderAlunos() {
         { title: "Data da Matrícula" },
         { title: "Ações", orderable: false, searchable: false },
       ],
+
       pageLength: 10,
       lengthChange: true,
       searching: true,
       ordering: true,
       info: true,
       autoWidth: false,
+
       language: {
         url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json",
         paginate: { previous: "Anterior", next: "Próximo" },

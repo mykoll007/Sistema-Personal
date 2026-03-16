@@ -35,12 +35,24 @@ async autenticarAluno(req, res) {
             { expiresIn: '1h' }
         );
 
+        const hoje = new Date();
+        const referencia_mes = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+
+        const pagamentoMesAtual = await database('aluno_pagamentos')
+            .where({
+                aluno_id: aluno.id,
+                referencia_mes,
+                status: 'pago'
+            })
+            .first();
+
         return res.status(200).json({
             token,
             nome: aluno.nome,
             email: aluno.email,
             data_matricula: aluno.data_matricula,
-            data_vencimento: aluno.data_vencimento
+            data_vencimento: aluno.data_vencimento,
+            pagamento_mes_atual: !!pagamentoMesAtual
         });
 
     } catch (error) {
