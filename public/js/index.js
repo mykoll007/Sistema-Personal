@@ -5,6 +5,7 @@ const CLOUDINARY_UPLOAD_PRESET_IMAGENS = "alunos_imagens";
 let alunos = [];
 let dataTable;
 let alunoSelecionado = null; // usado para edição e exclusão
+let alunoPagamentoSelecionado = null;
 let treinosSelecionados = [];
 let categorias = [];
 let alunoParaTreino = null;
@@ -184,6 +185,9 @@ function renderAlunos() {
         formatarData(a.data_matricula),
         `<a href="javascript:void(0)" class="btn btn-warning btn-circle btn-sm btn-treino" data-nome="${a.nome}">
             <i class="fas fa-dumbbell"></i>
+         </a>
+          <a href="javascript:void(0)" class="btn btn-success btn-circle btn-sm btn-pagamento" data-id="${a.id}" data-nome="${a.nome}">
+            <i class="fas fa-dollar-sign"></i>
          </a>
          <a href="javascript:void(0)" class="btn btn-primary btn-circle btn-sm btn-editar" data-id="${a.id}">
             <i class="fas fa-edit"></i>
@@ -379,6 +383,33 @@ async function editarAluno() {
     mostrarToast("Erro", err.message, "danger");
   } finally {
     setLoadingBotaoEditar(false);
+  }
+}
+
+async function marcarPagamentoAluno() {
+  if (!alunoPagamentoSelecionado) return;
+
+  setLoadingBotaoPagamento(true);
+
+  try {
+    const res = await authFetch(`${API_URL}/personal/alunos/${alunoPagamentoSelecionado.id}/pagamento`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Erro ao registrar pagamento");
+
+    mostrarToast("Sucesso", "Pagamento registrado com sucesso!", "success");
+    $("#modalPagamentoAluno").modal("hide");
+    alunoPagamentoSelecionado = null;
+
+    await carregarAlunos();
+  } catch (err) {
+    console.error(err);
+    mostrarToast("Erro", err.message, "danger");
+  } finally {
+    setLoadingBotaoPagamento(false);
   }
 }
 
@@ -795,6 +826,7 @@ function ativarDragOrdem() {
 $("#btnCriarAluno").on("click", criarAluno);
 $("#btnSalvarAluno").on("click", editarAluno);
 $("#btnConfirmarExcluir").on("click", excluirAluno);
+$("#btnConfirmarPagamento").on("click", marcarPagamentoAluno);
 
 $("#btnConfirmLogout").on("click", async function () {
   setLoadingBotaoLogout(true);
@@ -820,17 +852,17 @@ $("#dataTable tbody").on("click", ".btn-editar", function () {
   $("#editFoco").val(alunoSelecionado.foco);
   $("#editIdade").val(alunoSelecionado.idade);
   $("#editAltura").val(alunoSelecionado.altura);
-$("#editPeso").val(alunoSelecionado.peso);
+  $("#editPeso").val(alunoSelecionado.peso);
   $("#editData").val(
     alunoSelecionado.data_matricula
       ? alunoSelecionado.data_matricula.split("T")[0]
       : ""
   );
   $("#editDataVencimento").val(
-  alunoSelecionado.data_vencimento
-    ? alunoSelecionado.data_vencimento.split("T")[0]
-    : ""
-);
+    alunoSelecionado.data_vencimento
+      ? alunoSelecionado.data_vencimento.split("T")[0]
+      : ""
+  );
 
   fotoAntesUrlTemp = null;
   fotoDepoisUrlTemp = null;
@@ -858,6 +890,18 @@ $("#dataTable tbody").on("click", ".btn-excluir", function () {
   alunoSelecionado = alunos.find((a) => a.id === id);
   $("#nomeAlunoExcluir").text(nome);
   $("#modalExcluirAluno").modal("show");
+});
+
+/* ---------- Modal pagamento ---------- */
+$("#dataTable tbody").on("click", ".btn-pagamento", function () {
+  const id = $(this).data("id");
+  const nome = $(this).data("nome");
+
+  alunoPagamentoSelecionado = alunos.find((a) => a.id === id);
+  if (!alunoPagamentoSelecionado) return;
+
+  $("#nomeAlunoPagamento").text(nome);
+  $("#modalPagamentoAluno").modal("show");
 });
 
 /* ---------- Modal treinos (selecionar exercícios) ---------- */
@@ -1103,6 +1147,23 @@ function setLoadingBotaoSalvarConfig(loading) {
 
 function setLoadingBotaoLogout(loading) {
   const btn = document.getElementById("btnConfirmLogout");
+  if (!btn) return;
+  const text = btn.querySelector(".btn-text");
+  const spinner = btn.querySelector(".spinner-border");
+
+  if (loading) {
+    btn.disabled = true;
+    text.classList.add("d-none");
+    spinner.classList.remove("d-none");
+  } else {
+    btn.disabled = false;
+    text.classList.remove("d-none");
+    spinner.classList.add("d-none");
+  }
+}
+
+function setLoadingBotaoPagamento(loading) {
+  const btn = document.getElementById("btnConfirmarPagamento");
   if (!btn) return;
   const text = btn.querySelector(".btn-text");
   const spinner = btn.querySelector(".spinner-border");

@@ -394,6 +394,71 @@ class PersonalController {
         }
     }
 
+    async registrarPagamentoAluno(req, res) {
+    const { id } = req.params;
+    const personal_id = req.personalId;
+
+    try {
+        const aluno = await database('alunos')
+            .where({ id, personal_id })
+            .first();
+
+        if (!aluno) {
+            return res.status(403).json({
+                message: "Este aluno não pertence ao seu perfil."
+            });
+        }
+
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const referencia_mes = `${ano}-${mes}`;
+
+        const pagamentoExistente = await database('aluno_pagamentos')
+            .where({
+                aluno_id: id,
+                referencia_mes
+            })
+            .first();
+
+        if (pagamentoExistente) {
+            if (pagamentoExistente.status === 'pago') {
+                return res.status(400).json({
+                    message: "O pagamento deste mês já foi registrado."
+                });
+            }
+
+            await database('aluno_pagamentos')
+                .where({ id: pagamentoExistente.id })
+                .update({
+                    status: 'pago',
+                    pago_em: database.fn.now()
+                });
+
+            return res.status(200).json({
+                message: "Pagamento atualizado com sucesso!"
+            });
+        }
+
+        await database('aluno_pagamentos').insert({
+            aluno_id: id,
+            referencia_mes,
+            valor: 59.99,
+            status: 'pago',
+            pago_em: database.fn.now()
+        });
+
+        return res.status(201).json({
+            message: "Pagamento registrado com sucesso!"
+        });
+
+    } catch (error) {
+        console.error("Erro ao registrar pagamento:", error);
+        return res.status(500).json({
+            message: "Erro ao registrar pagamento."
+        });
+    }
+}
 
     async criarExercicio(request, response) {
         const { categoria_id, nome, descricao, video_url } = request.body;

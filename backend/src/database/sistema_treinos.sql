@@ -46,6 +46,26 @@ CREATE TABLE alunos (
 ) ENGINE=InnoDB;
 
 -- =====================================================
+-- ALUNO_PAGAMENTOS
+-- 1 linha = 1 pagamento mensal do aluno
+CREATE TABLE aluno_pagamentos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  aluno_id INT NOT NULL,
+  referencia_mes CHAR(7) NOT NULL,       -- ex: 2026-03
+  valor DECIMAL(10,2) NOT NULL DEFAULT 59.99,
+  status ENUM('pendente', 'pago') NOT NULL DEFAULT 'pago',
+  pago_em DATETIME NULL,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_pagamento_aluno
+    FOREIGN KEY (aluno_id) REFERENCES alunos(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT uniq_aluno_mes
+    UNIQUE (aluno_id, referencia_mes)
+) ENGINE=InnoDB;
+
+-- =====================================================
 -- CATEGORIAS
 -- =====================================================
 CREATE TABLE categorias (

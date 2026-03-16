@@ -410,7 +410,31 @@
             </div>
         </div>
     </div>
+    
+    <!-- Modal Pagamento -->
+    <div class="modal fade" id="modalPagamentoAluno" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Confirmar Pagamento</h5>
+            </div>
+
+            <div class="modal-body">
+                Deseja marcar o pagamento do mês atual para <strong id="nomeAlunoPagamento"></strong>?
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button class="btn btn-success" id="btnConfirmarPagamento">
+                    <span class="btn-text">Confirmar</span>
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
     <!-- Modal Excluir -->
     <div class="modal fade" id="modalExcluirAluno" tabindex="-1" aria-hidden="true">

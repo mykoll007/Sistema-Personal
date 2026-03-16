@@ -30,8 +30,8 @@ router.delete('/personal/alunos/treino/:aluno_id/:exercicio_id/:treino', verific
 router.post('/personal/alunos/treinos/salvar', verificarPersonal, PersonalController.salvarTreinosDoAluno);
 router.get('/personal/feedbacks', verificarPersonal, PersonalController.listarFeedbacks);
 
-
-
+// Rota para registrar pagamento do aluno (token obrigatório)
+router.post('/personal/alunos/:id/pagamento', verificarPersonal, PersonalController.registrarPagamentoAluno);
 
 
 
