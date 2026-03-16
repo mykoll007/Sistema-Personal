@@ -33,6 +33,7 @@ CREATE TABLE alunos (
   altura DECIMAL(4,2) NOT NULL, -- Ex: 1.75
   peso DECIMAL(5,2) NOT NULL,   -- Ex: 70.50
   data_matricula DATE NOT NULL,
+  data_vencimento DATE NULL,
 
   foto_antes_url VARCHAR(255) NULL,
   foto_depois_url VARCHAR(255) NULL,

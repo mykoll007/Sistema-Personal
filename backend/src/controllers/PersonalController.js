@@ -245,7 +245,7 @@ class PersonalController {
 
     // 📌 ADICIONAR ALUNO (com email + senha)
     async adicionarAluno(request, response) {
-        const { email, senha, confirmarSenha, nome, foco, idade, altura, peso, data_matricula } = request.body;
+        const { email, senha, confirmarSenha, nome, foco, idade, altura, peso, data_matricula, data_vencimento } = request.body;
         const personalId = request.personalId; // vem do token
 
         if (!personalId) {
@@ -274,7 +274,8 @@ class PersonalController {
                 idade,
                 altura,
                 peso,
-                data_matricula
+                data_matricula,
+                data_vencimento
             });
 
             return response.status(201).json({ message: "Aluno cadastrado com sucesso!" });
@@ -295,7 +296,7 @@ class PersonalController {
         try {
             const alunos = await database('alunos')
                 .where({ personal_id: personalId })
-                .select('id', 'email', 'nome', 'foco', 'idade', 'altura', 'peso', 'data_matricula', 'criado_em', 'foto_antes_url', 'foto_depois_url');
+                .select('id', 'email', 'nome', 'foco', 'idade', 'altura', 'peso', 'data_matricula', 'data_vencimento', 'criado_em', 'foto_antes_url', 'foto_depois_url');
 
             return response.status(200).json(alunos);
         } catch (error) {
@@ -304,60 +305,61 @@ class PersonalController {
         }
     }
 
-async editarAluno(request, response) {
-  const { id } = request.params;
-  const personalId = request.personalId;
-  const { nome, email, foco, idade, altura, peso, data_matricula, foto_antes_url, foto_depois_url } = request.body;
+    async editarAluno(request, response) {
+        const { id } = request.params;
+        const personalId = request.personalId;
+        const { nome, email, foco, idade, altura, peso, data_matricula, data_vencimento, foto_antes_url, foto_depois_url } = request.body;
 
-  if (!personalId) {
-    return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
-  }
+        if (!personalId) {
+            return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
+        }
 
-  try {
-    const aluno = await database("alunos")
-      .where({ id, personal_id: personalId })
-      .first();
+        try {
+            const aluno = await database("alunos")
+                .where({ id, personal_id: personalId })
+                .first();
 
-    if (!aluno) {
-      return response.status(403).json({ message: "Este aluno não pertence ao seu perfil." });
+            if (!aluno) {
+                return response.status(403).json({ message: "Este aluno não pertence ao seu perfil." });
+            }
+
+            if (email && email !== aluno.email) {
+                const emailExistente = await database("alunos")
+                    .where({ email })
+                    .andWhereNot("id", id)
+                    .first();
+
+                if (emailExistente) {
+                    return response.status(400).json({ message: "Este email já está em uso por outro aluno." });
+                }
+            }
+
+            const updateData = {
+                nome: nome ?? aluno.nome,
+                email: email ?? aluno.email,
+                foco: foco ?? aluno.foco,
+                idade: idade ?? aluno.idade,
+                altura: altura ?? aluno.altura,
+                peso: peso ?? aluno.peso,
+                data_matricula: data_matricula ?? aluno.data_matricula,
+                data_vencimento: data_vencimento ?? aluno.data_vencimento
+            };
+
+            // ✅ só atualiza se veio no body
+            if (foto_antes_url !== undefined) updateData.foto_antes_url = foto_antes_url;
+            if (foto_depois_url !== undefined) updateData.foto_depois_url = foto_depois_url;
+
+            await database("alunos")
+                .where({ id })
+                .update(updateData);
+
+            return response.status(200).json({ message: "Aluno atualizado com sucesso!" });
+
+        } catch (error) {
+            console.error("Erro ao editar aluno:", error);
+            return response.status(500).json({ message: "Erro ao atualizar aluno." });
+        }
     }
-
-    if (email && email !== aluno.email) {
-      const emailExistente = await database("alunos")
-        .where({ email })
-        .andWhereNot("id", id)
-        .first();
-
-      if (emailExistente) {
-        return response.status(400).json({ message: "Este email já está em uso por outro aluno." });
-      }
-    }
-
-    const updateData = {
-      nome: nome ?? aluno.nome,
-      email: email ?? aluno.email,
-      foco: foco ?? aluno.foco,
-      idade: idade ?? aluno.idade,
-      altura: altura ?? aluno.altura,
-      peso: peso ?? aluno.peso,
-      data_matricula: data_matricula ?? aluno.data_matricula
-    };
-
-    // ✅ só atualiza se veio no body
-    if (foto_antes_url !== undefined) updateData.foto_antes_url = foto_antes_url;
-    if (foto_depois_url !== undefined) updateData.foto_depois_url = foto_depois_url;
-
-    await database("alunos")
-      .where({ id })
-      .update(updateData);
-
-    return response.status(200).json({ message: "Aluno atualizado com sucesso!" });
-
-  } catch (error) {
-    console.error("Erro ao editar aluno:", error);
-    return response.status(500).json({ message: "Erro ao atualizar aluno." });
-  }
-}
 
 
     // 📌 Excluir aluno
@@ -884,198 +886,198 @@ async editarAluno(request, response) {
     }
 
 
-async salvarTreinosDoAluno(req, res) {
-  const { aluno_id, treinos } = req.body;
-  const personal_id = req.personalId;
+    async salvarTreinosDoAluno(req, res) {
+        const { aluno_id, treinos } = req.body;
+        const personal_id = req.personalId;
 
-  if (!aluno_id) {
-    return res.status(400).json({ message: "Aluno obrigatório." });
-  }
-
-  if (!Array.isArray(treinos)) {
-    return res.status(400).json({ message: "Treinos deve ser um array." });
-  }
-
-  try {
-    // ✅ garante que o aluno pertence ao personal
-    const aluno = await database("alunos")
-      .where({ id: aluno_id, personal_id })
-      .first();
-
-    if (!aluno) {
-      return res.status(403).json({ message: "Este aluno não pertence ao seu perfil." });
-    }
-
-    // ✅ Normaliza payload:
-    // - se vier expandido: [{exercicio_id, treino:"A", ...}]
-    // - se vier agrupado: [{exercicio_id, treinos:["A","C"], ...}]
-    const normalizados = [];
-    for (const t of treinos) {
-      const exercicio_id = Number(t.exercicio_id);
-
-      // aceita treino único ou array
-      const letras =
-        Array.isArray(t.treinos) ? t.treinos :
-        (t.treino ? [t.treino] : []);
-
-      for (const letra of letras) {
-        if (!letra) continue;
-
-        normalizados.push({
-          exercicio_id,
-          treino: String(letra).trim().toUpperCase(),
-          nome_treino: t.nome_treino ?? null,
-          series: Number(t.series) || 0,
-          repeticoes: Number(t.repeticoes) || 0,
-          peso: Number(t.peso) || 0,
-          intervalo_seg: Number(t.intervalo_seg) || 0,
-          descricao: t.descricao ?? null,
-          ordem: Number(t.ordem) || 0
-        });
-      }
-    }
-
-    // se nada veio, significa: remover tudo do aluno
-    // (opcional: você pode bloquear isso, se quiser)
-    await database.transaction(async (trx) => {
-      // 1) Buscar treinos atuais (por letra)
-      const treinosAtuais = await trx("aluno_treinos as at")
-        .join("alunos as a", "at.aluno_id", "a.id")
-        .where("at.aluno_id", aluno_id)
-        .andWhere("a.personal_id", personal_id)
-        .select("at.exercicio_id", "at.treino");
-
-      const atuais = treinosAtuais.map((t) => ({
-        exercicio_id: Number(t.exercicio_id),
-        treino: String(t.treino)
-      }));
-
-      const novos = normalizados.map((t) => ({
-        exercicio_id: Number(t.exercicio_id),
-        treino: String(t.treino)
-      }));
-
-      // 2) Deletar o que saiu
-      const paraDeletar = atuais.filter((a) =>
-        !novos.some((n) => n.exercicio_id === a.exercicio_id && n.treino === a.treino)
-      );
-
-      for (const t of paraDeletar) {
-        await trx("aluno_treinos")
-          .where({
-            aluno_id,
-            exercicio_id: t.exercicio_id,
-            treino: t.treino
-          })
-          .del();
-      }
-
-      // 3) Inserir/Atualizar os novos
-      //    - se existir, update
-      //    - se não existir, insert
-      for (const t of normalizados) {
-        const existe = atuais.some((a) =>
-          a.exercicio_id === t.exercicio_id && a.treino === t.treino
-        );
-
-        if (existe) {
-          await trx("aluno_treinos")
-            .where({
-              aluno_id,
-              exercicio_id: t.exercicio_id,
-              treino: t.treino
-            })
-            .update({
-              nome_treino: t.nome_treino || null,
-              series: t.series,
-              repeticoes: t.repeticoes,
-              peso: t.peso,
-              intervalo_seg: t.intervalo_seg,
-              descricao: t.descricao || null,
-              ordem: t.ordem
-            });
-        } else {
-          await trx("aluno_treinos")
-            .insert({
-              aluno_id,
-              exercicio_id: t.exercicio_id,
-              treino: t.treino,
-              nome_treino: t.nome_treino || null,
-              series: t.series,
-              repeticoes: t.repeticoes,
-              peso: t.peso,
-              intervalo_seg: t.intervalo_seg,
-              descricao: t.descricao || null,
-              ordem: t.ordem
-            });
+        if (!aluno_id) {
+            return res.status(400).json({ message: "Aluno obrigatório." });
         }
-      }
-    });
 
-    return res.status(200).json({ message: "Treinos salvos com sucesso!" });
+        if (!Array.isArray(treinos)) {
+            return res.status(400).json({ message: "Treinos deve ser um array." });
+        }
 
-  } catch (error) {
-    console.error("Erro ao salvar treinos do aluno:", error);
-    return res.status(500).json({ message: "Erro ao salvar treinos do aluno." });
-  }
-}
+        try {
+            // ✅ garante que o aluno pertence ao personal
+            const aluno = await database("alunos")
+                .where({ id: aluno_id, personal_id })
+                .first();
+
+            if (!aluno) {
+                return res.status(403).json({ message: "Este aluno não pertence ao seu perfil." });
+            }
+
+            // ✅ Normaliza payload:
+            // - se vier expandido: [{exercicio_id, treino:"A", ...}]
+            // - se vier agrupado: [{exercicio_id, treinos:["A","C"], ...}]
+            const normalizados = [];
+            for (const t of treinos) {
+                const exercicio_id = Number(t.exercicio_id);
+
+                // aceita treino único ou array
+                const letras =
+                    Array.isArray(t.treinos) ? t.treinos :
+                        (t.treino ? [t.treino] : []);
+
+                for (const letra of letras) {
+                    if (!letra) continue;
+
+                    normalizados.push({
+                        exercicio_id,
+                        treino: String(letra).trim().toUpperCase(),
+                        nome_treino: t.nome_treino ?? null,
+                        series: Number(t.series) || 0,
+                        repeticoes: Number(t.repeticoes) || 0,
+                        peso: Number(t.peso) || 0,
+                        intervalo_seg: Number(t.intervalo_seg) || 0,
+                        descricao: t.descricao ?? null,
+                        ordem: Number(t.ordem) || 0
+                    });
+                }
+            }
+
+            // se nada veio, significa: remover tudo do aluno
+            // (opcional: você pode bloquear isso, se quiser)
+            await database.transaction(async (trx) => {
+                // 1) Buscar treinos atuais (por letra)
+                const treinosAtuais = await trx("aluno_treinos as at")
+                    .join("alunos as a", "at.aluno_id", "a.id")
+                    .where("at.aluno_id", aluno_id)
+                    .andWhere("a.personal_id", personal_id)
+                    .select("at.exercicio_id", "at.treino");
+
+                const atuais = treinosAtuais.map((t) => ({
+                    exercicio_id: Number(t.exercicio_id),
+                    treino: String(t.treino)
+                }));
+
+                const novos = normalizados.map((t) => ({
+                    exercicio_id: Number(t.exercicio_id),
+                    treino: String(t.treino)
+                }));
+
+                // 2) Deletar o que saiu
+                const paraDeletar = atuais.filter((a) =>
+                    !novos.some((n) => n.exercicio_id === a.exercicio_id && n.treino === a.treino)
+                );
+
+                for (const t of paraDeletar) {
+                    await trx("aluno_treinos")
+                        .where({
+                            aluno_id,
+                            exercicio_id: t.exercicio_id,
+                            treino: t.treino
+                        })
+                        .del();
+                }
+
+                // 3) Inserir/Atualizar os novos
+                //    - se existir, update
+                //    - se não existir, insert
+                for (const t of normalizados) {
+                    const existe = atuais.some((a) =>
+                        a.exercicio_id === t.exercicio_id && a.treino === t.treino
+                    );
+
+                    if (existe) {
+                        await trx("aluno_treinos")
+                            .where({
+                                aluno_id,
+                                exercicio_id: t.exercicio_id,
+                                treino: t.treino
+                            })
+                            .update({
+                                nome_treino: t.nome_treino || null,
+                                series: t.series,
+                                repeticoes: t.repeticoes,
+                                peso: t.peso,
+                                intervalo_seg: t.intervalo_seg,
+                                descricao: t.descricao || null,
+                                ordem: t.ordem
+                            });
+                    } else {
+                        await trx("aluno_treinos")
+                            .insert({
+                                aluno_id,
+                                exercicio_id: t.exercicio_id,
+                                treino: t.treino,
+                                nome_treino: t.nome_treino || null,
+                                series: t.series,
+                                repeticoes: t.repeticoes,
+                                peso: t.peso,
+                                intervalo_seg: t.intervalo_seg,
+                                descricao: t.descricao || null,
+                                ordem: t.ordem
+                            });
+                    }
+                }
+            });
+
+            return res.status(200).json({ message: "Treinos salvos com sucesso!" });
+
+        } catch (error) {
+            console.error("Erro ao salvar treinos do aluno:", error);
+            return res.status(500).json({ message: "Erro ao salvar treinos do aluno." });
+        }
+    }
 
 
-    
-// 📌 Listar feedbacks do personal logado 
-async listarFeedbacks(request, response) {
-  const personal_id = request.personalId;
 
-  if (!personal_id) {
-    return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
-  }
+    // 📌 Listar feedbacks do personal logado 
+    async listarFeedbacks(request, response) {
+        const personal_id = request.personalId;
 
-  try {
-    const feedbacks = await database('feedbacks as f')
-      .join('alunos as a', 'f.aluno_id', 'a.id')
+        if (!personal_id) {
+            return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
+        }
 
-      // pega nome_treino do aluno para aquela letra (A/B/C...)
-      .leftJoin('aluno_treinos as at', function () {
-        this.on('at.aluno_id', '=', 'f.aluno_id')
-            .andOn('at.treino', '=', 'f.treino');
-      })
+        try {
+            const feedbacks = await database('feedbacks as f')
+                .join('alunos as a', 'f.aluno_id', 'a.id')
 
-      .where('f.personal_id', personal_id)
+                // pega nome_treino do aluno para aquela letra (A/B/C...)
+                .leftJoin('aluno_treinos as at', function () {
+                    this.on('at.aluno_id', '=', 'f.aluno_id')
+                        .andOn('at.treino', '=', 'f.treino');
+                })
 
-      .select(
-        'f.id',
-        'f.mensagem',
-        'f.estrelas',
-        'f.treino',
-        'f.criado_em',
-        'a.id as aluno_id',
-        'a.nome as aluno_nome',
-        'a.email as aluno_email'
-      )
+                .where('f.personal_id', personal_id)
 
-      // como tem várias linhas em aluno_treinos (por exercício),
-      // agregamos para 1 nome_treino por feedback
-      .max({ nome_treino: 'at.nome_treino' })
+                .select(
+                    'f.id',
+                    'f.mensagem',
+                    'f.estrelas',
+                    'f.treino',
+                    'f.criado_em',
+                    'a.id as aluno_id',
+                    'a.nome as aluno_nome',
+                    'a.email as aluno_email'
+                )
 
-      .groupBy(
-        'f.id',
-        'f.mensagem',
-        'f.estrelas',
-        'f.treino',
-        'f.criado_em',
-        'a.id',
-        'a.nome',
-        'a.email'
-      )
+                // como tem várias linhas em aluno_treinos (por exercício),
+                // agregamos para 1 nome_treino por feedback
+                .max({ nome_treino: 'at.nome_treino' })
 
-      .orderBy('f.criado_em', 'desc');
+                .groupBy(
+                    'f.id',
+                    'f.mensagem',
+                    'f.estrelas',
+                    'f.treino',
+                    'f.criado_em',
+                    'a.id',
+                    'a.nome',
+                    'a.email'
+                )
 
-    return response.status(200).json(feedbacks);
-  } catch (error) {
-    console.error("Erro ao listar feedbacks:", error);
-    return response.status(500).json({ message: "Erro ao buscar feedbacks." });
-  }
-}
+                .orderBy('f.criado_em', 'desc');
+
+            return response.status(200).json(feedbacks);
+        } catch (error) {
+            console.error("Erro ao listar feedbacks:", error);
+            return response.status(500).json({ message: "Erro ao buscar feedbacks." });
+        }
+    }
 
 
 

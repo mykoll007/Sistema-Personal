@@ -274,9 +274,10 @@ async function criarAluno() {
   const nome = $("#novoNome").val();
   const foco = $("#novoFoco").val();
   const idade = $("#novaIdade").val();
-  const altura = $("#novaAltura").val();
+  const altura = normalizarAltura($("#novaAltura").val());
   const peso = $("#novoPeso").val();
   const data_matricula = $("#novaData").val();
+  const data_vencimento = $("#novaDataVencimento").val();
 
   if (
     !email ||
@@ -285,7 +286,10 @@ async function criarAluno() {
     !nome ||
     !foco ||
     !idade ||
-    !data_matricula
+    !altura ||
+    !peso ||
+    !data_matricula ||
+    !data_vencimento
   ) {
     mostrarToast("Erro", "Preencha todos os campos!", "danger");
     return;
@@ -307,6 +311,7 @@ async function criarAluno() {
         altura,
         peso,
         data_matricula,
+        data_vencimento
       }),
     });
 
@@ -334,9 +339,10 @@ async function editarAluno() {
   const nome = $("#editNome").val();
   const foco = $("#editFoco").val();
   const idade = $("#editIdade").val();
-  const altura = $("#editAltura").val();
+  const altura = normalizarAltura($("#editAltura").val());
   const peso = $("#editPeso").val();
   const data_matricula = $("#editData").val();
+  const data_vencimento = $("#editDataVencimento").val();
 
   try {
     const fileAntes =
@@ -347,7 +353,7 @@ async function editarAluno() {
     if (fileAntes) fotoAntesUrlTemp = await uploadImagemCloudinary(fileAntes);
     if (fileDepois) fotoDepoisUrlTemp = await uploadImagemCloudinary(fileDepois);
 
-    const payload = { email, nome, foco, idade, altura, peso, data_matricula };
+    const payload = { email, nome, foco, idade, altura, peso, data_matricula, data_vencimento };
     if (fotoAntesUrlTemp) payload.foto_antes_url = fotoAntesUrlTemp;
     if (fotoDepoisUrlTemp) payload.foto_depois_url = fotoDepoisUrlTemp;
 
@@ -403,6 +409,19 @@ async function excluirAluno() {
   } finally {
     setLoadingBotaoExcluir(false);
   }
+}
+
+function normalizarAltura(valor) {
+  if (!valor) return null;
+
+  valor = valor.toString().replace(",", "."); // troca vírgula por ponto
+  let numero = parseFloat(valor);
+
+  if (numero > 3) {
+    numero = numero / 100; // ex: 177 → 1.77
+  }
+
+  return Number(numero.toFixed(2));
 }
 
 /* ============================================================
