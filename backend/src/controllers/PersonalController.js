@@ -65,6 +65,23 @@ async function resetarCreditosSeNecessario(trx, personalId) {
     return personal;
 }
 
+function criarDataLocal(dataStr) {
+    if (!dataStr) return null;
+
+    const dataLimpa = String(dataStr).split('T')[0];
+    const partes = dataLimpa.split('-');
+
+    if (partes.length !== 3) return null;
+
+    const ano = Number(partes[0]);
+    const mes = Number(partes[1]) - 1;
+    const dia = Number(partes[2]);
+
+    const data = new Date(ano, mes, dia);
+    data.setHours(0, 0, 0, 0);
+
+    return isNaN(data.getTime()) ? null : data;
+}
 
 class PersonalController {
 
@@ -593,6 +610,26 @@ class PersonalController {
                         pago_em: trx.fn.now()
                     });
                 }
+                const hojeLocal = new Date();
+hojeLocal.setHours(0, 0, 0, 0);
+
+const vencimentoAtual = aluno.data_vencimento
+    ? criarDataLocal(aluno.data_vencimento)
+    : null;
+
+const baseRenovacao = vencimentoAtual && vencimentoAtual > hojeLocal
+    ? vencimentoAtual
+    : hojeLocal;
+
+baseRenovacao.setMonth(baseRenovacao.getMonth() + 1);
+
+const novaDataVencimento = formatarDataSQL(baseRenovacao);
+
+await trx('alunos')
+    .where({ id })
+    .update({
+        data_vencimento: novaDataVencimento
+    });
 
                 await trx('personals')
                     .where({ id: personal_id })
@@ -628,16 +665,16 @@ class PersonalController {
     }
 async listarCreditosConsumidos(req, res) {
     const personal_id = req.personalId;
-    const { ciclo_inicio, ciclo_fim } = req.query;
+    const { data_inicio, data_fim } = req.query;
 
     try {
         let query = database('personal_creditos_consumidos')
             .where({ personal_id });
 
-        if (ciclo_inicio && ciclo_fim) {
+        if (data_inicio && data_fim) {
             query = query
-                .andWhere('ciclo_inicio', ciclo_inicio)
-                .andWhere('ciclo_fim', ciclo_fim);
+                .whereRaw('DATE(criado_em) >= ?', [data_inicio])
+                .whereRaw('DATE(criado_em) <= ?', [data_fim]);
         }
 
         const creditos = await query

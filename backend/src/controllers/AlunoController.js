@@ -2,74 +2,156 @@ const database = require('../database/connection');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-class AlunoController {
+function criarDataLocal(dataStr) {
+    if (!dataStr) return null;
 
-    // =========================
-    // Autenticar aluno
-    // =========================
-async autenticarAluno(req, res) {
-    const { email, senha } = req.body;
+    const dataLimpa = String(dataStr).split('T')[0];
+    const partes = dataLimpa.split('-');
 
-    if (!email || !senha) {
-        return res.status(400).json({ message: "Email e senha são obrigatórios." });
+    if (partes.length !== 3) return null;
+
+    const ano = Number(partes[0]);
+    const mes = Number(partes[1]) - 1;
+    const dia = Number(partes[2]);
+
+    const data = new Date(ano, mes, dia);
+    data.setHours(0, 0, 0, 0);
+
+    return isNaN(data.getTime()) ? null : data;
+}
+
+function adicionarDias(data, dias) {
+    const nova = new Date(data);
+    nova.setDate(nova.getDate() + dias);
+    nova.setHours(0, 0, 0, 0);
+    return nova;
+}
+
+function verificarAcessoAluno(dataVencimento) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const vencimento = criarDataLocal(dataVencimento);
+
+    if (!vencimento) {
+        return {
+            acesso_bloqueado: false,
+            data_expiracao_acesso: null
+        };
     }
 
-    try {
+    const limiteAcesso = adicionarDias(vencimento, 5);
+
+    return {
+        acesso_bloqueado: hoje > limiteAcesso,
+        data_expiracao_acesso: limiteAcesso.toISOString().split('T')[0]
+    };
+}
+
+class AlunoController {
+
+    async autenticarAluno(req, res) {
+        const { email, senha } = req.body;
+
+        if (!email || !senha) {
+            return res.status(400).json({ message: "Email e senha são obrigatórios." });
+        }
+
+        try {
+            const aluno = await database('alunos')
+                .where({ email })
+                .first();
+
+            if (!aluno) {
+                return res.status(401).json({ message: "Email ou senha incorretos." });
+            }
+
+            const validarSenha = await bcrypt.compare(senha, aluno.senha);
+
+            if (!validarSenha) {
+                return res.status(401).json({ message: "Email ou senha incorretos." });
+            }
+
+            const token = jwt.sign(
+                { aluno_id: aluno.id },
+                process.env.SALT,
+                { expiresIn: '1h' }
+            );
+
+            const hoje = new Date();
+            const referencia_mes = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+
+            const pagamentoMesAtual = await database('aluno_pagamentos')
+                .where({
+                    aluno_id: aluno.id,
+                    referencia_mes,
+                    status: 'pago'
+                })
+                .first();
+
+            const acesso = verificarAcessoAluno(aluno.data_vencimento);
+
+            return res.status(200).json({
+                token,
+                nome: aluno.nome,
+                email: aluno.email,
+                data_matricula: aluno.data_matricula,
+                data_vencimento: aluno.data_vencimento,
+                pagamento_mes_atual: !!pagamentoMesAtual,
+                acesso_bloqueado: acesso.acesso_bloqueado,
+                data_expiracao_acesso: acesso.data_expiracao_acesso
+            });
+
+        } catch (error) {
+            console.error("Erro ao autenticar aluno:", error);
+            return res.status(500).json({ message: "Erro ao tentar autenticar." });
+        }
+    }
+
+    async verificarBloqueioDoAluno(alunoId) {
         const aluno = await database('alunos')
-            .where({ email })
+            .where({ id: alunoId })
             .first();
 
         if (!aluno) {
-            return res.status(401).json({ message: "Email ou senha incorretos." });
+            return {
+                bloqueado: true,
+                status: 404,
+                message: "Aluno não encontrado.",
+                data_expiracao_acesso: null
+            };
         }
 
-        const validarSenha = await bcrypt.compare(senha, aluno.senha);
+        const acesso = verificarAcessoAluno(aluno.data_vencimento);
 
-        if (!validarSenha) {
-            return res.status(401).json({ message: "Email ou senha incorretos." });
+        if (acesso.acesso_bloqueado) {
+            return {
+                bloqueado: true,
+                status: 403,
+                message: `Seu acesso expirou em ${acesso.data_expiracao_acesso}. Aguarde a renovação do pagamento pelo professor.`,
+                data_expiracao_acesso: acesso.data_expiracao_acesso
+            };
         }
 
-        const token = jwt.sign(
-            { aluno_id: aluno.id },
-            process.env.SALT,
-            { expiresIn: '1h' }
-        );
-
-        const hoje = new Date();
-        const referencia_mes = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
-
-        const pagamentoMesAtual = await database('aluno_pagamentos')
-            .where({
-                aluno_id: aluno.id,
-                referencia_mes,
-                status: 'pago'
-            })
-            .first();
-
-        return res.status(200).json({
-            token,
-            nome: aluno.nome,
-            email: aluno.email,
-            data_matricula: aluno.data_matricula,
-            data_vencimento: aluno.data_vencimento,
-            pagamento_mes_atual: !!pagamentoMesAtual
-        });
-
-    } catch (error) {
-        console.error("Erro ao autenticar aluno:", error);
-        return res.status(500).json({ message: "Erro ao tentar autenticar." });
+        return {
+            bloqueado: false
+        };
     }
-}
-
-    // =========================
-    // Buscar treinos do aluno
-    // =========================
 
     async listarTreinos(req, res) {
         const alunoId = req.alunoId;
 
         try {
-            // 🔁 RESET AUTOMÁTICO (24h)
+            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+
+            if (bloqueio.bloqueado) {
+                return res.status(bloqueio.status).json({
+                    message: bloqueio.message,
+                    acesso_bloqueado: true,
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                });
+            }
+
             await database('aluno_treinos')
                 .where('status', 'finalizado')
                 .where('finalizado_em', '<', database.raw('NOW() - INTERVAL 1 DAY'))
@@ -78,7 +160,6 @@ async autenticarAluno(req, res) {
                     finalizado_em: null
                 });
 
-            // 📥 BUSCAR TREINOS
             const rows = await database('aluno_treinos')
                 .join('exercicios', 'aluno_treinos.exercicio_id', 'exercicios.id')
                 .join('categorias', 'exercicios.categoria_id', 'categorias.id')
@@ -94,20 +175,14 @@ async autenticarAluno(req, res) {
                     'aluno_treinos.repeticoes',
                     'aluno_treinos.peso',
                     'aluno_treinos.intervalo_seg',
-
-                    // ✅ NOVA (personalizada do aluno)
                     'aluno_treinos.descricao as descricao_personalizada',
-
-                    // ✅ ANTIGA (descrição do exercício)
                     'exercicios.descricao as descricao_exercicio',
-
                     'aluno_treinos.status',
                     'aluno_treinos.finalizado_em'
                 )
                 .where('aluno_treinos.aluno_id', alunoId)
                 .orderBy('aluno_treinos.treino')
                 .orderBy('aluno_treinos.ordem');
-
 
             return res.json(rows);
 
@@ -117,14 +192,21 @@ async autenticarAluno(req, res) {
         }
     }
 
-    // =========================
-    // Finalizar treino
-    // =========================
     async finalizarTreino(req, res) {
         const alunoId = req.alunoId;
         const { treinoId } = req.params;
 
         try {
+            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+
+            if (bloqueio.bloqueado) {
+                return res.status(bloqueio.status).json({
+                    message: bloqueio.message,
+                    acesso_bloqueado: true,
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                });
+            }
+
             const treino = await database('aluno_treinos')
                 .where({
                     id: treinoId,
@@ -136,7 +218,6 @@ async autenticarAluno(req, res) {
                 return res.status(404).json({ message: 'Treino não encontrado' });
             }
 
-            // 🔁 TOGGLE
             if (treino.status === 'finalizado') {
                 await database('aluno_treinos')
                     .where('id', treinoId)
@@ -148,7 +229,6 @@ async autenticarAluno(req, res) {
                 return res.json({ status: 'em_andamento' });
             }
 
-            // se estiver em andamento
             await database('aluno_treinos')
                 .where('id', treinoId)
                 .update({
@@ -164,10 +244,6 @@ async autenticarAluno(req, res) {
         }
     }
 
-    // =========================
-    // Aluno atualizar os treinos
-    // =========================
-
     async atualizarCargaTreino(req, res) {
         const alunoId = req.alunoId;
         const { treinoId } = req.params;
@@ -180,6 +256,16 @@ async autenticarAluno(req, res) {
         }
 
         try {
+            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+
+            if (bloqueio.bloqueado) {
+                return res.status(bloqueio.status).json({
+                    message: bloqueio.message,
+                    acesso_bloqueado: true,
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                });
+            }
+
             const linhasAfetadas = await database('aluno_treinos')
                 .where({
                     id: treinoId,
@@ -203,9 +289,6 @@ async autenticarAluno(req, res) {
         }
     }
 
-    // =========================
-    // Enviar feedback do aluno
-    // =========================
     async enviarFeedback(req, res) {
         const alunoId = req.alunoId;
         const { estrelas, mensagem, treino } = req.body;
@@ -217,7 +300,16 @@ async autenticarAluno(req, res) {
         }
 
         try {
-            // 🔎 Descobre o personal responsável
+            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+
+            if (bloqueio.bloqueado) {
+                return res.status(bloqueio.status).json({
+                    message: bloqueio.message,
+                    acesso_bloqueado: true,
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                });
+            }
+
             const aluno = await database('alunos')
                 .select('personal_id')
                 .where('id', alunoId)
@@ -227,7 +319,6 @@ async autenticarAluno(req, res) {
                 return res.status(404).json({ message: 'Aluno não encontrado' });
             }
 
-            // 📅 evita duplicidade no mesmo dia
             const hoje = new Date().toISOString().slice(0, 10);
 
             const jaExiste = await database('feedbacks')
@@ -244,7 +335,6 @@ async autenticarAluno(req, res) {
                 });
             }
 
-            // 💾 Salvar feedback
             await database('feedbacks').insert({
                 aluno_id: alunoId,
                 personal_id: aluno.personal_id,
@@ -261,16 +351,23 @@ async autenticarAluno(req, res) {
         }
     }
 
-    // =========================
-    // Verifica se ja foi avaliado no dia
-    // =========================
     async podeAvaliar(req, res) {
         const alunoId = req.alunoId;
         const { treino } = req.params;
 
-        const hoje = new Date().toISOString().slice(0, 10);
-
         try {
+            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+
+            if (bloqueio.bloqueado) {
+                return res.status(bloqueio.status).json({
+                    message: bloqueio.message,
+                    acesso_bloqueado: true,
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                });
+            }
+
+            const hoje = new Date().toISOString().slice(0, 10);
+
             const jaExiste = await database('feedbacks')
                 .where({
                     aluno_id: alunoId,
@@ -288,11 +385,6 @@ async autenticarAluno(req, res) {
             return res.status(500).json({ message: 'Erro ao verificar feedback' });
         }
     }
-
-
-
-
-
 }
 
 module.exports = new AlunoController();
