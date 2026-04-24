@@ -197,38 +197,8 @@ function getUltimoDiaDoMes(ano, mes) {
   return new Date(ano, mes + 1, 0).getDate();
 }
 
-function calcularProximoVencimento(dataBaseVencimento, mesAtualPago = false) {
-  const diaBase = parseDiaVencimento(dataBaseVencimento);
-  if (!diaBase) return null;
-
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-
-  let ano = hoje.getFullYear();
-  let mes = hoje.getMonth();
-
-  let diaDoMesAtual = Math.min(diaBase, getUltimoDiaDoMes(ano, mes));
-  let vencimentoAtual = new Date(ano, mes, diaDoMesAtual);
-  vencimentoAtual.setHours(0, 0, 0, 0);
-
-  // se o mês atual já foi pago, joga automaticamente para o próximo mês
-  if (mesAtualPago) {
-    mes += 1;
-
-    if (mes > 11) {
-      mes = 0;
-      ano += 1;
-    }
-
-    const diaDoProximoMes = Math.min(diaBase, getUltimoDiaDoMes(ano, mes));
-    const vencimentoProximo = new Date(ano, mes, diaDoProximoMes);
-    vencimentoProximo.setHours(0, 0, 0, 0);
-
-    return vencimentoProximo;
-  }
-
-  // se ainda não pagou e o vencimento do mês já passou, continua mostrando o mês atual como referência vencida
-  return vencimentoAtual;
+function calcularProximoVencimento(dataBaseVencimento) {
+  return criarDataLocal(dataBaseVencimento);
 }
 
 function diferencaEmDias(dataFutura, dataAtual) {
@@ -278,9 +248,7 @@ function atualizarAvisoPagamento() {
   const diasRestantes = diferencaEmDias(proximaData, hoje);
 
   paymentSection.style.display = 'block';
-  paymentText.textContent = pagamentoMesAtual
-    ? `Seu próximo pagamento será em: ${formatarDataBR(proximaData)}.`
-    : `Sua próxima data de pagamento é: ${formatarDataBR(proximaData)}.`;
+paymentText.textContent = `Sua data de vencimento é: ${formatarDataBR(proximaData)}.`;
 
   if (!pagamentoMesAtual && diasRestantes >= 0 && diasRestantes <= 3) {
     paymentWarning.style.display = 'flex';
@@ -386,6 +354,8 @@ function logoutAluno(e) {
   localStorage.removeItem('emailAluno');
   localStorage.removeItem('dataVencimentoAluno');
   localStorage.removeItem('pagamentoMesAtual');
+  localStorage.removeItem('acessoBloqueadoAluno');
+localStorage.removeItem('dataExpiracaoAcessoAluno');
 
   ultimoAvisoPagamento = null;
 
@@ -445,6 +415,13 @@ loginForm?.addEventListener('submit', async (e) => {
       }
 
       localStorage.setItem('pagamentoMesAtual', data.pagamento_mes_atual ? 'true' : 'false');
+      localStorage.setItem('acessoBloqueadoAluno', data.acesso_bloqueado ? 'true' : 'false');
+
+if (data.data_expiracao_acesso) {
+  localStorage.setItem('dataExpiracaoAcessoAluno', data.data_expiracao_acesso);
+} else {
+  localStorage.removeItem('dataExpiracaoAcessoAluno');
+}
 
       ultimoAvisoPagamento = null;
 

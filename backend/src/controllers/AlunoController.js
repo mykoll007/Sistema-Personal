@@ -48,6 +48,36 @@ function verificarAcessoAluno(dataVencimento) {
     };
 }
 
+async function verificarBloqueioDoAluno(alunoId) {
+    const aluno = await database('alunos')
+        .where({ id: alunoId })
+        .first();
+
+    if (!aluno) {
+        return {
+            bloqueado: true,
+            status: 404,
+            message: "Aluno não encontrado.",
+            data_expiracao_acesso: null
+        };
+    }
+
+    const acesso = verificarAcessoAluno(aluno.data_vencimento);
+
+    if (acesso.acesso_bloqueado) {
+        return {
+            bloqueado: true,
+            status: 403,
+            message: `Seu acesso expirou em ${acesso.data_expiracao_acesso}. Aguarde a renovação do pagamento pelo professor.`,
+            data_expiracao_acesso: acesso.data_expiracao_acesso
+        };
+    }
+
+    return {
+        bloqueado: false
+    };
+}
+
 class AlunoController {
 
     async autenticarAluno(req, res) {
@@ -108,41 +138,11 @@ class AlunoController {
         }
     }
 
-    async verificarBloqueioDoAluno(alunoId) {
-        const aluno = await database('alunos')
-            .where({ id: alunoId })
-            .first();
-
-        if (!aluno) {
-            return {
-                bloqueado: true,
-                status: 404,
-                message: "Aluno não encontrado.",
-                data_expiracao_acesso: null
-            };
-        }
-
-        const acesso = verificarAcessoAluno(aluno.data_vencimento);
-
-        if (acesso.acesso_bloqueado) {
-            return {
-                bloqueado: true,
-                status: 403,
-                message: `Seu acesso expirou em ${acesso.data_expiracao_acesso}. Aguarde a renovação do pagamento pelo professor.`,
-                data_expiracao_acesso: acesso.data_expiracao_acesso
-            };
-        }
-
-        return {
-            bloqueado: false
-        };
-    }
-
     async listarTreinos(req, res) {
         const alunoId = req.alunoId;
 
         try {
-            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+            const bloqueio = await verificarBloqueioDoAluno(alunoId);
 
             if (bloqueio.bloqueado) {
                 return res.status(bloqueio.status).json({
@@ -197,7 +197,7 @@ class AlunoController {
         const { treinoId } = req.params;
 
         try {
-            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+            const bloqueio = await verificarBloqueioDoAluno(alunoId);
 
             if (bloqueio.bloqueado) {
                 return res.status(bloqueio.status).json({
@@ -256,7 +256,7 @@ class AlunoController {
         }
 
         try {
-            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+            const bloqueio = await verificarBloqueioDoAluno(alunoId);
 
             if (bloqueio.bloqueado) {
                 return res.status(bloqueio.status).json({
@@ -300,7 +300,7 @@ class AlunoController {
         }
 
         try {
-            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+            const bloqueio = await verificarBloqueioDoAluno(alunoId);
 
             if (bloqueio.bloqueado) {
                 return res.status(bloqueio.status).json({
@@ -356,7 +356,7 @@ class AlunoController {
         const { treino } = req.params;
 
         try {
-            const bloqueio = await this.verificarBloqueioDoAluno(alunoId);
+            const bloqueio = await verificarBloqueioDoAluno(alunoId);
 
             if (bloqueio.bloqueado) {
                 return res.status(bloqueio.status).json({

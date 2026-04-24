@@ -1,12 +1,47 @@
 let treinoAtualFeedback = null;
 let estrelasSelecionadas = 0;
 
-function forcarLogout() {
+function limparDadosAluno() {
   localStorage.removeItem('tokenAluno');
   localStorage.removeItem('nomeAluno');
   localStorage.removeItem('emailAluno');
+  localStorage.removeItem('dataVencimentoAluno');
+  localStorage.removeItem('pagamentoMesAtual');
+  localStorage.removeItem('acessoBloqueadoAluno');
+  localStorage.removeItem('dataExpiracaoAcessoAluno');
+}
 
+function forcarLogout() {
+  limparDadosAluno();
   window.location.replace('aluno.html?login=1');
+}
+
+async function tratarRespostaBloqueioOuSessao(response) {
+  if (response.status === 401) {
+    forcarLogout();
+    return true;
+  }
+
+  if (response.status === 403) {
+    const data = await response.json().catch(() => ({}));
+
+    if (data.acesso_bloqueado) {
+      localStorage.setItem('acessoBloqueadoAluno', 'true');
+
+      if (data.data_expiracao_acesso) {
+        localStorage.setItem('dataExpiracaoAcessoAluno', data.data_expiracao_acesso);
+      }
+
+      alert(data.message || 'Seu acesso expirou. Aguarde a renovação do pagamento pelo professor.');
+      window.location.replace('aluno.html');
+      return true;
+    }
+
+    forcarLogout();
+    return true;
+  }
+
+  return false;
 }
 
 // 🔐 Proteção da página
@@ -25,8 +60,8 @@ if (nomeAluno) {
 /* Logout */
 const logoutBtn = document.getElementById('logoutBtn');
 
-logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem('tokenAluno');
+logoutBtn?.addEventListener('click', () => {
+  limparDadosAluno();
   window.location.replace('aluno.html');
 });
 
@@ -38,22 +73,18 @@ window.addEventListener('online', () => {
   console.log('Conexão restabelecida');
 });
 
-//Tratando erros
+// Tratando erros
 function tratarErroFetch(error) {
   if (!navigator.onLine) {
     alert('Você está sem conexão com a internet 📡');
-  }
-  else if (error instanceof TypeError) {
+  } else if (error instanceof TypeError) {
     alert('Você está sem conexão com a internet 📡');
-  }
-  else if (error.message) {
+  } else if (error.message) {
     alert(error.message);
-  }
-  else {
+  } else {
     alert('Ocorreu um erro inesperado.');
   }
 }
-
 
 /* ============================= */
 /* Buscar treinos do backend */
@@ -72,23 +103,19 @@ async function carregarTreinos() {
       }
     });
 
-    if (response.status === 401 || response.status === 403) {
-      forcarLogout();
-      return;
-    }
+    if (await tratarRespostaBloqueioOuSessao(response)) return;
 
     if (!response.ok) {
-      throw new Error('Erro ao buscar treinos');
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || 'Erro ao buscar treinos');
     }
 
     const dados = await response.json();
 
     renderizarTreinos(dados);
 
-    // ✅ Mostra treinos
     container.style.display = 'block';
 
-    // ⚠️ inicializa carrosséis APÓS renderização
     if (window.innerWidth <= 706) {
       iniciarCarrosseis();
     }
@@ -97,11 +124,9 @@ async function carregarTreinos() {
     console.error(error);
     tratarErroFetch(error);
   } finally {
-    // 🔄 Sempre esconde o loader
     loader.style.display = 'none';
   }
 }
-
 
 /* ============================= */
 /* Renderização */
@@ -110,7 +135,6 @@ function renderizarTreinos(dados) {
   const container = document.getElementById('treinos-container');
   container.innerHTML = '';
 
-  // 🔹 Agrupar por treino (A–E)
   const porTreino = {};
 
   dados.forEach(item => {
@@ -125,14 +149,10 @@ function renderizarTreinos(dados) {
     porTreino[item.treino][item.categoria].push(item);
   });
 
-  // Ordenar treinos A → E
   Object.keys(porTreino).sort().forEach(letraTreino => {
-
-    // Accordion container
     const accordion = document.createElement('div');
     accordion.classList.add('treino-accordion', `treino-${letraTreino}`);
 
-    // Descobre o nome do treino (pega o primeiro que tiver)
     let nomeTreino = '';
 
     Object.values(porTreino[letraTreino]).some(lista =>
@@ -145,7 +165,6 @@ function renderizarTreinos(dados) {
       })
     );
 
-    // Monta o título
     const tituloTreino = nomeTreino
       ? `Treino ${letraTreino} - ${nomeTreino}`
       : `Treino ${letraTreino}`;
@@ -162,7 +181,6 @@ function renderizarTreinos(dados) {
 
     const body = accordion.querySelector('.treino-body');
 
-    // 🔹 Dentro do treino, agrupa por categoria
     Object.keys(porTreino[letraTreino]).forEach(categoria => {
       const card = document.createElement('div');
       card.classList.add('treino-card');
@@ -185,109 +203,105 @@ function renderizarTreinos(dados) {
       const lista = document.createElement('div');
       lista.classList.add('exercicios-list');
 
-     porTreino[letraTreino][categoria]
-  .sort((a, b) => (a.ordem || 999) - (b.ordem || 999))
-  .forEach(ex => {
-    const item = document.createElement('div');
-    item.classList.add('exercicio-item');
+      porTreino[letraTreino][categoria]
+        .sort((a, b) => (a.ordem || 999) - (b.ordem || 999))
+        .forEach(ex => {
+          const item = document.createElement('div');
+          item.classList.add('exercicio-item');
 
-    const obsPersonal = (ex.descricao_personalizada?.trim() || '');
-    const descExercicio = (ex.descricao_exercicio?.trim() || '');
+          const obsPersonal = (ex.descricao_personalizada?.trim() || '');
+          const descExercicio = (ex.descricao_exercicio?.trim() || '');
 
-    item.innerHTML = `
-      <div class="exercicio-header">
-        <i class="fa-solid fa-dumbbell altere-icon" title="Exercício de força"></i>
-      </div>
+          item.innerHTML = `
+            <div class="exercicio-header">
+              <i class="fa-solid fa-dumbbell altere-icon" title="Exercício de força"></i>
+            </div>
 
-      <strong>${ex.exercicio}</strong>
+            <strong>${ex.exercicio}</strong>
 
-      <div class="exercicio-metricas">
+            <div class="exercicio-metricas">
 
-        <div class="metrica-box">
-          <span class="metrica-label">Séries</span>
-          <div class="metrica-controls">
-            <button class="btn-menos" onclick="alterarValor(${ex.id}, 'series', -1)">−</button>
-            <span id="series-${ex.id}">${ex.series}</span>
-            <button class="btn-mais" onclick="alterarValor(${ex.id}, 'series', 1)">+</button>
-          </div>
-        </div>
+              <div class="metrica-box">
+                <span class="metrica-label">Séries</span>
+                <div class="metrica-controls">
+                  <button class="btn-menos" onclick="alterarValor(${ex.id}, 'series', -1)">−</button>
+                  <span id="series-${ex.id}">${ex.series}</span>
+                  <button class="btn-mais" onclick="alterarValor(${ex.id}, 'series', 1)">+</button>
+                </div>
+              </div>
 
-        <div class="metrica-box">
-          <span class="metrica-label">Reps</span>
-          <div class="metrica-controls">
-            <button class="btn-menos" onclick="alterarValor(${ex.id}, 'repeticoes', -1)">−</button>
-            <span id="repeticoes-${ex.id}">${ex.repeticoes}</span>
-            <button class="btn-mais" onclick="alterarValor(${ex.id}, 'repeticoes', 1)">+</button>
-          </div>
-        </div>
+              <div class="metrica-box">
+                <span class="metrica-label">Reps</span>
+                <div class="metrica-controls">
+                  <button class="btn-menos" onclick="alterarValor(${ex.id}, 'repeticoes', -1)">−</button>
+                  <span id="repeticoes-${ex.id}">${ex.repeticoes}</span>
+                  <button class="btn-mais" onclick="alterarValor(${ex.id}, 'repeticoes', 1)">+</button>
+                </div>
+              </div>
 
-        <div class="metrica-box">
-          <span class="metrica-label">Peso (kg)</span>
-          <div class="metrica-controls">
-            <button class="btn-menos" onclick="alterarValor(${ex.id}, 'peso', -1)">−</button>
-            <span id="peso-${ex.id}">${ex.peso}</span>
-            <button class="btn-mais" onclick="alterarValor(${ex.id}, 'peso', 1)">+</button>
-          </div>
-        </div>
+              <div class="metrica-box">
+                <span class="metrica-label">Peso (kg)</span>
+                <div class="metrica-controls">
+                  <button class="btn-menos" onclick="alterarValor(${ex.id}, 'peso', -1)">−</button>
+                  <span id="peso-${ex.id}">${ex.peso}</span>
+                  <button class="btn-mais" onclick="alterarValor(${ex.id}, 'peso', 1)">+</button>
+                </div>
+              </div>
 
-        <div class="metrica-box">
-          <span class="metrica-label">Intervalo</span>
-          <div class="metrica-controls">
-            <button class="btn-menos" onclick="alterarValor(${ex.id}, 'intervalo_seg', -5)">−</button>
-            <span id="intervalo_seg-${ex.id}">${ex.intervalo_seg}</span>
-            <small>s</small>
-            <button class="btn-mais" onclick="alterarValor(${ex.id}, 'intervalo_seg', 5)">+</button>
-          </div>
-        </div>
+              <div class="metrica-box">
+                <span class="metrica-label">Intervalo</span>
+                <div class="metrica-controls">
+                  <button class="btn-menos" onclick="alterarValor(${ex.id}, 'intervalo_seg', -5)">−</button>
+                  <span id="intervalo_seg-${ex.id}">${ex.intervalo_seg}</span>
+                  <small>s</small>
+                  <button class="btn-mais" onclick="alterarValor(${ex.id}, 'intervalo_seg', 5)">+</button>
+                </div>
+              </div>
 
-      </div>
+            </div>
 
-      ${obsPersonal ? `
-        <p class="descricao-label descricao-personal">
-          <strong>Obs do personal:</strong> ${obsPersonal}
-        </p>
-      ` : ''}
+            ${obsPersonal ? `
+              <p class="descricao-label descricao-personal">
+                <strong>Obs do personal:</strong> ${obsPersonal}
+              </p>
+            ` : ''}
 
-      ${descExercicio ? `
-        <p class="descricao-label descricao-exercicio">
-          <strong>Descrição do exercício:</strong> ${descExercicio}
-        </p>
-      ` : ''}
+            ${descExercicio ? `
+              <p class="descricao-label descricao-exercicio">
+                <strong>Descrição do exercício:</strong> ${descExercicio}
+              </p>
+            ` : ''}
 
-      <div class="acoes-exercicio">
+            <div class="acoes-exercicio">
 
-        ${ex.video_url ? `
-          <button class="video-btn"
-            onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
-            Vídeo
-          </button>
-        ` : ''}
+              ${ex.video_url ? `
+                <button class="video-btn"
+                  onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
+                  Vídeo
+                </button>
+              ` : ''}
 
-        <button class="finalizar-btn ${ex.status === 'finalizado' ? 'finalizado' : ''}"
-          onclick="toggleFinalizarTreino(${ex.id}, this)">
-          ${ex.status === 'finalizado' ? '✅ Finalizado' : 'Finalizar'}
-        </button>
+              <button class="finalizar-btn ${ex.status === 'finalizado' ? 'finalizado' : ''}"
+                onclick="toggleFinalizarTreino(${ex.id}, this)">
+                ${ex.status === 'finalizado' ? '✅ Finalizado' : 'Finalizar'}
+              </button>
 
-      </div>
-    `;
+            </div>
+          `;
 
-    lista.appendChild(item);
-  });
-
+          lista.appendChild(item);
+        });
 
       const viewport = document.createElement('div');
-viewport.classList.add('carousel-viewport');
-viewport.appendChild(lista);
-card.appendChild(viewport);
+      viewport.classList.add('carousel-viewport');
+      viewport.appendChild(lista);
+      card.appendChild(viewport);
 
       const inner = body.querySelector('.treino-body-inner');
       inner.appendChild(card);
     });
 
-    // Toggle do accordion
     accordion.querySelector('.treino-header').addEventListener('click', () => {
-
-      // Fecha todos os outros accordions
       document.querySelectorAll('.treino-body.aberto').forEach(outroBody => {
         if (outroBody !== body) {
           outroBody.classList.remove('aberto');
@@ -295,7 +309,6 @@ card.appendChild(viewport);
         }
       });
 
-      // Toggle do atual
       body.classList.toggle('aberto');
       accordion.querySelector('.treino-header').classList.toggle('ativo');
     });
@@ -303,7 +316,6 @@ card.appendChild(viewport);
     container.appendChild(accordion);
   });
 }
-
 
 async function toggleFinalizarTreino(treinoId, botao) {
   try {
@@ -317,24 +329,19 @@ async function toggleFinalizarTreino(treinoId, botao) {
       }
     );
 
-    if (response.status === 401 || response.status === 403) {
-      forcarLogout();
-      return;
-    }
+    if (await tratarRespostaBloqueioOuSessao(response)) return;
 
     if (!response.ok) {
-      throw new Error('Erro ao atualizar treino');
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || 'Erro ao atualizar treino');
     }
 
     const data = await response.json();
 
     if (data.status === 'finalizado') {
-
-      // 1️⃣ primeiro marca como finalizado
       botao.classList.add('finalizado');
       botao.innerHTML = '✅ Finalizado';
 
-      // 2️⃣ depois verifica se o treino inteiro terminou
       const accordion = botao.closest('.treino-accordion');
       const classes = accordion.className;
       const match = classes.match(/treino-([A-Z])/);
@@ -390,10 +397,7 @@ async function verificarTreinoConcluido(letraTreino) {
       }
     );
 
-    if (response.status === 401 || response.status === 403) {
-      forcarLogout();
-      return;
-    }
+    if (await tratarRespostaBloqueioOuSessao(response)) return;
 
     if (!response.ok) return;
 
@@ -422,7 +426,6 @@ function alterarValor(treinoId, campo, delta) {
 
   span.innerText = novoValor;
 
-  // ✅ SALVA NO BACKEND
   atualizarTreinoBackend(treinoId, campo, novoValor);
 }
 
@@ -443,13 +446,11 @@ async function atualizarTreinoBackend(treinoId, campo, valor) {
       }
     );
 
-    if (response.status === 401 || response.status === 403) {
-      forcarLogout();
-      return;
-    }
+    if (await tratarRespostaBloqueioOuSessao(response)) return;
 
     if (!response.ok) {
-      throw new Error('Erro ao atualizar treino');
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || 'Erro ao atualizar treino');
     }
 
   } catch (error) {
@@ -458,7 +459,7 @@ async function atualizarTreinoBackend(treinoId, campo, valor) {
   }
 }
 
-//Sistema de estrelas ⭐
+// Sistema de estrelas ⭐
 document.querySelectorAll('#starsContainer i').forEach(star => {
   star.addEventListener('click', () => {
     estrelasSelecionadas = parseInt(star.dataset.value);
@@ -474,12 +475,12 @@ document.querySelectorAll('#starsContainer i').forEach(star => {
 });
 
 // Fechar modal de feedback
-document.getElementById('cancelarFeedback').addEventListener('click', () => {
+document.getElementById('cancelarFeedback')?.addEventListener('click', () => {
   document.getElementById('feedbackModal').style.display = 'none';
 });
 
 // Enviar feedback
-document.getElementById('enviarFeedback').addEventListener('click', async () => {
+document.getElementById('enviarFeedback')?.addEventListener('click', async () => {
   const erro = document.getElementById('erroEstrelas');
 
   if (estrelasSelecionadas === 0) {
@@ -507,19 +508,14 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
       }
     );
 
-    if (response.status === 401 || response.status === 403) {
-      forcarLogout();
-      return;
-    }
+    if (await tratarRespostaBloqueioOuSessao(response)) return;
 
     if (!response.ok) {
-      throw new Error('Erro ao enviar feedback');
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || 'Erro ao enviar feedback');
     }
 
-    // fecha modal de feedback
     document.getElementById('feedbackModal').style.display = 'none';
-
-    // abre modal de agradecimento
     document.getElementById('obrigadoModal').style.display = 'flex';
 
   } catch (error) {
@@ -529,7 +525,7 @@ document.getElementById('enviarFeedback').addEventListener('click', async () => 
 });
 
 // Fechar modal de obrigado
-document.getElementById('fecharObrigado').addEventListener('click', () => {
+document.getElementById('fecharObrigado')?.addEventListener('click', () => {
   document.getElementById('obrigadoModal').style.display = 'none';
 });
 
@@ -543,7 +539,6 @@ function abrirModalVideo(videoUrl, titulo) {
 
   title.innerText = titulo;
 
-  // Se a URL começar com http, usa direto, senão concatena com localhost
   video.src = videoUrl.startsWith('http')
     ? videoUrl
     : `https://sistema-personal.vercel.app${videoUrl}?t=${Date.now()}`;
