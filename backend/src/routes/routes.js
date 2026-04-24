@@ -32,6 +32,7 @@ router.get('/personal/feedbacks', verificarPersonal, PersonalController.listarFe
 
 // Rota para registrar pagamento do aluno (token obrigatório)
 router.post('/personal/alunos/:id/pagamento', verificarPersonal, PersonalController.registrarPagamentoAluno);
+router.get('/personal/creditos/consumidos', verificarPersonal, PersonalController.listarCreditosConsumidos);
 
 
 

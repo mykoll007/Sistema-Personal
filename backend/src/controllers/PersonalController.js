@@ -244,28 +244,53 @@ class PersonalController {
     }
 
     // 📌 ADICIONAR ALUNO (com email + senha)
-    async adicionarAluno(request, response) {
-        const { email, senha, confirmarSenha, nome, foco, idade, altura, peso, data_matricula, data_vencimento } = request.body;
-        const personalId = request.personalId; // vem do token
+async adicionarAluno(request, response) {
+    const {
+        email,
+        senha,
+        confirmarSenha,
+        nome,
+        foco,
+        idade,
+        altura,
+        peso,
+        data_matricula,
+        data_vencimento
+    } = request.body;
 
-        if (!personalId) {
-            return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
-        }
+    const personalId = request.personalId;
 
-        if (senha !== confirmarSenha) {
-            return response.status(400).json({ message: "As senhas não coincidem." });
-        }
+    if (!personalId) {
+        return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
+    }
 
-        try {
-            // Verifica email já cadastrado
-            const existe = await database('alunos').where({ email }).first();
+    if (senha !== confirmarSenha) {
+        return response.status(400).json({ message: "As senhas não coincidem." });
+    }
+
+    try {
+        await database.transaction(async trx => {
+            const personal = await trx('personals')
+                .where({ id: personalId })
+                .first();
+
+            if (!personal) {
+                throw { status: 404, message: "Personal não encontrado." };
+            }
+
+            if (personal.creditos_disponiveis <= 0) {
+                throw { status: 400, message: "Você não possui créditos disponíveis." };
+            }
+
+            const existe = await trx('alunos').where({ email }).first();
+
             if (existe) {
-                return response.status(400).json({ message: "Email já está cadastrado!" });
+                throw { status: 400, message: "Email já está cadastrado!" };
             }
 
             const senhaHash = bcrypt.hashSync(senha, 10);
 
-            await database('alunos').insert({
+            const ids = await trx('alunos').insert({
                 personal_id: personalId,
                 email,
                 senha: senhaHash,
@@ -278,13 +303,34 @@ class PersonalController {
                 data_vencimento
             });
 
-            return response.status(201).json({ message: "Aluno cadastrado com sucesso!" });
+            const alunoId = ids[0];
 
-        } catch (error) {
-            console.error("Erro ao adicionar aluno:", error);
-            return response.status(500).json({ message: "Erro ao cadastrar aluno." });
+            await trx('personals')
+                .where({ id: personalId })
+                .decrement('creditos_disponiveis', 1);
+
+            await trx('personal_creditos_consumidos').insert({
+                personal_id: personalId,
+                aluno_id: alunoId,
+                aluno_nome: nome,
+                tipo: 'cadastro_aluno',
+                creditos_usados: 1,
+                estornavel_ate: trx.raw("DATE_ADD(NOW(), INTERVAL 3 DAY)")
+            });
+        });
+
+        return response.status(201).json({ message: "Aluno cadastrado com sucesso!" });
+
+    } catch (error) {
+        console.error("Erro ao adicionar aluno:", error);
+
+        if (error.status) {
+            return response.status(error.status).json({ message: error.message });
         }
+
+        return response.status(500).json({ message: "Erro ao cadastrar aluno." });
     }
+}
     // 📌 Listar todos os alunos de um personal
     async listarAlunos(request, response) {
         const personalId = request.personalId;
@@ -363,89 +409,133 @@ class PersonalController {
 
 
     // 📌 Excluir aluno
-    async excluirAluno(request, response) {
-        const { id } = request.params;
-        const personalId = request.personalId;
+  async excluirAluno(request, response) {
+    const { id } = request.params;
+    const personalId = request.personalId;
 
-        if (!personalId) {
-            return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
-        }
+    if (!personalId) {
+        return response.status(401).json({ message: "Token inválido! Personal não reconhecido." });
+    }
 
-        try {
-            // Verificar se o aluno pertence ao personal
-            const aluno = await database('alunos')
+    try {
+        await database.transaction(async trx => {
+            const aluno = await trx('alunos')
                 .where({ id, personal_id: personalId })
                 .first();
 
             if (!aluno) {
-                return response.status(403).json({ message: "Este aluno não pertence ao seu perfil." });
+                throw { status: 403, message: "Este aluno não pertence ao seu perfil." };
             }
 
-            // Deletar aluno
-            await database('alunos')
-                .where({ id })
+            const credito = await trx('personal_creditos_consumidos')
+                .where({
+                    personal_id: personalId,
+                    aluno_id: id,
+                    tipo: 'cadastro_aluno',
+                    estornado: 0
+                })
+                .whereRaw('NOW() <= estornavel_ate')
+                .first();
+
+            if (credito) {
+                await trx('personals')
+                    .where({ id: personalId })
+                    .increment('creditos_disponiveis', 1);
+
+                await trx('personal_creditos_consumidos')
+                    .where({ id: credito.id })
+                    .del();
+            }
+
+            await trx('alunos')
+                .where({ id, personal_id: personalId })
                 .del();
+        });
 
-            return response.status(200).json({ message: "Aluno excluído com sucesso!" });
+        return response.status(200).json({ message: "Aluno excluído com sucesso!" });
 
-        } catch (error) {
-            console.error("Erro ao excluir aluno:", error);
-            return response.status(500).json({ message: "Erro ao excluir aluno." });
+    } catch (error) {
+        console.error("Erro ao excluir aluno:", error);
+
+        if (error.status) {
+            return response.status(error.status).json({ message: error.message });
         }
-    }
 
-    async registrarPagamentoAluno(req, res) {
+        return response.status(500).json({ message: "Erro ao excluir aluno." });
+    }
+}
+
+   async registrarPagamentoAluno(req, res) {
     const { id } = req.params;
     const personal_id = req.personalId;
 
     try {
-        const aluno = await database('alunos')
-            .where({ id, personal_id })
-            .first();
+        await database.transaction(async trx => {
+            const personal = await trx('personals')
+                .where({ id: personal_id })
+                .first();
 
-        if (!aluno) {
-            return res.status(403).json({
-                message: "Este aluno não pertence ao seu perfil."
-            });
-        }
+            if (!personal) {
+                throw { status: 404, message: "Personal não encontrado." };
+            }
 
-        const hoje = new Date();
-        const ano = hoje.getFullYear();
-        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-        const referencia_mes = `${ano}-${mes}`;
+            if (personal.creditos_disponiveis <= 0) {
+                throw { status: 400, message: "Você não possui créditos disponíveis." };
+            }
 
-        const pagamentoExistente = await database('aluno_pagamentos')
-            .where({
-                aluno_id: id,
-                referencia_mes
-            })
-            .first();
+            const aluno = await trx('alunos')
+                .where({ id, personal_id })
+                .first();
 
-        if (pagamentoExistente) {
-            if (pagamentoExistente.status === 'pago') {
-                return res.status(400).json({
-                    message: "O pagamento deste mês já foi registrado."
+            if (!aluno) {
+                throw { status: 403, message: "Este aluno não pertence ao seu perfil." };
+            }
+
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const referencia_mes = `${ano}-${mes}`;
+
+            const pagamentoExistente = await trx('aluno_pagamentos')
+                .where({
+                    aluno_id: id,
+                    referencia_mes
+                })
+                .first();
+
+            if (pagamentoExistente && pagamentoExistente.status === 'pago') {
+                throw { status: 400, message: "O pagamento deste mês já foi registrado." };
+            }
+
+            if (pagamentoExistente) {
+                await trx('aluno_pagamentos')
+                    .where({ id: pagamentoExistente.id })
+                    .update({
+                        status: 'pago',
+                        pago_em: trx.fn.now()
+                    });
+            } else {
+                await trx('aluno_pagamentos').insert({
+                    aluno_id: id,
+                    referencia_mes,
+                    valor: 59.99,
+                    status: 'pago',
+                    pago_em: trx.fn.now()
                 });
             }
 
-            await database('aluno_pagamentos')
-                .where({ id: pagamentoExistente.id })
-                .update({
-                    status: 'pago',
-                    pago_em: database.fn.now()
-                });
+            await trx('personals')
+                .where({ id: personal_id })
+                .decrement('creditos_disponiveis', 1);
 
-            return res.status(200).json({
-                message: "Pagamento atualizado com sucesso!"
+            await trx('personal_creditos_consumidos').insert({
+                personal_id,
+                aluno_id: id,
+                aluno_nome: aluno.nome,
+                tipo: 'renovacao_pagamento',
+                creditos_usados: 1,
+                estornavel_ate: null
             });
-        }
-
-        await database('aluno_pagamentos').insert({
-            aluno_id: id,
-            referencia_mes,
-            valor: 59.99,
-            status: 'pago',
-            pago_em: database.fn.now()
         });
 
         return res.status(201).json({
@@ -454,8 +544,39 @@ class PersonalController {
 
     } catch (error) {
         console.error("Erro ao registrar pagamento:", error);
+
+        if (error.status) {
+            return res.status(error.status).json({ message: error.message });
+        }
+
         return res.status(500).json({
             message: "Erro ao registrar pagamento."
+        });
+    }
+}
+async listarCreditosConsumidos(req, res) {
+    const personal_id = req.personalId;
+
+    try {
+        const creditos = await database('personal_creditos_consumidos')
+            .where({ personal_id })
+            .select(
+                'id',
+                'aluno_id',
+                'aluno_nome',
+                'tipo',
+                'creditos_usados',
+                'estornavel_ate',
+                'criado_em'
+            )
+            .orderBy('criado_em', 'desc');
+
+        return res.status(200).json(creditos);
+
+    } catch (error) {
+        console.error("Erro ao listar créditos consumidos:", error);
+        return res.status(500).json({
+            message: "Erro ao listar créditos consumidos."
         });
     }
 }

@@ -162,6 +162,22 @@ async function carregarPersonalLogado(forceReload = false) {
     document.getElementById("nomePersonal").textContent = personal.nome;
     document.getElementById("fotoTopbar").src = fotoFinal;
 
+    const creditosEl = document.getElementById("creditosPersonal");
+    if (creditosEl) {
+      const creditos = personal.creditos_disponiveis ?? 0;
+      creditosEl.textContent = `${creditos}/100 créditos`;
+
+      creditosEl.classList.remove("badge-success", "badge-warning", "badge-danger");
+
+      if (creditos <= 0) {
+        creditosEl.classList.add("badge-danger");
+      } else if (creditos <= 10) {
+        creditosEl.classList.add("badge-warning");
+      } else {
+        creditosEl.classList.add("badge-success");
+      }
+    }
+
     cachePersonal = personal;
     return personal;
   } catch (err) {
@@ -329,7 +345,9 @@ async function criarAluno() {
     mostrarToast("Sucesso", "Aluno criado com sucesso!", "success");
     $("#modalCriarAluno").modal("hide");
     $("#formCriarAluno").trigger("reset");
-    carregarAlunos();
+    await carregarAlunos();
+    cachePersonal = null;
+    await carregarPersonalLogado(true);
   } catch (err) {
     console.error(err);
     mostrarToast("Erro", err.message, "danger");
@@ -409,6 +427,8 @@ async function marcarPagamentoAluno() {
     alunoPagamentoSelecionado = null;
 
     await carregarAlunos();
+    cachePersonal = null;
+    await carregarPersonalLogado(true);
   } catch (err) {
     console.error(err);
     mostrarToast("Erro", err.message, "danger");
@@ -437,7 +457,9 @@ async function excluirAluno() {
     $("#modalExcluirAluno").modal("hide");
 
     alunoSelecionado = null;
-    carregarAlunos();
+    await carregarAlunos();
+    cachePersonal = null;
+    await carregarPersonalLogado(true);
   } catch (err) {
     console.error(err);
     mostrarToast("Erro", err.message, "danger");
