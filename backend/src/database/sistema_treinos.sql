@@ -18,6 +18,7 @@ CREATE TABLE personals (
   foto_url VARCHAR(255) NULL,
 
   creditos_disponiveis INT NOT NULL DEFAULT 100,
+  creditos_reset_em DATE NULL, -- controle do ciclo (dia 10)
 
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
@@ -69,7 +70,7 @@ CREATE TABLE aluno_pagamentos (
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- CRÉDITOS CONSUMIDOS
+-- CRÉDITOS CONSUMIDOS (COM CICLO)
 -- =====================================================
 CREATE TABLE personal_creditos_consumidos (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -82,6 +83,9 @@ CREATE TABLE personal_creditos_consumidos (
   tipo ENUM('cadastro_aluno', 'renovacao_pagamento') NOT NULL,
 
   creditos_usados INT NOT NULL DEFAULT 1,
+
+  ciclo_inicio DATE NOT NULL,
+  ciclo_fim DATE NOT NULL,
 
   estornavel_ate DATETIME NULL,
   estornado TINYINT(1) NOT NULL DEFAULT 0,
