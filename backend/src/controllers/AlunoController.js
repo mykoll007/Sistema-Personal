@@ -5,6 +5,16 @@ const jwt = require('jsonwebtoken');
 function criarDataLocal(dataStr) {
     if (!dataStr) return null;
 
+    if (dataStr instanceof Date) {
+        const data = new Date(
+            dataStr.getFullYear(),
+            dataStr.getMonth(),
+            dataStr.getDate()
+        );
+        data.setHours(0, 0, 0, 0);
+        return data;
+    }
+
     const dataLimpa = String(dataStr).split('T')[0];
     const partes = dataLimpa.split('-');
 
@@ -18,6 +28,17 @@ function criarDataLocal(dataStr) {
     data.setHours(0, 0, 0, 0);
 
     return isNaN(data.getTime()) ? null : data;
+}
+
+function formatarDataBR(dataStr) {
+    const data = criarDataLocal(dataStr);
+    if (!data) return null;
+
+    const dia = String(data.getDate()).padStart(2, '0');
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const ano = data.getFullYear();
+
+    return `${dia}/${mes}/${ano}`;
 }
 
 function adicionarDias(data, dias) {
@@ -36,15 +57,22 @@ function verificarAcessoAluno(dataVencimento) {
     if (!vencimento) {
         return {
             acesso_bloqueado: false,
-            data_expiracao_acesso: null
+            data_expiracao_acesso: null,
+            data_expiracao_acesso_br: null
         };
     }
 
     const limiteAcesso = adicionarDias(vencimento, 5);
+    const bloqueado = hoje > limiteAcesso;
 
     return {
-        acesso_bloqueado: hoje > limiteAcesso,
-        data_expiracao_acesso: limiteAcesso.toISOString().split('T')[0]
+        acesso_bloqueado: bloqueado,
+        data_expiracao_acesso: [
+            limiteAcesso.getFullYear(),
+            String(limiteAcesso.getMonth() + 1).padStart(2, '0'),
+            String(limiteAcesso.getDate()).padStart(2, '0')
+        ].join('-'),
+        data_expiracao_acesso_br: formatarDataBR(limiteAcesso)
     };
 }
 
@@ -58,7 +86,8 @@ async function verificarBloqueioDoAluno(alunoId) {
             bloqueado: true,
             status: 404,
             message: "Aluno não encontrado.",
-            data_expiracao_acesso: null
+            data_expiracao_acesso: null,
+            data_expiracao_acesso_br: null
         };
     }
 
@@ -68,18 +97,16 @@ async function verificarBloqueioDoAluno(alunoId) {
         return {
             bloqueado: true,
             status: 403,
-            message: `Seu acesso expirou em ${acesso.data_expiracao_acesso}. Aguarde a renovação do pagamento pelo professor.`,
-            data_expiracao_acesso: acesso.data_expiracao_acesso
+            message: `Seu acesso expirou em ${acesso.data_expiracao_acesso_br || acesso.data_expiracao_acesso}. Aguarde a renovação do pagamento pelo professor.`,
+            data_expiracao_acesso: acesso.data_expiracao_acesso,
+            data_expiracao_acesso_br: acesso.data_expiracao_acesso_br
         };
     }
 
-    return {
-        bloqueado: false
-    };
+    return { bloqueado: false };
 }
 
 class AlunoController {
-
     async autenticarAluno(req, res) {
         const { email, senha } = req.body;
 
@@ -129,7 +156,8 @@ class AlunoController {
                 data_vencimento: aluno.data_vencimento,
                 pagamento_mes_atual: !!pagamentoMesAtual,
                 acesso_bloqueado: acesso.acesso_bloqueado,
-                data_expiracao_acesso: acesso.data_expiracao_acesso
+                data_expiracao_acesso: acesso.data_expiracao_acesso,
+                data_expiracao_acesso_br: acesso.data_expiracao_acesso_br
             });
 
         } catch (error) {
@@ -148,7 +176,8 @@ class AlunoController {
                 return res.status(bloqueio.status).json({
                     message: bloqueio.message,
                     acesso_bloqueado: true,
-                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso,
+                    data_expiracao_acesso_br: bloqueio.data_expiracao_acesso_br
                 });
             }
 
@@ -203,7 +232,8 @@ class AlunoController {
                 return res.status(bloqueio.status).json({
                     message: bloqueio.message,
                     acesso_bloqueado: true,
-                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso,
+                    data_expiracao_acesso_br: bloqueio.data_expiracao_acesso_br
                 });
             }
 
@@ -262,7 +292,8 @@ class AlunoController {
                 return res.status(bloqueio.status).json({
                     message: bloqueio.message,
                     acesso_bloqueado: true,
-                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso,
+                    data_expiracao_acesso_br: bloqueio.data_expiracao_acesso_br
                 });
             }
 
@@ -306,7 +337,8 @@ class AlunoController {
                 return res.status(bloqueio.status).json({
                     message: bloqueio.message,
                     acesso_bloqueado: true,
-                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso,
+                    data_expiracao_acesso_br: bloqueio.data_expiracao_acesso_br
                 });
             }
 
@@ -362,7 +394,8 @@ class AlunoController {
                 return res.status(bloqueio.status).json({
                     message: bloqueio.message,
                     acesso_bloqueado: true,
-                    data_expiracao_acesso: bloqueio.data_expiracao_acesso
+                    data_expiracao_acesso: bloqueio.data_expiracao_acesso,
+                    data_expiracao_acesso_br: bloqueio.data_expiracao_acesso_br
                 });
             }
 
