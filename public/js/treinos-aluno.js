@@ -16,6 +16,25 @@ function forcarLogout() {
   window.location.replace('aluno.html?login=1');
 }
 
+function mostrarModalBloqueio(mensagem) {
+  const modal = document.getElementById('bloqueioModal');
+  const texto = document.getElementById('bloqueioMensagem');
+  const btn = document.getElementById('bloqueioBtn');
+
+  if (!modal || !texto || !btn) {
+    alert(mensagem || 'Seu acesso está bloqueado.');
+    window.location.replace('aluno.html');
+    return;
+  }
+
+  texto.innerText = mensagem || 'Seu acesso está bloqueado. Aguarde a renovação do pagamento pelo professor.';
+  modal.style.display = 'flex';
+
+  btn.onclick = () => {
+    window.location.replace('aluno.html');
+  };
+}
+
 async function tratarRespostaBloqueioOuSessao(response) {
   if (response.status === 401) {
     forcarLogout();
@@ -32,8 +51,10 @@ async function tratarRespostaBloqueioOuSessao(response) {
         localStorage.setItem('dataExpiracaoAcessoAluno', data.data_expiracao_acesso);
       }
 
-      alert(data.message || 'Seu acesso expirou. Aguarde a renovação do pagamento pelo professor.');
-      window.location.replace('aluno.html');
+      mostrarModalBloqueio(
+        data.message || 'Seu acesso expirou. Aguarde a renovação do pagamento pelo professor.'
+      );
+
       return true;
     }
 
@@ -44,7 +65,6 @@ async function tratarRespostaBloqueioOuSessao(response) {
   return false;
 }
 
-// 🔐 Proteção da página
 const token = localStorage.getItem('tokenAluno');
 
 if (!token) {
@@ -57,7 +77,6 @@ if (nomeAluno) {
   document.getElementById('nomeAluno').innerText = nomeAluno;
 }
 
-/* Logout */
 const logoutBtn = document.getElementById('logoutBtn');
 
 logoutBtn?.addEventListener('click', () => {
@@ -73,7 +92,6 @@ window.addEventListener('online', () => {
   console.log('Conexão restabelecida');
 });
 
-// Tratando erros
 function tratarErroFetch(error) {
   if (!navigator.onLine) {
     alert('Você está sem conexão com a internet 📡');
@@ -86,9 +104,6 @@ function tratarErroFetch(error) {
   }
 }
 
-/* ============================= */
-/* Buscar treinos do backend */
-/* ============================= */
 async function carregarTreinos() {
   const loader = document.getElementById('loader-treinos');
   const container = document.getElementById('treinos-container');
@@ -99,7 +114,7 @@ async function carregarTreinos() {
   try {
     const response = await fetch('https://sistema-personal.vercel.app/aluno/treinos', {
       headers: {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       }
     });
 
@@ -113,13 +128,11 @@ async function carregarTreinos() {
     const dados = await response.json();
 
     renderizarTreinos(dados);
-
     container.style.display = 'block';
 
     if (window.innerWidth <= 706) {
       iniciarCarrosseis();
     }
-
   } catch (error) {
     console.error(error);
     tratarErroFetch(error);
@@ -128,9 +141,6 @@ async function carregarTreinos() {
   }
 }
 
-/* ============================= */
-/* Renderização */
-/* ============================= */
 function renderizarTreinos(dados) {
   const container = document.getElementById('treinos-container');
   container.innerHTML = '';
@@ -138,13 +148,8 @@ function renderizarTreinos(dados) {
   const porTreino = {};
 
   dados.forEach(item => {
-    if (!porTreino[item.treino]) {
-      porTreino[item.treino] = {};
-    }
-
-    if (!porTreino[item.treino][item.categoria]) {
-      porTreino[item.treino][item.categoria] = [];
-    }
+    if (!porTreino[item.treino]) porTreino[item.treino] = {};
+    if (!porTreino[item.treino][item.categoria]) porTreino[item.treino][item.categoria] = [];
 
     porTreino[item.treino][item.categoria].push(item);
   });
@@ -185,13 +190,10 @@ function renderizarTreinos(dados) {
       const card = document.createElement('div');
       card.classList.add('treino-card');
 
-      card.innerHTML = `
-        <h4 class="categoria-titulo">${categoria}</h4>
-      `;
+      card.innerHTML = `<h4 class="categoria-titulo">${categoria}</h4>`;
 
       const controles = document.createElement('div');
       controles.classList.add('carousel-controls');
-
       controles.innerHTML = `
         <button class="carousel-prev">‹</button>
         <span class="carousel-indicator">1 / 1</span>
@@ -209,8 +211,8 @@ function renderizarTreinos(dados) {
           const item = document.createElement('div');
           item.classList.add('exercicio-item');
 
-          const obsPersonal = (ex.descricao_personalizada?.trim() || '');
-          const descExercicio = (ex.descricao_exercicio?.trim() || '');
+          const obsPersonal = ex.descricao_personalizada?.trim() || '';
+          const descExercicio = ex.descricao_exercicio?.trim() || '';
 
           item.innerHTML = `
             <div class="exercicio-header">
@@ -220,7 +222,6 @@ function renderizarTreinos(dados) {
             <strong>${ex.exercicio}</strong>
 
             <div class="exercicio-metricas">
-
               <div class="metrica-box">
                 <span class="metrica-label">Séries</span>
                 <div class="metrica-controls">
@@ -257,7 +258,6 @@ function renderizarTreinos(dados) {
                   <button class="btn-mais" onclick="alterarValor(${ex.id}, 'intervalo_seg', 5)">+</button>
                 </div>
               </div>
-
             </div>
 
             ${obsPersonal ? `
@@ -273,10 +273,8 @@ function renderizarTreinos(dados) {
             ` : ''}
 
             <div class="acoes-exercicio">
-
               ${ex.video_url ? `
-                <button class="video-btn"
-                  onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
+                <button class="video-btn" onclick="abrirModalVideo('${ex.video_url}', '${ex.exercicio}')">
                   Vídeo
                 </button>
               ` : ''}
@@ -285,7 +283,6 @@ function renderizarTreinos(dados) {
                 onclick="toggleFinalizarTreino(${ex.id}, this)">
                 ${ex.status === 'finalizado' ? '✅ Finalizado' : 'Finalizar'}
               </button>
-
             </div>
           `;
 
@@ -297,8 +294,7 @@ function renderizarTreinos(dados) {
       viewport.appendChild(lista);
       card.appendChild(viewport);
 
-      const inner = body.querySelector('.treino-body-inner');
-      inner.appendChild(card);
+      body.querySelector('.treino-body-inner').appendChild(card);
     });
 
     accordion.querySelector('.treino-header').addEventListener('click', () => {
@@ -319,15 +315,12 @@ function renderizarTreinos(dados) {
 
 async function toggleFinalizarTreino(treinoId, botao) {
   try {
-    const response = await fetch(
-      `https://sistema-personal.vercel.app/aluno/treinos/${treinoId}/finalizar`,
-      {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+    const response = await fetch(`https://sistema-personal.vercel.app/aluno/treinos/${treinoId}/finalizar`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    );
+    });
 
     if (await tratarRespostaBloqueioOuSessao(response)) return;
 
@@ -343,19 +336,13 @@ async function toggleFinalizarTreino(treinoId, botao) {
       botao.innerHTML = '✅ Finalizado';
 
       const accordion = botao.closest('.treino-accordion');
-      const classes = accordion.className;
-      const match = classes.match(/treino-([A-Z])/);
+      const match = accordion.className.match(/treino-([A-Z])/);
 
-      if (match) {
-        const letraTreino = match[1];
-        verificarTreinoConcluido(letraTreino);
-      }
-
+      if (match) verificarTreinoConcluido(match[1]);
     } else {
       botao.classList.remove('finalizado');
       botao.innerHTML = 'Finalizar';
     }
-
   } catch (error) {
     console.error(error);
     tratarErroFetch(error);
@@ -380,35 +367,23 @@ async function verificarTreinoConcluido(letraTreino) {
   if (!treinoAccordion) return;
 
   const botoes = treinoAccordion.querySelectorAll('.finalizar-btn');
-
-  const todosFinalizados = [...botoes].every(btn =>
-    btn.classList.contains('finalizado')
-  );
+  const todosFinalizados = [...botoes].every(btn => btn.classList.contains('finalizado'));
 
   if (!todosFinalizados) return;
 
   try {
-    const response = await fetch(
-      `https://sistema-personal.vercel.app/aluno/feedbacks/pode-avaliar/${letraTreino}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+    const response = await fetch(`https://sistema-personal.vercel.app/aluno/feedbacks/pode-avaliar/${letraTreino}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    );
+    });
 
     if (await tratarRespostaBloqueioOuSessao(response)) return;
-
     if (!response.ok) return;
 
     const data = await response.json();
 
-    if (data.podeAvaliar) {
-      abrirModalFeedback(letraTreino);
-    } else {
-      console.log('Feedback já enviado hoje para este treino.');
-    }
-
+    if (data.podeAvaliar) abrirModalFeedback(letraTreino);
   } catch (error) {
     console.error('Erro ao verificar se pode avaliar:', error);
   }
@@ -416,7 +391,6 @@ async function verificarTreinoConcluido(letraTreino) {
 
 function alterarValor(treinoId, campo, delta) {
   const span = document.getElementById(`${campo}-${treinoId}`);
-
   if (!span) return;
 
   let valorAtual = parseInt(span.innerText, 10);
@@ -425,26 +399,19 @@ function alterarValor(treinoId, campo, delta) {
   if (novoValor < 0) novoValor = 0;
 
   span.innerText = novoValor;
-
   atualizarTreinoBackend(treinoId, campo, novoValor);
 }
 
 async function atualizarTreinoBackend(treinoId, campo, valor) {
   try {
-    const response = await fetch(
-      `https://sistema-personal.vercel.app/aluno/treinos/${treinoId}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          campo: campo,
-          valor: valor
-        })
-      }
-    );
+    const response = await fetch(`https://sistema-personal.vercel.app/aluno/treinos/${treinoId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ campo, valor })
+    });
 
     if (await tratarRespostaBloqueioOuSessao(response)) return;
 
@@ -452,34 +419,27 @@ async function atualizarTreinoBackend(treinoId, campo, valor) {
       const data = await response.json().catch(() => ({}));
       throw new Error(data.message || 'Erro ao atualizar treino');
     }
-
   } catch (error) {
     console.error('Erro ao salvar alteração:', error);
     tratarErroFetch(error);
   }
 }
 
-// Sistema de estrelas ⭐
 document.querySelectorAll('#starsContainer i').forEach(star => {
   star.addEventListener('click', () => {
     estrelasSelecionadas = parseInt(star.dataset.value);
 
     document.querySelectorAll('#starsContainer i').forEach(s => {
       const val = parseInt(s.dataset.value);
-      s.className =
-        val <= estrelasSelecionadas
-          ? 'fa-solid fa-star'
-          : 'fa-regular fa-star';
+      s.className = val <= estrelasSelecionadas ? 'fa-solid fa-star' : 'fa-regular fa-star';
     });
   });
 });
 
-// Fechar modal de feedback
 document.getElementById('cancelarFeedback')?.addEventListener('click', () => {
   document.getElementById('feedbackModal').style.display = 'none';
 });
 
-// Enviar feedback
 document.getElementById('enviarFeedback')?.addEventListener('click', async () => {
   const erro = document.getElementById('erroEstrelas');
 
@@ -492,21 +452,18 @@ document.getElementById('enviarFeedback')?.addEventListener('click', async () =>
   const mensagem = document.getElementById('feedbackMensagem').value;
 
   try {
-    const response = await fetch(
-      'https://sistema-personal.vercel.app/aluno/feedbacks',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          treino: treinoAtualFeedback,
-          estrelas: estrelasSelecionadas,
-          mensagem: mensagem
-        })
-      }
-    );
+    const response = await fetch('https://sistema-personal.vercel.app/aluno/feedbacks', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        treino: treinoAtualFeedback,
+        estrelas: estrelasSelecionadas,
+        mensagem
+      })
+    });
 
     if (await tratarRespostaBloqueioOuSessao(response)) return;
 
@@ -517,21 +474,16 @@ document.getElementById('enviarFeedback')?.addEventListener('click', async () =>
 
     document.getElementById('feedbackModal').style.display = 'none';
     document.getElementById('obrigadoModal').style.display = 'flex';
-
   } catch (error) {
     console.error(error);
     tratarErroFetch(error);
   }
 });
 
-// Fechar modal de obrigado
 document.getElementById('fecharObrigado')?.addEventListener('click', () => {
   document.getElementById('obrigadoModal').style.display = 'none';
 });
 
-/* ============================= */
-/* MODAL VÍDEO */
-/* ============================= */
 function abrirModalVideo(videoUrl, titulo) {
   const modal = document.getElementById('videoModal');
   const video = document.getElementById('videoModalPlayer');
@@ -603,5 +555,4 @@ function iniciarCarrosseis() {
   });
 }
 
-// 🚀 Inicializa
 carregarTreinos();
